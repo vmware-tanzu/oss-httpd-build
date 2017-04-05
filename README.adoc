@@ -95,10 +95,33 @@ BLD target are updated.
 The result of this step is suitable for archive, or escrow and distribution
 to multiple build systems, beginning at the Makefile.build step.
 
+== Phase 3: Build Sources
 
+$ cd bld/
+$ make Makefile.build [BLD={type}] [TAG={-suffix}] all
 
+Build all components described by the manifest into the intermediate/
+temporary installation tree, using that intermediate tree as the component
+reference for later components.
 
+TAG defines the target directory and package name suffix such as a datestamp,
+checkout revision, or continuous build revision number. By default there is
+no suffix tag.
 
+This makefile is run after Makefile.gather and Makefile.preconfig and may
+be based on a snapshot of the build tree from those two previous steps from
+another continuous build job.
+
+This makefile must be run from the build (not source) subdirectory, such
+as bld/. The build tree uses the same component directory names as the
+source tree. The components are initially installed into the DESTDIR
+which is the ../dst/httpd component directory name with the TAG variable
+suffixed. SRCDIR references the source tree (typically ../src) and would
+typically not need to be overridden.
+
+The TARGET directory, /opt/pivotal/webserver/$(httpd_srcdir)$(TAG) would
+typically not be overridden, and refers to the anticipated installation
+path of the resulting package.
 
 
 

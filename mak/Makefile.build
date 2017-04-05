@@ -1,0 +1,160 @@
+# Pivotal OSS Build Schema for Apache HTTP Server
+#
+# Copyright (c) 2017 Pivotal Software, Inc.
+#
+# Pivotal licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# Makefile.build : Build all components described by the manifest in the
+#                  source tree.
+#
+# BLD defines the build type: release - candidate - snapshot - bleed
+# TAG defines the target directory and package name suffixes
+#
+# This makefile is run after Makefile.gather and Makefile.preconfig
+#
+# This makefile must be run from the build (not source) subdirectory,
+# the build tree uses the same component directory names as the source tree
+# The components are initially installed into the DESTDIR which is the
+# ../dst/httpd component directory name with the TAG variable suffixed.
+
+BLD=release
+TAG=
+SRCDIR=$(shell cd ..; pwd)/src
+
+include $(SRCDIR)/$(BLD)-manifest-vars
+
+DESTDIR=$(shell cd ..; pwd)/dst/$(httpd_srcdir)$(TAG)
+TARGET=/opt/pivotal/webserver/$(httpd_srcdir)$(TAG)
+
+all: build-httpd
+
+pre-build:
+	-mkdir -p $(DSTDIR) 2>/dev/null
+	echo $(SRCDIR)
+
+$(apr_srcdir)/Makefile: $(SRCDIR)/$(apr_srcdir)/configure
+	-mkdir $(apr_srcdir) 2>/dev/null
+	cd $(apr_srcdir) && \
+	  $(SRCDIR)/$(apr_srcdir)/configure \
+		 --prefix=$(DESTDIR) && \
+	cd ..
+
+build-apr: $(apr_srcdir)/Makefile
+	cd $(apr_srcdir) && \
+	  make -j && \
+	  make -j install && \
+	cd ..
+
+ifndef aprutil_srcdir
+with_aprutil=
+build-aprutil: build-apr
+
+else
+with_aprutil=--with-apr-util=$(DESTDIR)
+$(aprutil_srcdir)/Makefile: $(SRCDIR)/$(aprutil_srcdir)/configure
+	-mkdir $(aprutil_srcdir) 2>/dev/null
+	cd $(aprutil_srcdir) && \
+	  $(SRCDIR)/$(aprutil_srcdir)/configure \
+		 --with-apr=$(DESTDIR) \
+		 --prefix=$(DESTDIR) && \
+	cd ..
+
+build-aprutil: build-apr $(aprutil_srcdir)/Makefile
+	cd $(aprutil_srcdir) && \
+	  make -j && \
+	  make -j install && \
+	cd ..
+
+endif
+
+# Ancient openssl 1.0.2 did not support vpath builds
+ifeq "$(patsubst 1.0.%,,$(openssl_ver))" ""
+$(openssl_srcdir)/Makefile: $(SRCDIR)/$(openssl_srcdir)/Configure
+	-mkdir $(openssl_srcdir) 2>/dev/null
+	cp -prf $(SRCDIR)/$(openssl_srcdir)/* $(openssl_srcdir)/
+	cd $(openssl_srcdir) && \
+	  ./config --prefix=$(DESTDIR) -Wl,-rpath,$(TARGET) && \
+	cd ..
+
+else
+$(openssl_srcdir)/Makefile: $(SRCDIR)/$(openssl_srcdir)/Configure
+	-mkdir $(openssl_srcdir) 2>/dev/null
+	cd $(openssl_srcdir) && \
+	  $(SRCDIR)/$(openssl_srcdir)/config \
+		 --prefix=$(DESTDIR) -Wl,-rpath,$(TARGET) && \
+	cd ..
+
+endif
+
+build-openssl: $(openssl_srcdir)/Makefile
+	cd $(openssl_srcdir) && \
+	  make -j && \
+	  make -j install && \
+	cd ..
+
+$(brotli_srcdir)/Makefile: $(SRCDIR)/$(brotli_srcdir)
+	-mkdir $(brotli_srcdir) 2>/dev/null
+	cd $(brotli_srcdir) && \
+	  cmake -G "Unix Makefiles" \
+		-D CMAKE_INSTALL_PREFIX=$(DESTDIR) \
+		$(SRCDIR)/$(brotli_srcdir) && \
+	cd ..
+
+build-brotli: $(brotli_srcdir)/Makefile
+	cd $(brotli_srcdir) && \
+	  make -j && \
+	  make -j install && \
+	cd ..
+
+
+$(nghttp2_srcdir)/Makefile: $(SRCDIR)/$(nghttp2_srcdir)/configure
+	-mkdir $(nghttp2_srcdir) 2>/dev/null
+	cd $(nghttp2_srcdir) && \
+	  $(SRCDIR)/$(nghttp2_srcdir)/configure \
+		 --enable-lib-only \
+		 --prefix=$(DESTDIR) && \
+	cd ..
+
+build-nghttp2: $(nghttp2_srcdir)/Makefile
+	cd $(nghttp2_srcdir) && \
+	  make -j && \
+	  make -j install && \
+	cd ..
+
+$(httpd_srcdir)/Makefile: $(SRCDIR)/$(httpd_srcdir)/configure
+	-mkdir $(httpd_srcdir) 2>/dev/null
+	cd $(httpd_srcdir) && \
+	  $(SRCDIR)/$(httpd_srcdir)/configure \
+		 --prefix=$(DESTDIR) \
+		 --with-apr=$(DESTDIR) $(with_aprutil) \
+		 --with-openssl=$(DESTDIR) \
+		 --with-nghttp2=$(DESTDIR) \
+		 --with-brotli=$(DESTDIR) \
+		 --enable-mods-shared=all \
+		 --enable-mpms-shared=all \
+		 --enable-load-all-modules \
+		 --enable-unixd=static \
+		 --enable-version=static \
+		 --with-mpm=worker \
+		 --disable-ldap && \
+	cd ..
+
+build-httpd: build-apr build-aprutil build-openssl build-brotli build-nghttp2 \
+	     $(httpd_srcdir)/Makefile
+	cd $(httpd_srcdir) && \
+	  make -j && \
+	  make -j install && \
+	cd ..
+
+
+

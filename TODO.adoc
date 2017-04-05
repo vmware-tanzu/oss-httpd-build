@@ -17,5 +17,14 @@
 
  - Eliminate maintainer mode to avoid automake/autoconf on specific builds
 
+== Makefile.build
+
+ - Correct all dependencies for make -j parallel build
+
+ - Perform validation of system -dev/-devel components
+
+ - Allow brotli / openssl / nghttp2 to be omitted entirely once current
+
+ - Add pcre2 / expat / zlib component dependencies for bleed builds
 
 
