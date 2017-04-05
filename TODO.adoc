@@ -1,0 +1,12 @@
+= Items for correction or potential enhancement
+
+== Makefile.gather
+
+ - Handle multiple-releases-found with highest numbered (version semantics)
+
+ - Perform GPG source package validation
+
+ - svn export/git archive specific src snapshots (e.g. apr-1.6-r1789955)?
+
+
+

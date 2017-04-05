@@ -1,0 +1,83 @@
+= Pivotal OSS Build Schema for Apache HTTP Server
+
+Copyright (c) 2017 Pivotal Software, Inc.
+
+Pivotal licenses this file to You under the Apache License, Version 2.0
+(the "License"); you may not use this file except in compliance with
+the License.  You may obtain a copy of the License at
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+== Overview
+
+Builds are monolithic. These rely on many established
+components shipped with modern linux distributions
+which are reasonably stable and up to date. On Windows,
+every component must be built from source.
+
+The build target is /opt/pivotal/webserver/httpd-2.4/
+on Linux and Windows, but is relocatable. Each has a
+long pathname, e.g. httpd-2.4.25-$bldno/ which is
+symlinked from the 'expected' path. Non-release builds
+have additional pathname components such as -snapshot,
+-bleed, etc, and may have a TAG to distinguish two
+otherwise apparently identical builds.
+
+Build {pkg} reflects the particular component, either
+the offical designation (httpd-2.4.25/), an indication
+of interim packages (httpd-2.4.26-rc1/), or the exact
+province of the file (httpd-2.4.26-dev-r1872199/)
+
+Several {bld} schemas are expected; 'release' for the
+official packages, 'candidate' for packages anticipated
+for release, 'snapshot' for the working trees of the
+component's current maintenance trees, and 'bleed' for
+next-major or minor development trees.
+
+mak/                   Build script files
+
+src/                   Complete build sources
+  {pkg}/               Component source (for VPATH build)
+  pkgs/                Source component package downloads
+  {bld}-manifest-vars  Description of {pkg} names and versions for {bld}
+
+bld/                   Build trees of components by build type
+  {pkg}/               Component build tree (vpath or copied from src/)
+
+dst/                   Resulting intermediate binary packages
+  {httpd-pkg}{tag}/    Temporary installation for testing and relocation
+
+out/                   Final binary package
+  {httpd-pkg}{tag}/    Relocateable binaries for distribution
+
+
+== Phase 1: Gather Sources
+
+$ make Makefile.gather [BLD={type}] all
+
+BLD defines the build type: release - candidate - snapshot - bleed
+(case sensitive) where release is the default.
+
+Gathers source code packages or (source checkouts) for all packages
+into the source tree, and generates a version and directory name manifest.
+
+Each component is designed for persistence, if from git or svn it performs
+a fetch / update, if from a most recent release package, it fetches and
+unpacks the package. The source directory tree is designed for parallelism,
+the different build types may coexist in the same source tree.
+
+This makefile is run first from the source directory root (e.g. src/),
+and must be performed only upon updates to the source packages.
+The resulting manifest can be compared to the previously created manifest
+to determine if the sources have been updated.
+
+Makefile.prepare should follow immediately when the manifest changes.
+
+
+
+
