@@ -61,13 +61,12 @@ test-brotli: pre-test
 	  make test && \
 	cd ..
 
+endif
 
 test-nghttp2: pre-test
 	cd $(nghttp2_srcdir) && \
 	  make check && \
 	cd ..
-
-endif
 
 $(httpdtest_srcdir)/t/TEST: pre-test
 	-mkdir $(httpdtest_srcdir) 2>/dev/null
