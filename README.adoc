@@ -55,6 +55,22 @@ dst/                   Resulting intermediate binary packages
 out/                   Final binary package
   {httpd-pkg}{tag}/    Relocateable binaries for distribution
 
+== Platform Requirements
+
+The development toolchain / package group from the respective OS distribution
+is required to build this package. In addition, a number of stable, well
+maintained components are leveraged, rather than building and installing
+potentially conflicting versions.
+
+=== RedHat or Fedora Linux development package dependencies:
+
+yum groupinstall 'C Development Tools and Libraries'
+yum install expat-devel libxml2-devel lua-devel pcre-devel zlib-devel
+
+=== Ubuntu or Debian development package dependencies:
+
+apt-get install build-essential
+apt-get install libexpat1-dev libxml2-dev zlib1g-dev liblua5.2-0 libpcre3-dev
 
 == Phase 1: Gather Sources
 

@@ -1,11 +1,10 @@
 #!/usr/bin/bash
 #
 # Pivotal OSS httpd webserver build schema
-# Copyright (c) 2016 Pivotal Software, Inc.
+# Copyright (c) 2017 Pivotal Software, Inc.
 # Licensed under the Apache Software License 2.0
 # 
 # validate-depends.sh : Review required -dev[el] dependencies
-#
 
 if test -f /etc/redhat-release; then
     echo RedHat development package dependencies:
