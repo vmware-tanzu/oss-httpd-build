@@ -1,0 +1,92 @@
+# Pivotal OSS Build Schema for Apache HTTP Server
+#
+# Copyright (c) 2017 Pivotal Software, Inc.
+#
+# Pivotal licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# Makefile.preconfig : Prepare configuration scripts of packages from source
+#                      control where autoconf etc have not been invoked yet
+#                      (typical of checkouts from source control)
+#
+# BLD defines the build type: release - candidate - snapshot - bleed
+#
+# This makefile is run after Makefile.gather from the source directory root,
+# and must be performed only upon updates to the source packages as indicated
+# by manifest changes.
+#
+# The result of this step is suitable for archive or escrow and distribution
+# to multiple build systems, beginning at the Makefile.build step.
+
+BLD=release
+
+include $(BLD)-manifest-vars
+
+all: prepare-linux
+
+pre-preconfig:
+	echo Preparing $(BLD) Source Trees
+
+$(apr_srcdir)/configure: $(apr_srcdir)/configure.in 
+	cd $(apr_srcdir) && \
+	  ./buildconf && \
+	cd ..
+
+preconfig-apr: pre-preconfig $(apr_srcdir)/configure
+
+ifndef aprutil_srcdir
+with_aprutil=
+preconfig-aprutil: preconfig-apr
+
+else
+with_aprutil=--with-aprutil=../$(aprutil_srcdir)
+$(aprutil_srcdir)/configure: $(aprutil_srcdir)/configure.in 
+	cd $(aprutil_srcdir) && \
+	  ./buildconf --with-apr=../$(apr_srcdir) && \
+	cd ..
+
+preconfig-aprutil: preconfig-apr $(aprutil_srcdir)/configure
+
+endif
+
+$(httpd_srcdir)/configure: $(httpd_srcdir)/configure.in 
+	cd $(httpd_srcdir) && \
+	  ./buildconf --with-apr=../$(apr_srcdir) $(with_aprutil) && \
+	cd ..
+
+preconfig-httpd: preconfig-aprutil $(httpd_srcdir)/configure
+
+preconfig-httpdtest: pre-preconfig
+#	Apparently a noop
+
+preconfig-openssl: pre-preconfig
+	cd $(openssl_srcdir) && \
+	  ./Configure dist && \
+	  $(MAKE) depend && \
+	cd ..
+
+$(nghttp2_srcdir)/configure: $(nghttp2_srcdir)/configure.ac
+	cd $(nghttp2_srcdir) && \
+	   autoreconf -i && \
+	   automake && \
+	   autoconf && \
+	cd ..
+
+preconfig-nghttp2: pre-preconfig $(nghttp2_srcdir)/configure
+
+preconfig-brotli: pre-preconfig
+#	Noop, except perhaps if premake5/bazel support vpath builds
+
+prepare-linux: preconfig-apr preconfig-aprutil preconfig-httpd \
+		preconfig-httpdtest preconfig-openssl preconfig-nghttp2 \
+		preconfig-brotli
+

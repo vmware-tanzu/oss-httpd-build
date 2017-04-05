@@ -58,6 +58,7 @@ out/                   Final binary package
 
 == Phase 1: Gather Sources
 
+$ cd src/
 $ make Makefile.gather [BLD={type}] all
 
 BLD defines the build type: release - candidate - snapshot - bleed
@@ -76,7 +77,27 @@ and must be performed only upon updates to the source packages.
 The resulting manifest can be compared to the previously created manifest
 to determine if the sources have been updated.
 
-Makefile.prepare should follow immediately when the manifest changes.
+Makefile.preconfig should follow immediately when the manifest changes.
+
+== Phase 2: Preconfigure Sources
+
+$ cd src/
+$ make Makefile.preconfig [BLD={type}] all
+
+Prepare configuration scripts of packages, particularly from source control
+where autoconf etc have not been invoked yet.
+
+This makefile is run after Makefile.gather from the source directory root,
+and must be performed following updates to the source packages as indicated
+by manifest changes. Only source code packages corresponding to the specific
+BLD target are updated.
+
+The result of this step is suitable for archive, or escrow and distribution
+to multiple build systems, beginning at the Makefile.build step.
+
+
+
+
 
 
 

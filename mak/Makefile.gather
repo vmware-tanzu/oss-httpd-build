@@ -21,8 +21,8 @@
 # BLD defines the build type: release - candidate - snapshot - bleed
 #
 # This makefile is run first from the source directory root, and must be
-# performed only upon updates to the source packages. Makefile.prepare from
-# the same directory should follow immediately if the manifest changes.
+# performed following updates to the source packages. Makefile.preconfig
+# in the same directory should follow immediately if the manifest changes.
 
 BLD=release
 

@@ -8,5 +8,14 @@
 
  - svn export/git archive specific src snapshots (e.g. apr-1.6-r1789955)?
 
+ - Determine cause of dns failure with make -j parallel updates
+
+== Makefile.preconfig
+
+ - Clean up dependency rules to pick up changes to build/* components
+   affecting any automake/autoconf logic, per component
+
+ - Eliminate maintainer mode to avoid automake/autoconf on specific builds
+
 
 
