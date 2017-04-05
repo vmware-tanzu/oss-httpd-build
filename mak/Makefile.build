@@ -90,27 +90,32 @@ build-aprutil: build-apr $(aprutil_srcdir)/Makefile
 
 endif
 
-# Ancient openssl 1.0.2 did not support vpath builds
+# Ancient openssl 1.0.2 did not support vpath builds or concurrent builds
 ifeq "$(patsubst 1.0.%,,$(openssl_ver))" ""
 $(openssl_srcdir)/Makefile: $(firstword $(MAKEFILE_LIST)) \
 			    $(SRCDIR)/$(openssl_srcdir)
 	-mkdir $(openssl_srcdir) 2>/dev/null
 	cp -prf $(SRCDIR)/$(openssl_srcdir)/* $(openssl_srcdir)/
 	cd $(openssl_srcdir) && \
-	  ./config --prefix=$(DESTDIR) shared \
+	  ./config --prefix=$(DESTDIR) shared no-fips \
 		   -I$(DESTDIR)/include -L$(DESTDIR)/lib \
 		   -Wl,-rpath,$(TARGET)/lib && \
+	cd ..
+
+build-openssl: $(openssl_srcdir)/Makefile
+	cd $(openssl_srcdir) && \
+	  make && \
+	  make install && \
 	cd ..
 
 else
 $(openssl_srcdir)/Makefile: $(SRCDIR)/$(openssl_srcdir)/Configure
 	-mkdir $(openssl_srcdir) 2>/dev/null
 	cd $(openssl_srcdir) && \
-	  $(SRCDIR)/$(openssl_srcdir)/config shared \
-		 --prefix=$(DESTDIR) -Wl,-rpath,$(TARGET)/lib && \
+	  $(SRCDIR)/$(openssl_srcdir)/config shared no-fips \
+		 --libdir=lib --prefix=$(DESTDIR) \
+		 -Wl,-rpath,$(TARGET)/lib && \
 	cd ..
-
-endif
 
 build-openssl: $(openssl_srcdir)/Makefile
 	cd $(openssl_srcdir) && \
@@ -118,10 +123,17 @@ build-openssl: $(openssl_srcdir)/Makefile
 	  make -j install && \
 	cd ..
 
+endif
+
+ifndef brotli_srcdir
+build-brotli:
+
+else
 $(brotli_srcdir)/Makefile: $(SRCDIR)/$(brotli_srcdir)
 	-mkdir $(brotli_srcdir) 2>/dev/null
 	cd $(brotli_srcdir) && \
 	  cmake -G "Unix Makefiles" \
+		-D CMAKE_INSTALL_LIBDIR=lib \
 		-D CMAKE_INSTALL_PREFIX=$(DESTDIR) \
 		$(SRCDIR)/$(brotli_srcdir) && \
 	cd ..
@@ -132,6 +144,7 @@ build-brotli: $(brotli_srcdir)/Makefile
 	  make -j install && \
 	cd ..
 
+endif
 
 $(nghttp2_srcdir)/Makefile: $(SRCDIR)/$(nghttp2_srcdir)/configure
 	-mkdir $(nghttp2_srcdir) 2>/dev/null

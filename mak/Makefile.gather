@@ -241,7 +241,7 @@ gather-brotli-master: pre-manifest
 
 gather-linux-release: gather-apr-release gather-aprutil-release \
 		      gather-httpd-release gather-openssl-release \
-		      gather-nghttp2-release gather-brotli-release \
+		      gather-nghttp2-release \
 		      gather-httpdtest-trunk
 	mv $(BLD)-manifest-vars $(BLD)-manifest-vars.sav
 	sort < $(BLD)-manifest-vars.sav > $(BLD)-manifest-vars
