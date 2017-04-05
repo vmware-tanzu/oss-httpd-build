@@ -23,8 +23,13 @@
 
  - Perform validation of system -dev/-devel components
 
+ - Determine any disabled or required APR-util DBD / DBM providers
+   (E.g. is the run-time mysql connector to GPL permitted?)
+
  - Allow brotli / openssl / nghttp2 to be omitted entirely once current
 
  - Add pcre2 / expat / zlib component dependencies for bleed builds
 
+== Makefile.test
 
+ - TBD

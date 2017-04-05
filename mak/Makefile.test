@@ -1,0 +1,79 @@
+# Pivotal OSS Build Schema for Apache HTTP Server
+#
+# Copyright (c) 2017 Pivotal Software, Inc.
+#
+# Pivotal licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# Makefile.test : Run all tests against built packages
+#
+# BLD defines the group: release - candidate - snapshot - bleed
+#
+# TAG defines the target directory and package name suffixes
+#
+# This makefile must be run from the build (not source) subdirectory and
+# may occur at any point following the Makefile.build step.
+
+BLD=release
+TAG=
+SRCDIR=$(shell cd ..; pwd)/src
+
+include $(SRCDIR)/$(BLD)-manifest-vars
+
+DESTDIR=$(shell cd ..; pwd)/dst/$(httpd_srcdir)$(TAG)
+
+all: test-openssl test-apr test-aprutil test-nghttp2 test-brotli test-httpd
+
+pre-test:
+
+test-apr: pre-test
+	cd $(apr_srcdir) && \
+	  make test && \
+	cd ..
+
+test-aprutil: pre-test
+ifdef aprutil_srcdir
+	cd $(aprutil_srcdir) && \
+	  make test && \
+	cd ..
+endif
+
+test-openssl: pre-test
+	cd $(openssl_srcdir) && \
+	  make test && \
+	cd ..
+
+test-brotli: pre-test
+	cd $(brotli_srcdir) && \
+	  make test && \
+	cd ..
+
+
+test-nghttp2: pre-test
+	cd $(nghttp2_srcdir) && \
+	  make check && \
+	cd ..
+
+$(httpdtest_srcdir)/t/TEST: pre-test
+	-mkdir $(httpdtest_srcdir) 2>/dev/null
+	cp -prf $(SRCDIR)/$(httpdtest_srcdir)/* $(httpdtest_srcdir)/ && \
+	cd $(httpdtest_srcdir) && \
+	  perl Makefile.PL -apxs $(DESTDIR)/bin/apxs && \
+	cd ..
+
+test-httpd: $(httpdtest_srcdir)/t/TEST
+	cd $(httpdtest_srcdir) && \
+	  t/TEST -apxs $(DESTDIR)/bin/apxs -httpd $(DESTDIR)/bin/apachectl && \
+	cd ..
+
+
+

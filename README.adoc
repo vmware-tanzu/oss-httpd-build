@@ -123,5 +123,18 @@ The TARGET directory, /opt/pivotal/webserver/$(httpd_srcdir)$(TAG) would
 typically not be overridden, and refers to the anticipated installation
 path of the resulting package.
 
+== Phase 4: Test Source and Intermediate Installation
+
+$ cd bld/
+$ make Makefile.test [BLD={type}] [TAG={-suffix}] all
+
+Test all components described by the manifest and the intermediate/
+temporary installation httpd server.
+
+This makefile must be run from the build (not source) subdirectory.
+Where a component has an integrated test target these are processed
+within the build tree. The Apache httpd perl test framework is invoked
+against the intermediate installation in the $DESTDIR path.
+
 
 
