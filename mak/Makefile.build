@@ -42,10 +42,16 @@ pre-build:
 	-mkdir -p $(DSTDIR) 2>/dev/null
 	echo $(SRCDIR)
 
-$(apr_srcdir)/Makefile: $(SRCDIR)/$(apr_srcdir)/configure
+$(apr_srcdir)/Makefile: build-openssl $(SRCDIR)/$(apr_srcdir)/configure
 	-mkdir $(apr_srcdir) 2>/dev/null
 	cd $(apr_srcdir) && \
 	  $(SRCDIR)/$(apr_srcdir)/configure \
+		 --with-openssl=$(DESTDIR) \
+		 --with-crypto \
+		 --without-ldap \
+		 --without-lber \
+		 --with-installbuilddir=\$${prefix}/build \
+		 --includedir=\$${prefix}/include \
 		 --prefix=$(DESTDIR) && \
 	cd ..
 
@@ -61,11 +67,18 @@ build-aprutil: build-apr
 
 else
 with_aprutil=--with-apr-util=$(DESTDIR)
-$(aprutil_srcdir)/Makefile: $(SRCDIR)/$(aprutil_srcdir)/configure
+$(aprutil_srcdir)/Makefile: build-openssl build-apr \
+			    $(SRCDIR)/$(aprutil_srcdir)/configure
 	-mkdir $(aprutil_srcdir) 2>/dev/null
 	cd $(aprutil_srcdir) && \
 	  $(SRCDIR)/$(aprutil_srcdir)/configure \
 		 --with-apr=$(DESTDIR) \
+		 --with-openssl=$(DESTDIR) \
+		 --with-crypto \
+		 --without-ldap \
+		 --without-lber \
+		 --with-installbuilddir=\$${prefix}/build \
+		 --includedir=\$${prefix}/include \
 		 --prefix=$(DESTDIR) && \
 	cd ..
 
@@ -79,19 +92,22 @@ endif
 
 # Ancient openssl 1.0.2 did not support vpath builds
 ifeq "$(patsubst 1.0.%,,$(openssl_ver))" ""
-$(openssl_srcdir)/Makefile: $(SRCDIR)/$(openssl_srcdir)/Configure
+$(openssl_srcdir)/Makefile: $(firstword $(MAKEFILE_LIST)) \
+			    $(SRCDIR)/$(openssl_srcdir)
 	-mkdir $(openssl_srcdir) 2>/dev/null
 	cp -prf $(SRCDIR)/$(openssl_srcdir)/* $(openssl_srcdir)/
 	cd $(openssl_srcdir) && \
-	  ./config --prefix=$(DESTDIR) -Wl,-rpath,$(TARGET) && \
+	  ./config --prefix=$(DESTDIR) shared \
+		   -I$(DESTDIR)/include -L$(DESTDIR)/lib \
+		   -Wl,-rpath,$(TARGET)/lib && \
 	cd ..
 
 else
 $(openssl_srcdir)/Makefile: $(SRCDIR)/$(openssl_srcdir)/Configure
 	-mkdir $(openssl_srcdir) 2>/dev/null
 	cd $(openssl_srcdir) && \
-	  $(SRCDIR)/$(openssl_srcdir)/config \
-		 --prefix=$(DESTDIR) -Wl,-rpath,$(TARGET) && \
+	  $(SRCDIR)/$(openssl_srcdir)/config shared \
+		 --prefix=$(DESTDIR) -Wl,-rpath,$(TARGET)/lib && \
 	cd ..
 
 endif
@@ -131,7 +147,9 @@ build-nghttp2: $(nghttp2_srcdir)/Makefile
 	  make -j install && \
 	cd ..
 
-$(httpd_srcdir)/Makefile: $(SRCDIR)/$(httpd_srcdir)/configure
+$(httpd_srcdir)/Makefile: build-apr build-aprutil build-openssl \
+			  build-brotli build-nghttp2 \
+			  $(SRCDIR)/$(httpd_srcdir)/configure
 	-mkdir $(httpd_srcdir) 2>/dev/null
 	cd $(httpd_srcdir) && \
 	  $(SRCDIR)/$(httpd_srcdir)/configure \
@@ -145,16 +163,25 @@ $(httpd_srcdir)/Makefile: $(SRCDIR)/$(httpd_srcdir)/configure
 		 --enable-load-all-modules \
 		 --enable-unixd=static \
 		 --enable-version=static \
-		 --with-mpm=worker \
-		 --disable-ldap && \
+		 --disable-authnz-ldap \
+		 --disable-ldap \
+		 --enable-cgi=shared \
+		 --enable-authnz-fcgi=shared \
+		 --enable-proxy-http2=shared \
+		 --enable-suexec=shared \
+		 --with-suexec-caller=httpd \
+		 --with-suexec-bin=$(TARGET)/bin/suexec		\
+		 --with-suexec-docroot=$(TARGET)/suexec-cgi-bin	\
+		 --with-suexec-logfile=$(TARGET)/logs/suexec.log \
+		 --with-mpm=event && \
 	cd ..
 
-build-httpd: build-apr build-aprutil build-openssl build-brotli build-nghttp2 \
-	     $(httpd_srcdir)/Makefile
+build-httpd: $(httpd_srcdir)/Makefile
 	cd $(httpd_srcdir) && \
 	  make -j && \
 	  make -j install && \
+	  sed "s/\(LoadModule mpm_\(worker\|prefork\)\)/#\1/" \
+		< $(DESTDIR)/conf/original/httpd.conf \
+		> $(DESTDIR)/conf/httpd.conf && \
 	cd ..
-
-
 
