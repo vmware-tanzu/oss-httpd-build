@@ -97,7 +97,7 @@ The package names have remained the same.
 == Phase 1: Gather Sources
 
  $ cd src/
- $ make -f Makefile.gather [BLD={type}] all
+ $ make -f Makefile.gather [BLD={type}]
 
 BLD defines the build type: release - candidate - snapshot - bleed
 (case sensitive) where release is the default.
@@ -120,7 +120,7 @@ Makefile.preconfig should follow immediately when the manifest changes.
 == Phase 2: Preconfigure Sources
 
  $ cd src/
- $ make -f Makefile.preconfig [BLD={type}] all
+ $ make -f Makefile.preconfig [BLD={type}]
 
 Prepare configuration scripts of packages, particularly from source control
 where autoconf etc have not been invoked yet.
@@ -136,7 +136,7 @@ to multiple build systems, beginning at the Makefile.build step.
 == Phase 3: Build Sources
 
  $ cd bld/
- $ make -f Makefile.build [BLD={type}] [TAG={-suffix}] all
+ $ make -f Makefile.build [BLD={type}] [TAG={-suffix}]
 
 Build all components described by the manifest into the intermediate/
 temporary installation tree, using that intermediate tree as the component
@@ -164,7 +164,7 @@ path of the resulting package.
 == Phase 4: Test Source and Intermediate Installation
 
  $ cd bld/
- $ make -f Makefile.test [BLD={type}] [TAG={-suffix}] all
+ $ make -f Makefile.test [BLD={type}] [TAG={-suffix}]
 
 Test all components described by the manifest and the intermediate/
 temporary installation httpd server.
