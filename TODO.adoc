@@ -32,4 +32,17 @@
 
 == Makefile.test
 
- - TBD
+ - Automate the cpan gathering of dependencies noted in httpdtest-trunk/README
+   during the assembly of the httpdtest-trunk bld tree.
+
+ - Localize the httpdtest-trunk's flavor of Net::SSL etc, if it is possible,
+   relying on the flavor of libcrypto/libssl/openssl which has been prepared
+   for the release, to eliminate unexpected X509 formatting side effects and
+   potentially other quirks.
+
+== Makefile.package
+
+ -
+
+
+

@@ -28,32 +28,32 @@ have additional pathname components such as -snapshot,
 -bleed, etc, and may have a TAG to distinguish two
 otherwise apparently identical builds.
 
-Build {pkg} reflects the particular component, either
+Build \{pkg} reflects the particular component, either
 the offical designation (httpd-2.4.25/), an indication
 of interim packages (httpd-2.4.26-rc1/), or the exact
 province of the file (httpd-2.4.26-dev-r1872199/)
 
-Several {bld} schemas are expected; 'release' for the
+Several \{bld} schemas are expected; 'release' for the
 official packages, 'candidate' for packages anticipated
 for release, 'snapshot' for the working trees of the
 component's current maintenance trees, and 'bleed' for
 next-major or minor development trees.
 
-mak/                   Build script files
+ mak/                   Build script files
 
-src/                   Complete build sources
-  {pkg}/               Component source (for VPATH build)
-  pkgs/                Source component package downloads
-  {bld}-manifest-vars  Description of {pkg} names and versions for {bld}
+ src/                    Complete build sources
+    {pkg}/               Component source (for VPATH build)
+    pkgs/                Source component package downloads
+    {bld}-manifest-vars  Description of {pkg} names and versions for {bld}
 
-bld/                   Build trees of components by build type
-  {pkg}/               Component build tree (vpath or copied from src/)
+ bld/                    Build trees of components by build type
+    {pkg}/               Component build tree (vpath or copied from src/)
 
-dst/                   Resulting intermediate binary packages
-  {httpd-pkg}{tag}/    Temporary installation for testing and relocation
+ dst/                    Resulting intermediate binary packages
+    {httpd-pkg}{tag}/    Temporary installation for testing and relocation
 
-out/                   Final binary package
-  {httpd-pkg}{tag}/    Relocateable binaries for distribution
+ out/                    Final binary package
+    {httpd-pkg}{tag}/    Relocateable binaries for distribution
 
 == Platform Requirements
 
@@ -62,20 +62,42 @@ is required to build this package. In addition, a number of stable, well
 maintained components are leveraged, rather than building and installing
 potentially conflicting versions.
 
+On all platforms, in order to run Makefile.test there is a list of CPAN
+dependencies required to invoke the perl-based Apache::Test framework.
+These can be found under src/httpdtest-trunk/README after first running
+the Makefile.gather phase. An immediate goal of this toolchain is to
+automate the local provisioning of those dependencies if not installed.
+
 === RedHat or Fedora Linux development package dependencies:
 
-yum groupinstall 'C Development Tools and Libraries'
-yum install expat-devel libxml2-devel lua-devel pcre-devel zlib-devel
+For all steps the complete group of development tools is recommended, e.g.;
+
+ yum groupinstall 'C Development Tools and Libraries'
+
+For the Makefile.prepare step only, the imake package is required.
+
+For the actual Makefile.build phase, a number of system component -devel
+packages are needed.
+
+ yum install expat-devel libxml2-devel lua-devel pcre-devel zlib-devel
+
+These same base packages are required for deployment (and are installed by
+default given the command above);
+
+ yum install expat libxml2 lua pcre zlib
+
+* Note that following RHEL 7 / Fedora 21, yum becomes the dnf utility.
+The package names have remained the same.
 
 === Ubuntu or Debian development package dependencies:
 
-apt-get install build-essential
-apt-get install libexpat1-dev libxml2-dev zlib1g-dev liblua5.2-0 libpcre3-dev
+ apt-get install build-essential
+ apt-get install libexpat1-dev libxml2-dev zlib1g-dev liblua5.2-0 libpcre3-dev
 
 == Phase 1: Gather Sources
 
-$ cd src/
-$ make Makefile.gather [BLD={type}] all
+ $ cd src/
+ $ make Makefile.gather [BLD={type}] all
 
 BLD defines the build type: release - candidate - snapshot - bleed
 (case sensitive) where release is the default.
@@ -97,8 +119,8 @@ Makefile.preconfig should follow immediately when the manifest changes.
 
 == Phase 2: Preconfigure Sources
 
-$ cd src/
-$ make Makefile.preconfig [BLD={type}] all
+ $ cd src/
+ $ make Makefile.preconfig [BLD={type}] all
 
 Prepare configuration scripts of packages, particularly from source control
 where autoconf etc have not been invoked yet.
@@ -113,8 +135,8 @@ to multiple build systems, beginning at the Makefile.build step.
 
 == Phase 3: Build Sources
 
-$ cd bld/
-$ make Makefile.build [BLD={type}] [TAG={-suffix}] all
+ $ cd bld/
+ $ make Makefile.build [BLD={type}] [TAG={-suffix}] all
 
 Build all components described by the manifest into the intermediate/
 temporary installation tree, using that intermediate tree as the component
@@ -141,8 +163,8 @@ path of the resulting package.
 
 == Phase 4: Test Source and Intermediate Installation
 
-$ cd bld/
-$ make Makefile.test [BLD={type}] [TAG={-suffix}] all
+ $ cd bld/
+ $ make Makefile.test [BLD={type}] [TAG={-suffix}] all
 
 Test all components described by the manifest and the intermediate/
 temporary installation httpd server.
