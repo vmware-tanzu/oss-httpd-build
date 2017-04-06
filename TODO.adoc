@@ -2,13 +2,16 @@
 
 == Makefile.gather
 
- - Handle multiple-releases-found with highest numbered (version semantics)
-
- - Perform GPG source package validation
+ - Handle multiple-releases-found with highest numbered (in version sequence,
+   e.g. 1.1.9 < 1.1.10)
 
  - svn export/git archive specific src snapshots (e.g. apr-1.6-r1789955)?
 
+ - Perform GPG source package validation
+
  - Determine cause of dns failure with make -j parallel updates
+
+ - Add pcre2 / expat / zlib component dependencies for Windows, bleed sources
 
 == Makefile.preconfig
 
@@ -22,18 +25,29 @@
  - Correct all dependencies for make -j parallel build
 
  - Perform validation of system -dev/-devel components
+   (Example code in experimental/)
+
+ - Decorate httpd with the build type/tag to avoid two bld/httpd-2.4.x trees
+   that were configured to different dependencies?
 
  - Determine any disabled or required APR-util DBD / DBM providers
    (E.g. is the run-time mysql connector to GPL permitted?)
 
- - Allow brotli / openssl / nghttp2 to be omitted entirely once current
+ - Allow openssl / nghttp2 to be omitted entirely (e.g. once updated 
+   about 2018 for RHEL 8 / Ubuntu 18.04 LTS or an earlier non-LTS or
+   Fedora target.)
 
  - Add pcre2 / expat / zlib component dependencies for bleed builds
 
 == Makefile.test
 
+ - Distinguish bld/httpdtest-trunk/ by build type, because the tree becomes
+   bound to a specific dst/ target tree on initial configuration, and will
+   interfere with parallel, resumable make -f ../mak/Makefile.test invocations.
+
  - Automate the cpan gathering of dependencies noted in httpdtest-trunk/README
-   during the assembly of the httpdtest-trunk bld tree.
+   during the assembly of the httpdtest-trunk bld tree. (Upstream change to
+   the perl test framework repository.)
 
  - Localize the httpdtest-trunk's flavor of Net::SSL etc, if it is possible,
    relying on the flavor of libcrypto/libssl/openssl which has been prepared
@@ -43,6 +57,5 @@
 == Makefile.package
 
  -
-
 
 
