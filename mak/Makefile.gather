@@ -214,34 +214,33 @@ gather-nghttp2-master: pre-manifest
 
 gather-brotli-release: pre-manifest
 	brotli_srcpath=https://github.com/google/brotli/releases && \
-	brotli_pkg=`wget --max-redirect=0 $$brotli_srcpath/latest/ 2>&1 | sed 's#Location: \(.*\)/tag/v\([^/]*\) \[following\]#\1/download/v\2/brotli-\2.tar.gz#p;d;'` && \
-	brotli_srcpath=`echo $$brotli_pkg | sed 's#/[^/]*$$##;'` && \
-	brotli_pkg=`echo $$brotli_pkg | sed 's#.*/##;'` && \
-	brotli_ver=`echo $$brotli_pkg | sed 's#brotli-\(.*\)\.tar\.gz#\1#;'` && \
+	brotli_ver=`wget --max-redirect=0 $$brotli_srcpath/latest/ 2>&1 | sed 's#Location: .*/tag/v\([^/]*\) \[following\]#\1#p;d;'` && \
+	brotli_srcpath=https://github.com/google/brotli/archive && \
+	brotli_pkg=brotli-$$brotli_ver.tar.gz && \
 	if test ! -f pkgs/$$brotli_pkg; then \
 	  cd pkgs && \
-	  wget -nv $$brotli_srcpath/$$brotli_pkg && \
+	  wget -nv $$brotli_srcpath/v$$brotli_ver.tar.gz -O $$brotli_pkg && \
 	  cd .. && \
 	  tar -xzf pkgs/$$brotli_pkg; \
 	fi && \
 	echo brotli    $$brotli_ver && \
-	echo brotli_srcdir=Brotli-$$brotli_ver >>$(BLD)-manifest-vars && \
+	echo brotli_srcdir=brotli-$$brotli_ver >>$(BLD)-manifest-vars && \
 	echo brotli_ver=$$brotli_ver >>$(BLD)-manifest-vars
 
 gather-brotli-master: pre-manifest
 	brotli_srcpath=https://github.com/google/brotli && \
-	if test ! -d Brotli-master ; then \
-	  git clone -q $$brotli_srcpath.git Brotli-master; \
+	if test ! -d brotli-master ; then \
+	  git clone -q $$brotli_srcpath.git brotli-master; \
 	else \
-	  cd Brotli-master && git fetch -q && cd ..; \
+	  cd brotli-master && git fetch -q && cd ..; \
 	fi && \
 	echo brotli    git-master && \
-	echo brotli_srcdir=Brotli-master >>$(BLD)-manifest-vars && \
+	echo brotli_srcdir=brotli-master >>$(BLD)-manifest-vars && \
 	echo brotli_ver=1.x-git >>$(BLD)-manifest-vars
 
 gather-linux-release: gather-apr-release gather-aprutil-release \
 		      gather-httpd-release gather-openssl-release \
-		      gather-nghttp2-release \
+		      gather-nghttp2-release gather-brotli-release \
 		      gather-httpdtest-trunk
 	mv $(BLD)-manifest-vars $(BLD)-manifest-vars.sav
 	sort < $(BLD)-manifest-vars.sav > $(BLD)-manifest-vars
