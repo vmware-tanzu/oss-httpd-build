@@ -1,0 +1,483 @@
+#!/bin/sh
+#
+# Copyright © 2017 Pivotal Software, Inc. All rights reserved.
+#
+# httpdctl  This shell script takes care of starting and stopping
+#           Pivotal Web Server on Unix platforms.
+#
+# RedHat/Fedora init.d service configuration
+#
+# chkconfig: 2345 85 15
+# description: Pivotal Web Server httpd @HostName@
+# processname: httpd
+# pidfile: @ServerRoot@/logs/httpd.pid
+# config: @ServerRoot@/conf/httpd.conf
+#
+# Ubuntu/Debian init.d service configuration
+#
+### BEGIN INIT INFO
+# Provides:          pivotal-httpd-@HostName@
+# Required-Start:    $local_fs $remote_fs $network $syslog $named
+# Required-Stop:     $local_fs $remote_fs $network $syslog $named
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# X-Interactive:     true
+# Short-Description: Pivotal Web Server httpd @HostName@
+### END INIT INFO
+
+# Modified in 6.0.0
+#
+#   Switched to the loadable MPM model, removed MPM references from this script
+#
+# Modified in 5.4.0
+#
+#   Renamed services as pivotal httpd {instance}
+#   changed the long description text to Pivotal Web Server httpd 2.4
+#
+# Modified in 5.3.2
+#
+#   Support update-rc.d with LSB init header for Debian-style management
+#   Introduce Debian-style LSB init.d reload/force-reload/try-restart verbs
+#   Enhance 'restart' behavior to start a stopped server using last start flags
+#   Preserve quoted start and configtest arguments (e.g. -D "FOO BAR")
+#
+# Modified in 5.3.0
+#
+#   Added install/uninstall support of Solaris svcadm
+#
+# Modified in 5.2.1
+#
+#   Improved handling of ./httpdctl with no command line arguments
+#
+# Modified in 5.2.0
+#
+#   Outputs the service name Pivotal httpd {server} rather than simply httpd
+#   Added install/uninstall to manage /etc/init.d/servicename and /bin/chkconfig
+
+server_root="@ServerRoot@"
+apache_root="@exp_httpddir@"
+apache_bin="$apache_root/bin/httpd"
+apache_pid="$server_root/logs/httpd.pid"
+apache_last="$server_root/logs/httpd.last"
+service_name="pivotal httpd @ServerInstance@"
+action=$1
+if test "x$action" != "x"; then shift; fi
+start_flags=""
+for flag in "$@"; do start_flags="$start_flags \"$flag\""; done
+
+LD_LIBRARY_PATH="$apache_root/lib${LD_LIBRARY_PATH:+:}$LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH
+
+SMF_SITE_MANIFESTS=/var/svc/manifest/site
+
+STATUS="No Status"
+RUNNING=0
+PID=0
+RETVAL=0
+export STATUS
+export RUNNING
+export PID
+
+get_pid_status () {
+    server_dir="$1"
+    if test -f "$apache_pid" ; then
+        PID=`cat "$apache_pid"`
+        export PID
+        if test "x$PID" != "x" && kill -0 $PID 2>/dev/null ; then
+            STATUS="$service_name (pid $PID) RUNNING"
+            RUNNING=1
+        else 
+            STATUS="$service_name (pid $PID?) NOT RUNNING"
+            RUNNING=0
+        fi
+    else
+        STATUS="$service_name (no pid file) NOT RUNNING"
+        RUNNING=0
+    fi
+    export RUNNING
+    export STATUS
+}
+
+start_server () {
+    server_dir="$1"
+    flags="$2"
+
+    if test "$flags" = "--last"; then
+        echo "Restarting $service_name"
+        # 're'start with prior start configuration
+        if test -f "$apache_last" ; then
+            apache_cmd=`cat "$apache_last"`
+            if test "x$apache_cmd" = "x" ; then
+                echo "Empty $apache_last"
+                echo "Server restart FAILED"
+                return 1
+            fi
+        else
+            echo "Missing $apache_last"
+            echo "Server restart FAILED"
+            return 1
+        fi
+    else
+        echo "Starting $service_name"
+        if test ! -f "$server_dir/conf/httpd.conf" ; then
+            echo "Missing $server_dir/conf/httpd.conf"
+            echo "Server start FAILED"
+            return 1
+        fi
+
+        if test $RUNNING -eq 1 ; then
+            echo $STATUS
+            echo "Server start FAILED"
+            return 1
+        fi
+        apache_cmd=`echo "\"$apache_bin\" -d \"$server_dir\" $flags"`
+        echo $apache_cmd > "$apache_last"
+    fi
+
+    ulimit -n `ulimit -H -n`
+    eval $apache_cmd
+    RETVAL=$?
+    if test "$RETVAL" -ne 0 ; then
+        echo "Server start FAILED"
+        return $RETVAL
+    fi;
+
+    for i in 1 2 3 4 5 6 7 8 9 10; do
+        sleep 2
+        get_pid_status "$server_dir"
+        if test "$RETVAL" -eq 0 ; then
+            childlist=`ps -g $PID | grep "httpd"`
+            if test -n "$childlist" ; then
+                echo "Server started OK"
+                return 0
+            fi;
+        fi;
+    done;
+
+    echo "Server start FAILED"
+    return 1
+}
+
+test_server () {
+    echo "Testing $service_name configuration"
+    server_dir="$1"
+    flags="$2"
+
+    if test ! -f "$server_dir/conf/httpd.conf" ; then
+        echo "Missing $server_dir/conf/httpd.conf"
+        echo "Server configuration test FAILED"
+        return 1
+    fi
+
+    eval "$apache_bin" -t -d "$server_dir" $flags
+    RETVAL=$?
+    if test "$RETVAL" -ne 0 ; then
+        echo "Server configuration test FAILED"
+    fi
+    return $RETVAL
+}
+
+signal_server () {
+    signal=$1
+    present=$2
+    past=$3
+    kill $signal $PID
+    RETVAL=$?
+    if test "$RETVAL" -ne 0  ; then
+        echo "Server $present FAILED"
+    else
+        if test "$present" = "stop" ; then
+            # Allow Apache to shutdown all the child processes
+            sleep 2
+        fi
+        echo "Server $past OK"
+    fi
+    return $RETVAL
+}
+
+stop_server () {
+    server_dir="$1"
+    signal=$2
+    echo "Stopping $service_name"
+
+    if test $RUNNING -ne 1 ; then
+        echo "Server not running"
+        return 1
+    fi
+
+    # stop daemon
+    signal_server $signal stop stopped
+    RETVAL=$?
+    return $RETVAL
+}
+
+restart_server () {
+    echo "Restarting $service_name"
+    server_dir="$1"
+    signal=$2
+    
+    if test $RUNNING -ne 1 ; then
+        echo "Server not running"
+        return 1
+    fi
+
+    #test configuration
+    if test -f "$apache_last" ; then
+        apache_cmd=`cat "$apache_last"`
+        if test "x$apache_cmd" = "x" ; then
+            echo "Empty $apache_last"
+            echo "Server restart FAILED"
+            return 1
+        fi
+    else
+        echo "Missing $apache_last"
+        echo "Server restart FAILED"
+        return 1
+    fi
+    
+    eval $apache_cmd -t 
+    RETVAL=$?
+    if test $RETVAL -ne 0 ; then
+        echo "Error testing $apache_last"
+        echo "Server restart FAILED"
+        return $RETVAL
+    fi
+
+    # restart daemon
+    signal_server $signal restart restarted
+    RETVAL=$?
+    return $RETVAL
+}
+
+install_server () {
+    server_dir="$1"
+    init_name=`echo $2 | sed "s# #-#g;"`
+
+    if test ! -f "$server_dir/conf/httpd.conf" ; then
+        echo "Missing $server_dir/conf/httpd.conf"
+        echo "Server start FAILED"
+        return 1
+    fi
+
+    if which svccfg > /dev/null 2>&1 ; then
+        install_smf_service $server_dir $init_name
+    else
+        echo "Installing $service_name"
+        echo "as the unix service $init_name"
+        ln -s $server_dir/bin/httpdctl /etc/init.d/$init_name
+        if [ -x /sbin/chkconfig ]; then
+            /sbin/chkconfig --add $init_name
+        elif [ -x /usr/sbin/update-rc.d ]; then
+            /usr/sbin/update-rc.d $init_name defaults 85 15
+        fi	
+    fi
+
+    RETVAL=$?
+    return $RETVAL
+}
+
+smf_name() {
+    echo pivotal/httpd/`echo $1 | tr . _ | sed 's/pivotal-httpd-//'`
+}
+
+install_smf_service() {
+    server_dir="$1"
+    service=`smf_name $2`
+    manifest=$SMF_SITE_MANIFESTS/$service.xml
+
+    mkdir -p `dirname $manifest`
+    cat <<EOF > $manifest
+<?xml version="1.0"?>
+<!DOCTYPE service_bundle SYSTEM "/usr/share/lib/xml/dtd/service_bundle.dtd.1">
+<!--
+    Copyright (c) ....
+-->
+<service_bundle type='manifest' name='pivotal:httpd'>
+  <service name='$service'
+           type='service'
+           version='1'>
+    <instance name='default' enabled='false'>
+      <dependency name='network'
+                  grouping='require_all'
+                  restart_on='error'
+                  type='service'>
+        <service_fmri value='svc:/milestone/network:default'/>
+      </dependency>
+      <dependency name='filesystem-local'
+                  grouping='require_all'
+                  restart_on='none'
+                  type='service'>
+        <service_fmri value='svc:/system/filesystem/local:default'/>
+      </dependency>
+      <dependency name='autofs'
+                  grouping='optional_all'
+                  restart_on='error'
+                  type='service'>
+        <service_fmri value='svc:/system/filesystem/autofs:default'/>
+      </dependency>
+      <exec_method type='method'
+                   name='start'
+                   exec='$server_dir/bin/httpdctl start'
+                   timeout_seconds='60' />
+      <exec_method type='method'
+                   name='stop'
+                   exec='$server_dir/bin/httpdctl stop'
+                   timeout_seconds='60' />
+      <property_group name='startd' type='framework'>
+        <!-- sub-process core dumps shouldn't restart session -->
+        <propval name='ignore_error' type='astring' value='core,signal' />
+      </property_group>
+      <template>
+        <common_name>
+          <loctext xml:lang='C'>
+            Pivotal Web Server httpd 2.4
+          </loctext>
+        </common_name>
+        <documentation>
+          <manpage title='httpd' section='8'
+            manpath='$server_dir/httpd-2.4/man' />
+          <doc_link name='apache.org' uri='http://httpd.apache.org' />
+        </documentation>
+      </template>
+    </instance>
+    <stability value='Evolving' />
+  </service>
+</service_bundle>
+EOF
+    svcadm restart manifest-import
+    RETVAL=$?
+    if [ $RETVAL = 0 ] ; then
+        echo
+        echo "service $service installed"
+        echo "to enable/disable the service, run:"
+        echo
+        echo "  # svcadm enable $service"
+        echo "  # svcadm disable $service"
+        echo
+    else
+        echo failed to install service
+    fi
+    return $RETVAL
+}
+
+uninstall_server () {
+    server_dir="$1"
+    init_name=`echo $2 | sed "s# #-#g;"`
+
+    if which svccfg > /dev/null 2>&1 ; then
+        uninstall_smf_service $init_name
+    else
+        echo "Uninstalling the unix service $init_name"
+        if [ -x /sbin/chkconfig ]; then
+            /sbin/chkconfig --del $init_name
+        elif [ -x /usr/sbin/update-rc.d ]; then
+            /usr/sbin/update-rc.d -f $init_name remove
+        fi	
+        RETVAL=$?
+        rm -f /etc/init.d/$init_name
+    fi
+    return $RETVAL
+}
+
+uninstall_smf_service() {
+    service=`smf_name $1`
+    if [ `uname -r` = 5.10 ] ; then
+        svccfg delete $service
+    fi
+    rm $SMF_SITE_MANIFESTS/$service.xml 2> /dev/null
+    svcadm restart manifest-import
+    RETVAL=$?
+    rmdir $SMF_SITE_MANIFESTS/pivotal/httpd 2> /dev/null
+    rmdir $SMF_SITE_MANIFESTS/pivotal 2> /dev/null
+    if [ $RETVAL = 0 ] ; then
+        echo
+        echo service $service uninstalled
+        echo
+    else
+        echo failed to uninstall service $service
+    fi
+    return $RETVAL
+}
+
+echo_usage() {
+    echo "Usage: $0 {command}";
+    echo "{command} is one of:
+        start
+        stop
+        gracefulstop
+        restart
+        graceful (or [force-]reload)
+        status
+        install
+        uninstall
+        configtest
+        " ;
+}
+
+###### Main #######
+
+RETVAL=1
+
+if test ! -d "$server_root" ; then
+        echo Server $server_root does not exist 
+        exit 1
+fi
+
+get_pid_status "$server_root"
+
+# See how we were called.
+case "$action" in
+    start)
+        start_server "$server_root" "$start_flags"
+        RETVAL=$?
+        ;;
+    stop)
+        stop_server "$server_root" "-TERM"
+        RETVAL=$?
+        ;;
+    try-restart)
+        restart_server "$server_root" "-HUP"
+        RETVAL=$?
+	;;
+    restart)
+        if test $RUNNING -ne 1 ; then
+            start_server "$server_root" "--last"
+            RETVAL=$?
+        else
+            restart_server "$server_root" "-HUP"
+            RETVAL=$?
+        fi
+        ;;
+    graceful | reload | force-reload)
+        restart_server "$server_root" "-USR1"
+        RETVAL=$?
+        ;;
+    gracefulstop)
+        stop_server "$server_root" "-WINCH"
+        RETVAL=$?
+        ;;
+    status)
+        echo $STATUS
+        RETVAL=$?
+        ;;
+    install)
+        install_server "$server_root" "$service_name"
+        RETVAL=$?
+        ;;
+    uninstall)
+        uninstall_server "$server_root" "$service_name"
+        RETVAL=$?
+        ;;
+    configtest)
+        test_server "$server_root" "$start_flags"
+        RETVAL=$?
+        ;;
+    *)
+        if test "x$action" != "x"; then
+            echo "Command $action was not recognized"
+            echo
+        fi
+        echo_usage
+esac
+
+exit $RETVAL

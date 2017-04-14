@@ -1,0 +1,105 @@
+﻿#
+# Copyright © 2017 Pivotal Software, Inc. All rights reserved.
+#
+# Invoking this script from the product root path will default the
+# @@ PRODUCT_ROOT @@ to the current working directory
+#
+# NOTE: backtick ` character escapes within the @@ ... @@ pattern 
+# serves to prevent this script from modifying it's own documentation.
+# do not include that backtick when specifying such patterns.
+
+$name = "fixrootpath"
+$OutputEncoding = [System.Text.Encoding]::UTF8
+ 
+Write-Host "fixrootpath.ps1 script - adjusts paths or strings in text files"
+Write-Host "Copyright © 2017 Pivotal Software, Inc. All rights reserved."
+Write-Host ""
+
+function syntax {
+    Write-Host "fixrootpath.vbs [--srcdir={pattern}] [--dstdir={pattern}] [path [path...]]"
+    Write-Host "    --srcdir={pattern}  expression to replace, defaults to @@PRODUCT`_ROOT@@"
+    Write-Host "    --dstdir={string}   replacement path, defaults to current working"
+    Write-Host "                        directory using forward-slash notation,"
+    Write-Host "                        e.g. C:/Pivotal/WebServer"
+    Write-Host ""
+    Write-Host "The path list may contain one or more explicit file names or path names"
+    Write-Host "to recursively search for non-binary files.  The default path to recurse"
+    Write-Host "is the current working directory."
+}
+
+$srcdir = "@@PRODUCT`_ROOT@@"
+$dstdir = $pwd -replace "\\", "/"
+ 
+foreach ($arg in $args) {
+    if ($arg.StartsWith("--srcdir=")) {
+        $srcdir = $arg.Substring("--srcdir=".Length)
+    }
+    elseif ($arg.StartsWith("--dstdir=")) {
+        $dstdir = $arg.Substring("--dstdir=".Length)
+    }
+    elseif ($arg -eq "--help") {
+        syntax
+        exit
+    }
+    elseif ($arg.StartsWith("--")) {
+        syntax
+        Write-Host "FATAL: unrecognized command line option" $arg
+        exit 1
+    }
+    elseif ((-not (Test-Path $arg)) -or ((get-childitem -path $arg).length -lt 1)) {
+        syntax
+        Write-Host "FATAL: file or folder" $arg "not found"
+        exit 1
+    }
+}
+
+$rex = [regex] $srcdir
+
+Write-Host "Replacing" $srcdir "with" $dstdir
+
+$ignoreext = @{".exe" = $null; ".dll" = $null; ".so"  = $null; ".pdb" = $null;
+               ".lib" = $null; ".obj" = $null; ".exp" = $null; ".ico" = $null;
+               ".png" = $null; ".gif" = $null; ".jpg" = $null; ".jpeg" = $null}
+
+function fixfiles ($files) {
+    foreach ($file in $files) {
+        $origname = $file.FullName
+        if ($file.PSIsContainer) {
+             $subfiles = (get-childitem -path $origname)
+             if ($subfiles.length -gt 0) { fixfiles $subfiles }
+        }
+        elseif (($file.Extension.length -lt 1) -or (-not $ignoreext.ContainsKey($file.Extension.ToLower()))) {
+             try {
+                 $repl = $false
+                 $contents = Get-Content -Encoding UTF8 -path $origname
+                 for ($i = 0; $i -lt $contents.length; ++$i) {
+                     $newtxt = $rex.Replace($contents[$i], $dstdir)
+                     if ($newtxt -ne $contents[$i]) {
+                         $repl = $true; $contents[$i] = $newtxt
+                     }
+                 }
+                 if ($repl) {
+                     $contents | out-file $origname -enc utf8
+                     Write-Host "Modified" $origname
+                 }
+             }
+             catch {
+             }
+        }
+    }
+}
+
+$files = $null
+foreach ($arg in $args) {
+    if (-not $arg.StartsWith("--")) {
+        $files = (get-childitem -path $arg)
+        fixfiles $files
+    }
+}
+
+if ($files -eq $null) {
+    $files = (get-childitem -path ".")
+    fixfiles $files
+} 
+
+Write-Host "Replacement complete"
