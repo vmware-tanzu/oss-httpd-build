@@ -112,7 +112,7 @@ else
 $(openssl_srcdir)/Makefile: $(SRCDIR)/$(openssl_srcdir)/Configure
 	-mkdir $(openssl_srcdir) 2>/dev/null
 	cd $(openssl_srcdir) && \
-	  $(SRCDIR)/$(openssl_srcdir)/config shared no-fips \
+	  $(SRCDIR)/$(openssl_srcdir)/config shared \
 		 --libdir=lib --prefix=$(DESTDIR) \
 		 -Wl,-rpath,$(TARGET)/lib && \
 	cd ..
