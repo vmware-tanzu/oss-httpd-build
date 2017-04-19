@@ -97,7 +97,7 @@ $(openssl_srcdir)/Makefile: $(firstword $(MAKEFILE_LIST)) \
 	-mkdir $(openssl_srcdir) 2>/dev/null
 	cp -prf $(SRCDIR)/$(openssl_srcdir)/* $(openssl_srcdir)/
 	cd $(openssl_srcdir) && \
-	  ./config --prefix=$(DESTDIR) shared no-fips \
+	  ./config --prefix=$(DESTDIR) shared \
 		   -I$(DESTDIR)/include -L$(DESTDIR)/lib \
 		   -Wl,-rpath,$(TARGET)/lib && \
 	cd ..

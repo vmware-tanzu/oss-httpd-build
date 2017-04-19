@@ -91,7 +91,7 @@ The package names have remained the same.
 
 === Ubuntu or Debian development package dependencies:
 
- apt-get install build-essential
+ apt-get install build-essential subversion xutils-dev cmake libtool
  apt-get install libexpat1-dev libxml2-dev zlib1g-dev liblua5.2-0 libpcre3-dev
 
 == Phase 1: Gather Sources

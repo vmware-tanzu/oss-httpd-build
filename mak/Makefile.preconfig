@@ -70,7 +70,7 @@ preconfig-httpdtest: pre-preconfig
 
 preconfig-openssl: pre-preconfig
 	cd $(openssl_srcdir) && \
-	  ./Configure dist shared no-fips && \
+	  ./Configure dist shared && \
 	  $(MAKE) depend && \
 	cd ..
 
