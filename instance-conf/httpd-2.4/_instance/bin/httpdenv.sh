@@ -1,7 +1,5 @@
 #/bin/sh
 #
-# Copyright (c) 2017 Pivotal Software, Inc.  All rights reserved.
-#
 # httpdenv.sh
 #
 #   This script sets up environment variables to allow the user
