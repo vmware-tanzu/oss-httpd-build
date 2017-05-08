@@ -3,8 +3,8 @@
 # httpdenv.sh
 #
 #   This script sets up environment variables to allow the user
-#   to interact with Pivotal Web Server server instance scripts
-#   and bundled /bin utilities from the command line.
+#   to interact with instance-specific /bin scripts and the
+#   common /bin utilities from the command line.
 
 PATH=@ServerRoot@/bin:@@PRODUCT_ROOT@@/httpd-2.4/bin:$PATH
 export PATH

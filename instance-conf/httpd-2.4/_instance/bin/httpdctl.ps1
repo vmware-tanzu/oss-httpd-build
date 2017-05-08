@@ -1,11 +1,12 @@
 ﻿#
-# Pivotal OSS Instance Creation Schema for Apache HTTP Server
+# Pivotal Instance Management Schema for Apache HTTP Server
 #
-# Copyright (c) 2017 Pivotal Software, Inc.
+# Copyright (C) 2017-Present Pivotal Software, Inc. All rights reserved.
 #
-# Pivotal licenses this file to You under the Apache License, Version 2.0
-# (the "License"); you may not use this file except in compliance with
-# the License.  You may obtain a copy of the License at
+# This program and the accompanying materials are made available under
+# the terms of the under the Apache License, Version 2.0 (the "License”);
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
 #     http://www.apache.org/licenses/LICENSE-2.0
 #

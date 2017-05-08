@@ -1,11 +1,12 @@
 ﻿#
-# Pivotal OSS Build Schema for Apache HTTP Server
+# Pivotal Instance Management Schema for Apache HTTP Server
 #
-# Copyright (c) 2017 Pivotal Software, Inc.
+# Copyright (C) 2017-Present Pivotal Software, Inc. All rights reserved.
 #
-# Pivotal licenses this file to You under the Apache License, Version 2.0
-# (the "License"); you may not use this file except in compliance with
-# the License.  You may obtain a copy of the License at
+# This program and the accompanying materials are made available under
+# the terms of the under the Apache License, Version 2.0 (the "License”);
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
 #     http://www.apache.org/licenses/LICENSE-2.0
 #
@@ -15,7 +16,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# fixrootpath.pl
+# fixrootpath.ps1
 #
 # Invoking this script from the product root path will default the
 # @@ PRODUCT_ROOT @@ to the current working directory
@@ -32,7 +33,7 @@ Write-Host "Copyright © 2017 Pivotal Software, Inc. All rights reserved."
 Write-Host ""
 
 function syntax {
-    Write-Host "fixrootpath.vbs [--srcdir={pattern}] [--dstdir={pattern}] [path [path...]]"
+    Write-Host "fixrootpath.ps1 [--srcdir={pattern}] [--dstdir={pattern}] [path [path...]]"
     Write-Host "    --srcdir={pattern}  expression to replace, defaults to @@PRODUCT`_ROOT@@"
     Write-Host "    --dstdir={string}   replacement path, defaults to current working"
     Write-Host "                        directory using forward-slash notation,"

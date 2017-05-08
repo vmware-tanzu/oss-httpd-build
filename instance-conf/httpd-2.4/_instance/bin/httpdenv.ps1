@@ -1,25 +1,9 @@
 #
-# Pivotal OSS Instance Creation Schema for Apache HTTP Server
-#
-# Copyright (c) 2017 Pivotal Software, Inc.
-#
-# Pivotal licenses this file to You under the Apache License, Version 2.0
-# (the "License"); you may not use this file except in compliance with
-# the License.  You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
 # httpdenv.ps1
 #
-#   This script sets up environment variables to allow the user
-#   to interact with Pivotal Web Server server instance scripts
-#   and bundled \bin utilities from the PowerShell command line.
+#   This script sets up environment variables to allow the user to interact
+#   with instance-specific /bin scripts and the common /bin utilities from
+#   the PowerShell command line.
 #
 # Be absolutely certain to save this file in Encoding 'UTF-8'.
 
