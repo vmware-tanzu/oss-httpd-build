@@ -98,15 +98,15 @@ gather-apr-release: pre-manifest
 	echo apr_ver=$$apr_ver >>$(BLD)-manifest-vars
 
 gather-apr-1xbranch: pre-manifest
-	apr_srcpath=https://svn.apache.org/repos/asf/apr/apr/branches/1.6.x && \
-	if test ! -d apr-1.6-svn ; then \
-	  svn co -q $$apr_srcpath apr-1.6-svn; \
+	apr_srcpath=https://svn.apache.org/repos/asf/apr/apr/branches/1.7.x && \
+	if test ! -d apr-1.7-svn ; then \
+	  svn co -q $$apr_srcpath apr-1.7-svn; \
 	else \
-	  svn up -q apr-1.6-svn; \
+	  svn up -q apr-1.7-svn; \
 	fi && \
-	echo apr       apr-1.6-svn && \
-	echo apr_srcdir=apr-1.6-svn >>$(BLD)-manifest-vars && \
-	echo apr_ver=1.6-dev >>$(BLD)-manifest-vars
+	echo apr       apr-1.7-svn && \
+	echo apr_srcdir=apr-1.7-svn >>$(BLD)-manifest-vars && \
+	echo apr_ver=1.7-dev >>$(BLD)-manifest-vars
 
 gather-apr-trunk: pre-manifest
 	apr_srcpath=https://svn.apache.org/repos/asf/apr/apr/trunk && \
@@ -135,15 +135,15 @@ gather-aprutil-release: pre-manifest
 	echo aprutil_ver=$$aprutil_ver >>$(BLD)-manifest-vars
 
 gather-aprutil-1xbranch: pre-manifest
-	aprutil_srcpath=https://svn.apache.org/repos/asf/apr/apr-util/branches/1.6.x && \
-	if test ! -d apr-util-1.6-svn ; then \
-	  svn co -q $$aprutil_srcpath apr-util-1.6-svn; \
+	aprutil_srcpath=https://svn.apache.org/repos/asf/apr/apr-util/branches/1.7.x && \
+	if test ! -d apr-util-1.7-svn ; then \
+	  svn co -q $$aprutil_srcpath apr-util-1.7-svn; \
 	else \
-	  svn up -q apr-util-1.6-svn; \
+	  svn up -q apr-util-1.7-svn; \
 	fi && \
-	echo aprutil  apr-util-1.6-svn && \
-	echo aprutil_srcdir=apr-util-1.6-svn >>$(BLD)-manifest-vars && \
-	echo aprutil_ver=1.6-dev >>$(BLD)-manifest-vars
+	echo aprutil  apr-util-1.7-svn && \
+	echo aprutil_srcdir=apr-util-1.7-svn >>$(BLD)-manifest-vars && \
+	echo aprutil_ver=1.7-dev >>$(BLD)-manifest-vars
 
 gather-aprutil-trunk: pre-manifest
 #	NOOP - aprutil merges into apr
@@ -238,6 +238,35 @@ gather-brotli-master: pre-manifest
 	echo brotli    git-master && \
 	echo brotli_srcdir=brotli-master >>$(BLD)-manifest-vars && \
 	echo brotli_ver=1.x-git >>$(BLD)-manifest-vars
+
+gather-expat-release: pre-manifest
+	expat_srcpath=https://sourceforge.net/projects/expat/files/ && \
+	expat_ver=`wget --max-redirect=0 $$brotli_srcpath/latest/ 2>&1 | sed 's#Location: .*/tag/v\([^/]*\) \[following\]#\1#p;d;'` && \
+	expat_srcpath=https://github.com/libexpat/libexpat/archive/R_`sed 's#.#_#g;'` && \
+	expat_pkg=libexpat-$$expat_ver.tar.gz && \
+	if test ! -f pkgs/$$expat_pkg; then \
+	  cd pkgs && \
+	  wget -nv $$expat_srcpath/R_$$expat_ver.tar.gz -O $$brotli_pkg && \
+	  cd .. && \
+	  tar -xzf pkgs/$$brotli_pkg; \
+	fi && \
+	echo brotli    $$brotli_ver && \
+	echo brotli_srcdir=brotli-$$brotli_ver >>$(BLD)-manifest-vars && \
+	echo brotli_ver=$$brotli_ver >>$(BLD)-manifest-vars
+
+gather-brotli-master: pre-manifest
+	brotli_srcpath=https://github.com/google/brotli && \
+	if test ! -d brotli-master ; then \
+	  git clone -q $$brotli_srcpath.git brotli-master; \
+	else \
+	  cd brotli-master && git fetch -q && cd ..; \
+	fi && \
+	echo brotli    git-master && \
+	echo brotli_srcdir=brotli-master >>$(BLD)-manifest-vars && \
+	echo brotli_ver=1.x-git >>$(BLD)-manifest-vars
+
+
+
 
 gather-linux-release: gather-apr-release gather-aprutil-release \
 		      gather-httpd-release gather-openssl-release \
