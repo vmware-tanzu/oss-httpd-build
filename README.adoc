@@ -1,4 +1,4 @@
-= Pivotal OSS Build Schema for Apache HTTP Server
+= Pivotal OSS Build Schema and Instance Management for Apache HTTP Server
 
 Copyright (C) 2017-Present Pivotal Software, Inc. All rights reserved.
 
@@ -75,17 +75,23 @@ For all steps the complete group of development tools is recommended, e.g.;
 
  yum groupinstall 'C Development Tools and Libraries'
 
-For the Makefile.prepare step only, the imake package is required.
+or simply;
+
+ yum groupinstall 'Development Tools'
+
+Additional required tools which may not be included by default;
+
+ yum install cmake imake
 
 For the actual Makefile.build phase, a number of system component -devel
 packages are needed.
 
- yum install expat-devel libxml2-devel lua-devel pcre-devel zlib-devel
+ yum install libuuid-devel expat-devel libxml2-devel lua-devel pcre-devel zlib-devel
 
-These same base packages are required for deployment (and are installed by
-default given the command above);
+These base packages are required for deployment (and are incidently installed
+with the -devel packages above; most are already present by default);
 
- yum install expat libxml2 lua pcre zlib
+ yum install libuuid expat libxml2 lua pcre zlib 
 
 * Note that following RHEL 7 / Fedora 21, yum becomes the dnf utility.
 The package names have remained the same.
@@ -175,5 +181,16 @@ Where a component has an integrated test target these are processed
 within the build tree. The Apache httpd perl test framework is invoked
 against the intermediate installation in the $DESTDIR path.
 
+== Phase 5: Package Installation Binaries
 
+ $ cd dst/
+ $ make -f Makefile.package [BLD={type}] [TAG={-suffix}]
+
+Copy the intermediate/temporary installation httpd server and dependent
+binaries into the dst/webserver/ tree to rewrite configurations files and
+scripts with as relocatable paths, add the instance management scripts,
+split the debugging symbols from the binaries, and tar up the package.
+
+This makefile must be run from the dst (not source or build) subdirectory.
+ 
 
