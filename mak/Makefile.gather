@@ -84,7 +84,7 @@ gather-httpd-trunk: pre-manifest
 
 gather-apr-release: pre-manifest
 	apr_srcpath=https://www.apache.org/dist/apr && \
-	apr_pkg=`wget -q -O - $$apr_srcpath/ | sed 's#.*<a href="\(apr-1\.[0-9]\.[0-9]*\.tar\.bz2\)".*#\1#p;d;'` && \
+	apr_pkg=`wget -q -O - $$apr_srcpath/ | sed -n '/<a href="\(apr-1\.[0-9]\.[0-9]*\.tar\.bz2\)"/{s#.*href="\([^"]*\).*#\1#;h};$$!b;g;p'` && \
 	apr_ver=`echo $$apr_pkg | sed 's#apr-\(.*\)\.tar\.bz2#\1#;'` && \
 	if test ! -f pkgs/$$apr_pkg; then \
 	  cd pkgs && \
@@ -121,7 +121,7 @@ gather-apr-trunk: pre-manifest
 
 gather-aprutil-release: pre-manifest
 	aprutil_srcpath=https://www.apache.org/dist/apr && \
-	aprutil_pkg=`wget -q -O - $$aprutil_srcpath/ | sed 's#.*<a href="\(apr-util-1\.[0-9]\.[0-9]*\.tar\.bz2\)".*#\1#p;d;'` && \
+	aprutil_pkg=`wget -q -O - $$aprutil_srcpath/ | sed -n '/<a href="\(apr-util-1\.[0-9]\.[0-9]*\.tar\.bz2\)"/{s#.*href="\([^"]*\).*#\1#;h};$$!b;g;p'` && \
 	aprutil_ver=`echo $$aprutil_pkg | sed 's#apr-util-\(.*\)\.tar\.bz2#\1#;'` && \
 	if test ! -f pkgs/$$aprutil_pkg; then \
 	  cd pkgs && \
