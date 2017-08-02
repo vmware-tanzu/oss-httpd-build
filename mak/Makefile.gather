@@ -47,7 +47,7 @@ gather-httpdtest-trunk: pre-manifest
 
 gather-httpd-release: pre-manifest
 	httpd_srcpath=https://www.apache.org/dist/httpd && \
-	httpd_pkg=`wget -q -O - $$httpd_srcpath/ | sed 's#.*<a href="\(httpd-2\.4\.[0-9]*\.tar\.bz2\)".*#\1#p;d;'` && \
+	httpd_pkg=`wget -q -O - $$httpd_srcpath/ | sed -n '/<a href="\(httpd-2\.4\.[0-9]*\.tar\.bz2\)"/{s#.*href="\([^"]*\).*#\1#;h};$$!b;g;p'` && \
 	httpd_ver=`echo $$httpd_pkg | sed 's#httpd-\(.*\)\.tar\.bz2#\1#;'` && \
 	if test ! -f pkgs/$$httpd_pkg; then \
 	  cd pkgs && \
@@ -150,7 +150,7 @@ gather-aprutil-trunk: pre-manifest
 
 gather-openssl-release: pre-manifest
 	openssl_srcpath=https://www.openssl.org/source && \
-	openssl_pkg=`wget -q -O - $$openssl_srcpath/ | sed 's#.*<a href="\(openssl-1\.0\.2[a-z]*\.tar\.gz\)".*#\1#p;d;'` && \
+	openssl_pkg=`wget -q -O - $$openssl_srcpath/ | sed 's#.*<a href="\(openssl-1\.1\.0[a-z]*\.tar\.gz\)".*#\1#p;d;'` && \
 	openssl_ver=`echo $$openssl_pkg | sed 's#openssl-\(.*\)\.tar\.gz#\1#;'` && \
 	if test ! -f pkgs/$$openssl_pkg; then \
 	  cd pkgs && \
