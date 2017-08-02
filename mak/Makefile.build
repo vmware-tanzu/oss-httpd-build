@@ -37,7 +37,7 @@ include $(SRCDIR)/$(BLD)-manifest-vars
 DESTDIR=$(shell cd ..; pwd)/dst/$(httpd_srcdir)$(TAG)
 TARGET=/opt/pivotal/webserver/$(httpd_srcdir)$(TAG)
 
-all: build-httpd
+all: build-httpd build-tcnative
 
 pre-build:
 	-mkdir -p $(DSTDIR) 2>/dev/null
@@ -198,4 +198,26 @@ build-httpd: $(httpd_srcdir)/Makefile
 		< $(DESTDIR)/conf/original/httpd.conf \
 		> $(DESTDIR)/conf/httpd.conf && \
 	cd ..
+
+ifndef tcnative_srcdir
+build-tcnative:
+
+else
+$(tcnative_srcdir)/Makefile: build-apr build-openssl \
+			     $(SRCDIR)/$(tcnative_srcdir)/native/configure
+	-mkdir $(tcnative_srcdir) 2>/dev/null
+	cd $(tcnative_srcdir) && \
+	  $(SRCDIR)/$(tcnative_srcdir)/native/configure \
+		 --with-apr=$(DESTDIR) \
+		 --with-ssl=$(DESTDIR) \
+		 --prefix=$(DESTDIR) && \
+	cd ..
+
+build-tcnative: $(tcnative_srcdir)/Makefile
+	cd $(tcnative_srcdir) && \
+	  make -j && \
+	  make -j install && \
+	cd ..
+
+endif
 

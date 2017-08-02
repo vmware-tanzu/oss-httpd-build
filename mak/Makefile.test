@@ -32,7 +32,8 @@ include $(SRCDIR)/$(BLD)-manifest-vars
 
 DESTDIR=$(shell cd ..; pwd)/dst/$(httpd_srcdir)$(TAG)
 
-all: test-openssl test-apr test-aprutil test-nghttp2 test-brotli test-httpd
+all: test-openssl test-apr test-aprutil test-nghttp2 test-brotli test-httpd \
+     test-tcnative
 
 pre-test:
 
@@ -81,5 +82,12 @@ test-httpd: $(httpdtest_srcdir)/t/TEST
 	  t/TEST -apxs $(DESTDIR)/bin/apxs -httpd $(DESTDIR)/bin/apachectl && \
 	cd ..
 
+ifndef tcnative_srcdir
+test-tcnative:
 
+else
+# TBD
+test-tcnative: pre-test
+
+endif
 

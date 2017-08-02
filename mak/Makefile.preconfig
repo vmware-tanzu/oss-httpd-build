@@ -66,6 +66,19 @@ $(httpd_srcdir)/configure: $(httpd_srcdir)/configure.in
 
 preconfig-httpd: preconfig-aprutil $(httpd_srcdir)/configure
 
+ifndef tcnative_srcdir
+preconfig-tcnative:
+
+else
+$(tcnative_srcdir)/native/configure: $(tcnative_srcdir)/native/configure.in 
+	cd $(tcnative_srcdir)/native && \
+	  ./buildconf --with-apr=../../$(apr_srcdir) && \
+	cd ../..
+
+preconfig-tcnative: preconfig-apr $(tcnative_srcdir)/native/configure
+
+endif
+
 preconfig-httpdtest: pre-preconfig
 #	Apparently a noop
 
@@ -89,5 +102,5 @@ preconfig-brotli: pre-preconfig
 
 prepare-linux: preconfig-apr preconfig-aprutil preconfig-httpd \
 		preconfig-httpdtest preconfig-openssl preconfig-nghttp2 \
-		preconfig-brotli
+		preconfig-brotli preconfig-tcnative
 

@@ -82,6 +82,33 @@ gather-httpd-trunk: pre-manifest
 	echo httpd_srcdir=httpd-trunk >>$(BLD)-manifest-vars && \
 	echo httpd_ver=2.x-dev >>$(BLD)-manifest-vars
 
+gather-tcnative-release: pre-manifest
+	tcnative_srcpath=https://www.apache.org/dist/tomcat/tomcat-connectors/native && \
+	tcnative_ver=`wget -q -O - $$tcnative_srcpath/ | sed -n '/<a href="\(1\.2\.[0-9]*\/\)"/{s#.*href="\([^"/]*\)\/.*#\1#;h};$$!b;g;p'` && \
+	tcnative_srcpath=$$tcnative_srcpath/$$tcnative_ver/source && \
+	tcnative_pkg=tomcat-native-$$tcnative_ver-src.tar.gz && \
+	if test ! -f pkgs/$$tcnative_pkg; then \
+	  cd pkgs && \
+	  wget -nv $$tcnative_srcpath/$$tcnative_pkg && \
+	  wget -nv $$tcnative_srcpath/$$tcnative_pkg.asc && \
+	  cd .. && \
+	  tar -xzf pkgs/$$tcnative_pkg; \
+	fi && \
+	echo tcnative  $$tcnative_ver && \
+	echo tcnative_srcdir=tomcat-native-$$tcnative_ver-src >>$(BLD)-manifest-vars && \
+	echo tcnative_ver=$$tcnative_ver >>$(BLD)-manifest-vars
+
+gather-tcnative-trunk: pre-manifest
+	tcnative_srcpath=https://svn.apache.org/repos/asf/tomcat/native/trunk && \
+	if test ! -d tomcat-native-1.2-svn ; then \
+	  svn co -q $$tcnative_srcpath tomcat-native-1.2-svn; \
+	else \
+	  svn up -q tomcat-native-1.2-svn; \
+	fi && \
+	echo tcnative  tomcat-native-1.2-svn && \
+	echo tcnative_srcdir=tomcat-native-1.2-svn >>$(BLD)-manifest-vars && \
+	echo tcnative_ver=1.2-dev >>$(BLD)-manifest-vars
+
 gather-apr-release: pre-manifest
 	apr_srcpath=https://www.apache.org/dist/apr && \
 	apr_pkg=`wget -q -O - $$apr_srcpath/ | sed -n '/<a href="\(apr-1\.[0-9]\.[0-9]*\.tar\.bz2\)"/{s#.*href="\([^"]*\).*#\1#;h};$$!b;g;p'` && \
@@ -135,15 +162,15 @@ gather-aprutil-release: pre-manifest
 	echo aprutil_ver=$$aprutil_ver >>$(BLD)-manifest-vars
 
 gather-aprutil-1xbranch: pre-manifest
-	aprutil_srcpath=https://svn.apache.org/repos/asf/apr/apr-util/branches/1.7.x && \
-	if test ! -d apr-util-1.7-svn ; then \
-	  svn co -q $$aprutil_srcpath apr-util-1.7-svn; \
+	aprutil_srcpath=https://svn.apache.org/repos/asf/apr/apr-util/branches/1.6.x && \
+	if test ! -d apr-util-1.6-svn ; then \
+	  svn co -q $$aprutil_srcpath apr-util-1.6-svn; \
 	else \
-	  svn up -q apr-util-1.7-svn; \
+	  svn up -q apr-util-1.6-svn; \
 	fi && \
-	echo aprutil  apr-util-1.7-svn && \
-	echo aprutil_srcdir=apr-util-1.7-svn >>$(BLD)-manifest-vars && \
-	echo aprutil_ver=1.7-dev >>$(BLD)-manifest-vars
+	echo aprutil  apr-util-1.6-svn && \
+	echo aprutil_srcdir=apr-util-1.6-svn >>$(BLD)-manifest-vars && \
+	echo aprutil_ver=1.6-dev >>$(BLD)-manifest-vars
 
 gather-aprutil-trunk: pre-manifest
 #	NOOP - aprutil merges into apr
@@ -266,8 +293,6 @@ gather-brotli-master: pre-manifest
 	echo brotli_ver=1.x-git >>$(BLD)-manifest-vars
 
 
-
-
 gather-linux-release: gather-apr-release gather-aprutil-release \
 		      gather-httpd-release gather-openssl-release \
 		      gather-nghttp2-release gather-brotli-release \
@@ -299,4 +324,10 @@ gather-linux-bleed:   gather-apr-trunk \
 	mv $(BLD)-manifest-vars $(BLD)-manifest-vars.sav
 	sort < $(BLD)-manifest-vars.sav > $(BLD)-manifest-vars
 	rm $(BLD)-manifest-vars.sav
+
+ifeq "$(BLD)" "release"
+tcnative: gather-tcnative-release
+else
+tcnative: gather-tcnative-trunk
+endif
 
