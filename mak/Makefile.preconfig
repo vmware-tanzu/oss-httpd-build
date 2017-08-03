@@ -49,7 +49,7 @@ with_aprutil=
 preconfig-aprutil: preconfig-apr
 
 else
-with_aprutil=--with-aprutil=../$(aprutil_srcdir)
+with_aprutil=--with-apr-util=../$(aprutil_srcdir)
 $(aprutil_srcdir)/configure: $(aprutil_srcdir)/configure.in 
 	cd $(aprutil_srcdir) && \
 	  ./buildconf --with-apr=../$(apr_srcdir) && \
