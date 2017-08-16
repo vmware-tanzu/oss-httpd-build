@@ -42,6 +42,7 @@ gather-httpdtest-trunk: pre-manifest
 	else \
 	  svn up -q httpdtest-trunk; \
 	fi && \
+	echo httpdtest_srcpath=$$httpdtest_srcpath >>$(BLD)-manifest-vars && \
 	echo httpdtest_srcdir=httpdtest-trunk >>$(BLD)-manifest-vars && \
 	echo httpdtest_ver=httpdtest-trunk >>$(BLD)-manifest-vars
 
