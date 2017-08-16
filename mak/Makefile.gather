@@ -26,8 +26,9 @@
 # in the same directory should follow immediately if the manifest changes.
 
 BLD=release
+GRP=linux
 
-all: gather-linux-$(BLD)
+all: gather-$(GRP)-$(BLD)
 
 pre-manifest:
 	mkdir pkgs 2>/dev/null || true
@@ -202,7 +203,7 @@ gather-openssl-110branch: pre-manifest
 	openssl_srcpath=https://github.com/openssl/openssl && \
 	openssl_ver=1.1.0-git && \
 	openssl_srcdir=openssl-$$openssl_ver && \
-	if test ! -d openssl-1.1.0git ; then \
+	if test ! -d $$openssl_srcdir ; then \
 	  git clone -q $$openssl_srcpath.git $$openssl_srcdir && \
 	  cd $$openssl_srcdir && git checkout OpenSSL_1_1_0-stable && cd ..; \
 	else \
@@ -300,7 +301,7 @@ gather-apriconv-release: pre-manifest
 	echo apriconv_ver=$$apriconv_ver >>$(BLD)-manifest-vars
 
 gather-apriconv-1xbranch: pre-manifest
-	apriconv_srcpath=https://svn.apache.org/repos/asf/apr/apr-iconv/branches/1.6.x && \
+	apriconv_srcpath=https://svn.apache.org/repos/asf/apr/apr-iconv/trunk && \
 	apriconv_rev=`svn info $$apriconv_srcpath | sed -n '/Last Changed Rev: \([0-9]\+\)/{s#.*: ##;p}'` && \
 	apriconv_ver=1.2.x-$$apriconv_rev && \
 	apriconv_srcdir=apr-iconv-$$apriconv_ver && \
