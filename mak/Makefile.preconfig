@@ -100,7 +100,45 @@ preconfig-nghttp2: pre-preconfig $(nghttp2_srcdir)/configure
 preconfig-brotli: pre-preconfig
 #	Noop, except perhaps if premake5/bazel support vpath builds
 
+ifndef expat_srcdir
+preconfig-expat: pre-preconfig
+else
+$(expat_srcdir)/expat/configure: $(expat_srcdir)/expat/configure.ac
+	cd $(expat_srcdir)/expat && \
+	  ./buildconf.sh && \
+	cd ../..
+
+preconfig-expat: pre-preconfig $(expat_srcdir)/expat/configure
+endif
+
+ifndef pcre_srcdir
+preconfig-pcre: pre-preconfig
+else
+$(pcre_srcdir)/configure: $(pcre_srcdir)/configure.ac
+	cd $(pcre_srcdir) && \
+	  NOCONFIGURE=1 ./autogen.sh && \
+	cd ..
+
+preconfig-pcre: pre-preconfig $(pcre_srcdir)/configure
+endif
+
+ifndef libxml2_srcdir
+preconfig-libxml2: pre-preconfig
+else
+$(libxml2_srcdir)/configure: $(libxml2_srcdir)/configure.ac
+	cd $(libxml2_srcdir) && \
+	  NOCONFIGURE=1 ./autogen.sh && \
+	cd ..
+
+preconfig-libxml2: pre-preconfig $(libxml2_srcdir)/configure
+endif
+
+preconfig-lua: pre-preconfig
+
+preconfig-apriconv: pre-preconfig
+
 prepare-linux: preconfig-apr preconfig-aprutil preconfig-httpd \
 		preconfig-httpdtest preconfig-openssl preconfig-nghttp2 \
-		preconfig-brotli preconfig-tcnative
-
+		preconfig-brotli preconfig-expat preconfig-pcre \
+		preconfig-apriconv preconfig-libxml2 preconfig-lua \
+		preconfig-tcnative 
