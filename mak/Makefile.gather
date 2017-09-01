@@ -35,6 +35,7 @@ pre-manifest:
 	echo Gathering $(BLD) Source Trees
 	truncate -s0 $(BLD)-manifest-vars
 
+
 gather-httpdtest-trunk: pre-manifest
 	httpdtest_srcpath=https://svn.apache.org/repos/asf/httpd/test/framework/trunk && \
 	if test ! -d httpdtest-trunk ; then \
@@ -45,6 +46,7 @@ gather-httpdtest-trunk: pre-manifest
 	echo httpdtest_srcpath=$$httpdtest_srcpath >>$(BLD)-manifest-vars && \
 	echo httpdtest_srcdir=httpdtest-trunk >>$(BLD)-manifest-vars && \
 	echo httpdtest_ver=httpdtest-trunk >>$(BLD)-manifest-vars
+
 
 gather-httpd-release: pre-manifest
 	httpd_srcpath=https://www.apache.org/dist/httpd && \
@@ -86,6 +88,7 @@ gather-httpd-trunk: pre-manifest
 	echo httpd_srcdir=$$httpd_srcdir >>$(BLD)-manifest-vars && \
 	echo httpd_ver=$$httpd_ver >>$(BLD)-manifest-vars
 
+
 gather-tcnative-release: pre-manifest
 	tcnative_srcpath=https://www.apache.org/dist/tomcat/tomcat-connectors/native && \
 	tcnative_ver=`wget -q -O - $$tcnative_srcpath/ | sed -n '/<a href="\(1\.2\.[0-9]*\/\)"/{s#.*href="\([^"/]*\)\/.*#\1#;h};$$!b;g;p'` && \
@@ -114,6 +117,7 @@ gather-tcnative-trunk: pre-manifest
 	echo tcnative_srcpath=$$tcnative_srcpath >>$(BLD)-manifest-vars && \
 	echo tcnative_srcdir=$$tcnative_srcdir >>$(BLD)-manifest-vars && \
 	echo tcnative_ver=$$tcnative_ver >>$(BLD)-manifest-vars
+
 
 gather-apr-release: pre-manifest
 	apr_srcpath=https://www.apache.org/dist/apr && \
@@ -155,6 +159,7 @@ gather-apr-trunk: pre-manifest
 	echo apr_srcdir=$$apr_srcdir >>$(BLD)-manifest-vars && \
 	echo apr_ver=$$apr_ver >>$(BLD)-manifest-vars
 
+
 gather-aprutil-release: pre-manifest
 	aprutil_srcpath=https://www.apache.org/dist/apr && \
 	aprutil_pkg=`wget -q -O - $$aprutil_srcpath/ | sed -n '/<a href="\(apr-util-1\.[0-9]\.[0-9]*\.tar\.bz2\)"/{s#.*href="\([^"]*\).*#\1#;h};$$!b;g;p'` && \
@@ -184,6 +189,7 @@ gather-aprutil-1xbranch: pre-manifest
 
 gather-aprutil-trunk: pre-manifest
 #	NOOP - aprutil merges into apr
+
 
 gather-openssl-release: pre-manifest
 	openssl_srcpath=https://www.openssl.org/source && \
@@ -227,6 +233,7 @@ gather-openssl-master: pre-manifest
 	echo openssl_srcdir=$$openssl_srcdir >>$(BLD)-manifest-vars && \
 	echo openssl_ver=$$openssl_ver >>$(BLD)-manifest-vars
 
+
 gather-nghttp2-release: pre-manifest
 	nghttp2_srcpath=https://github.com/nghttp2/nghttp2/releases && \
 	nghttp2_pkg=`wget --max-redirect=0 $$nghttp2_srcpath/latest/ 2>&1 | sed 's#Location: \(.*\)/tag/v\([^/]*\) \[following\]#\1/download/v\2/nghttp2-\2.tar.bz2#p;d;'` && \
@@ -257,6 +264,7 @@ gather-nghttp2-master: pre-manifest
 	echo nghttp2_srcdir=$$nghttp2_srcdir >>$(BLD)-manifest-vars && \
 	echo nghttp2_ver=$$nghttp2_ver >>$(BLD)-manifest-vars
 
+
 gather-brotli-release: pre-manifest
 	brotli_srcpath=https://github.com/google/brotli/releases && \
 	brotli_ver=`wget --max-redirect=0 $$brotli_srcpath/latest/ 2>&1 | sed 's#Location: .*/tag/v\([^/]*\) \[following\]#\1#p;d;'` && \
@@ -286,6 +294,7 @@ gather-brotli-master: pre-manifest
 	echo brotli_srcdir=$$brotli_srcdir >>$(BLD)-manifest-vars && \
 	echo brotli_ver=$$brotli_ver >>$(BLD)-manifest-vars
 
+
 gather-apriconv-release: pre-manifest
 	apriconv_srcpath=https://www.apache.org/dist/apr && \
 	apriconv_pkg=`wget -q -O - $$apriconv_srcpath/ | sed -n '/<a href="\(apr-iconv-1\.[0-9]\.[0-9]*\.tar\.bz2\)"/{s#.*href="\([^"]*\).*#\1#;h};$$!b;g;p'` && \
@@ -312,6 +321,7 @@ gather-apriconv-1xbranch: pre-manifest
 	echo apriconv_srcpath=$$apriconv_srcpath >>$(BLD)-manifest-vars && \
 	echo apriconv_srcdir=$$apriconv_srcdir >>$(BLD)-manifest-vars && \
 	echo apriconv_ver=$$apriconv_ver >>$(BLD)-manifest-vars
+
 
 gather-expat-release: pre-manifest
 	expat_srcpath=https://github.com/libexpat/libexpat/releases && \
@@ -343,10 +353,12 @@ gather-expat-master: pre-manifest
 	echo expat_srcdir=$$expat_srcdir >>$(BLD)-manifest-vars && \
 	echo expat_ver=$$expat_ver >>$(BLD)-manifest-vars
 
+
 gather-pcre-release: pre-manifest
 	pcre_srcpath=https://ftp.pcre.org/pub/pcre/ && \
 	pcre_pkg=`wget -q -O - $$pcre_srcpath/ | sed -n '/<a href="\(pcre-8\.[0-9]*\.tar\.bz2\)"/{s#.*href="\([^"]*\).*#\1#;h};$$!b;g;p'` && \
-	pcre_ver=`echo $$pcre_pkg | sed 's#pcre-\(.*\)\.tar\.bz2#\1#;'` && \
+	pcre_srcdir=`echo $$pcre_pkg | sed 's#\(pcre-.*\)\.tar\.bz2#\1#;'` && \
+	pcre_ver=`echo $$pcre_srcdir | sed 's#pcre-\(.*\)#\1#;'` && \
 	if test ! -f pkgs/$$pcre_pkg; then \
 	  cd pkgs && \
 	  wget -nv $$pcre_srcpath/$$pcre_pkg && \
@@ -355,7 +367,7 @@ gather-pcre-release: pre-manifest
 	  tar -xjf pkgs/$$pcre_pkg; \
 	fi && \
 	echo pcre_srcpath=$$pcre_srcpath >>$(BLD)-manifest-vars && \
-	echo pcre_srcdir=pcre-$$pcre_ver >>$(BLD)-manifest-vars && \
+	echo pcre_srcdir=$$pcre_srcdir >>$(BLD)-manifest-vars && \
 	echo pcre_ver=$$pcre_ver >>$(BLD)-manifest-vars
 
 gather-pcre-trunk: pre-manifest
@@ -370,9 +382,38 @@ gather-pcre-trunk: pre-manifest
 	echo pcre_srcdir=$$pcre_srcdir >>$(BLD)-manifest-vars && \
 	echo pcre_ver=$$pcre_ver >>$(BLD)-manifest-vars
 
+gather-pcre2-trunk: pre-manifest
+	pcre_srcpath=svn://vcs.exim.org/pcre2/code/trunk && \
+	pcre_rev=`svn info $$pcre_srcpath | sed -n '/Last Changed Rev: \([0-9]\+\)/{s#.*: ##;p}'` && \
+	pcre_ver=10.x-$$pcre_rev && \
+	pcre_srcdir=pcre2-$$pcre_ver && \
+	if test ! -d $$pcre_srcdir; then \
+	  svn co -q -r $$pcre_rev $$pcre_srcpath $$pcre_srcdir; \
+	fi && \
+	echo pcre_srcpath=$$pcre_srcpath >>$(BLD)-manifest-vars && \
+	echo pcre_srcdir=$$pcre_srcdir >>$(BLD)-manifest-vars && \
+	echo pcre_ver=$$pcre_ver >>$(BLD)-manifest-vars
+
+
 gather-libxml2-release: pre-manifest
 	libxml2_srcpath=http://xmlsoft.org/sources && \
-	libxml2_ver=`wget -q -O - $$libxml2_srcpath/ | sed -n '/<a href="LATEST_LIBXML2_IS_/{s#.*href="LATEST_LIBXML2_IS_\([0-9.]*\)".*#\1#;p;q}'` && \
+	libxml2_pkg=`wget -q -O - $$libxml2_srcpath/ | sed -n '/<a href="\(libxml2-[0-9.]*\.tar\.gz\)"/{s#.*href="\([^"]*\).*#\1#;h};$$!b;g;p'` && \
+	libxml2_srcdir=`echo $$libxml2_pkg | sed 's#\(libxml2-.*\)\.tar\.gz#\1#;'` && \
+	libxml2_ver=`echo $$libxml2_pkg | sed 's#libxml2-\(.*\)#\1#;'` && \
+	if test ! -f pkgs/$$libxml2_pkg; then \
+	  cd pkgs && \
+	  wget -nv $$libxml2_srcpath/$$libxml2_pkg && \
+	  wget -nv $$libxml2_srcpath/$$libxml2_pkg.asc && \
+	  cd .. && \
+	  tar -xzf pkgs/$$libxml2_pkg; \
+	fi && \
+	echo libxml2_srcpath=$$libxml2_srcpath >>$(BLD)-manifest-vars && \
+	echo libxml2_srcdir=$$libxml2_srcdir >>$(BLD)-manifest-vars && \
+	echo libxml2_ver=$$libxml2_ver >>$(BLD)-manifest-vars
+
+gather-libxml2-candidate: pre-manifest
+	libxml2_srcpath=http://xmlsoft.org/sources && \
+	libxml2_ver=`wget -q -O - $$libxml2_srcpath/ | sed -n '/<a href="LATEST_LIBXML2_IS_/{s#.*href="LATEST_LIBXML2_IS_\([^"]*\)".*#\1#;p;q}'` && \
 	libxml2_srcdir=libxml2-$$libxml2_ver && \
 	libxml2_pkg=$$libxml2_srcdir.tar.gz && \
 	if test ! -f pkgs/$$libxml2_pkg; then \
@@ -414,6 +455,7 @@ gather-lua-release: pre-manifest
 	echo lua_srcdir=$$lua_srcdir >>$(BLD)-manifest-vars && \
 	echo lua_ver=$$lua_ver >>$(BLD)-manifest-vars
 
+
 gather-zlib-release: pre-manifest
 	zlib_srcpath=https://zlib.net && \
 	zlib_pkg=`wget -q -O - $$zlib_srcpath/ | sed -n '/<a href="\(zlib-1\.[0-9.]*\.tar\.gz\).asc"/{s#.*href="\(.*\)\.asc".*#\1#;p;q}'` && \
@@ -443,59 +485,81 @@ gather-zlib-master: pre-manifest
 	echo zlib_srcdir=$$zlib_srcdir >>$(BLD)-manifest-vars && \
 	echo zlib_ver=$$zlib_ver >>$(BLD)-manifest-vars
 
-gather-complete-release: gather-expat-release gather-pcre-release \
-		      gather-apr-release gather-aprutil-release \
-		      gather-apriconv-release \
+
+gather-core-release:  gather-apr-release gather-aprutil-release \
 		      gather-httpd-release gather-openssl-release \
 		      gather-nghttp2-release gather-brotli-release \
-		      gather-libxml2-release gather-lua-release \
-		      gather-zlib-release gather-httpdtest-trunk
+		      gather-httpdtest-trunk
+
+gather-complete-release: gather-core-release \
+		      gather-expat-release gather-pcre-release \
+		      gather-apriconv-release gather-libxml2-release \
+		      gather-lua-release gather-zlib-release
 	mv $(BLD)-manifest-vars $(BLD)-manifest-vars.sav
 	LC_COLLATE=C sort < $(BLD)-manifest-vars.sav > $(BLD)-manifest-vars
 	rm $(BLD)-manifest-vars.sav
 
-gather-linux-release: gather-apr-release gather-aprutil-release \
-		      gather-httpd-release gather-openssl-release \
-		      gather-nghttp2-release gather-brotli-release \
-		      gather-httpdtest-trunk
+gather-linux-release: gather-core-release
 	mv $(BLD)-manifest-vars $(BLD)-manifest-vars.sav
 	LC_COLLATE=C sort < $(BLD)-manifest-vars.sav > $(BLD)-manifest-vars
 	rm $(BLD)-manifest-vars.sav
 
-gather-linux-candidate: gather-apr-release gather-aprutil-release \
+
+gather-core-candidate: gather-apr-release gather-aprutil-release \
 		      gather-httpd-release gather-openssl-release \
 		      gather-nghttp2-release gather-brotli-release \
 		      gather-httpdtest-trunk
+
+gather-linux-candidate: gather-core-candidate
 	mv $(BLD)-manifest-vars $(BLD)-manifest-vars.sav
-	sort < $(BLD)-manifest-vars.sav > $(BLD)-manifest-vars
+	LC_COLLATE=C sort < $(BLD)-manifest-vars.sav > $(BLD)-manifest-vars
 	rm $(BLD)-manifest-vars.sav
 
-gather-complete-snapshot: gather-expat-master gather-pcre-trunk \
-		      gather-apr-1xbranch gather-aprutil-1xbranch \
-		      gather-apriconv-1xbranch \
-		      gather-httpd-2xbranch gather-openssl-110branch \
-		      gather-nghttp2-master gather-brotli-master \
-		      gather-libxml2-master gather-lua-release \
-		      gather-zlib-master gather-httpdtest-trunk
+gather-complete-candidate: gather-core-candidate \
+		      gather-expat-release gather-pcre-release \
+		      gather-apriconv-release gather-libxml2-candidate \
+		      gather-lua-release gather-zlib-release
 	mv $(BLD)-manifest-vars $(BLD)-manifest-vars.sav
-	sort < $(BLD)-manifest-vars.sav > $(BLD)-manifest-vars
+	LC_COLLATE=C sort < $(BLD)-manifest-vars.sav > $(BLD)-manifest-vars
 	rm $(BLD)-manifest-vars.sav
 
-gather-linux-snapshot: gather-apr-1xbranch gather-aprutil-1xbranch \
+
+gather-core-snapshot: gather-apr-1xbranch gather-aprutil-1xbranch \
 		      gather-httpd-2xbranch gather-openssl-110branch \
 		      gather-nghttp2-master gather-brotli-master \
 		      gather-httpdtest-trunk
+
+gather-complete-snapshot: gather-core-snapshot \
+		      gather-expat-master gather-pcre-trunk \
+		      gather-apriconv-1xbranch gather-libxml2-master \
+		      gather-lua-release gather-zlib-master
 	mv $(BLD)-manifest-vars $(BLD)-manifest-vars.sav
-	sort < $(BLD)-manifest-vars.sav > $(BLD)-manifest-vars
+	LC_COLLATE=C sort < $(BLD)-manifest-vars.sav > $(BLD)-manifest-vars
 	rm $(BLD)-manifest-vars.sav
 
-gather-linux-bleed:   gather-apr-trunk \
+gather-linux-snapshot: gather-core-snapshot
+	mv $(BLD)-manifest-vars $(BLD)-manifest-vars.sav
+	LC_COLLATE=C sort < $(BLD)-manifest-vars.sav > $(BLD)-manifest-vars
+	rm $(BLD)-manifest-vars.sav
+
+
+gather-core-bleed:    gather-apr-trunk gather-pcre2-trunk \
 		      gather-httpd-trunk gather-openssl-master \
 		      gather-nghttp2-master gather-brotli-master \
 		      gather-httpdtest-trunk
+
+gather-complete-bleed: gather-core-bleed \
+		      gather-expat-master gather-libxml2-master \
+		      gather-lua-release gather-zlib-master
 	mv $(BLD)-manifest-vars $(BLD)-manifest-vars.sav
-	sort < $(BLD)-manifest-vars.sav > $(BLD)-manifest-vars
+	LC_COLLATE=C sort < $(BLD)-manifest-vars.sav > $(BLD)-manifest-vars
 	rm $(BLD)-manifest-vars.sav
+
+gather-linux-bleed:   gather-core-bleed
+	mv $(BLD)-manifest-vars $(BLD)-manifest-vars.sav
+	LC_COLLATE=C sort < $(BLD)-manifest-vars.sav > $(BLD)-manifest-vars
+	rm $(BLD)-manifest-vars.sav
+
 
 ifeq "$(BLD)" "release"
 tcnative: gather-tcnative-release
