@@ -37,38 +37,45 @@ all: prepare-linux
 pre-preconfig:
 	echo Preparing $(BLD) Source Trees
 
+ifndef apr_srcdir
+preconfig-apr: pre-preconfig
+with_apr=
+else
+with_apr=--with-apr=../$(apr_srcdir)
 $(apr_srcdir)/configure: $(apr_srcdir)/configure.in 
 	cd $(apr_srcdir) && \
 	  ./buildconf && \
 	cd ..
 
 preconfig-apr: pre-preconfig $(apr_srcdir)/configure
+endif
 
 ifndef aprutil_srcdir
 with_aprutil=
 preconfig-aprutil: preconfig-apr
-
 else
 with_aprutil=--with-apr-util=../$(aprutil_srcdir)
 $(aprutil_srcdir)/configure: $(aprutil_srcdir)/configure.in 
 	cd $(aprutil_srcdir) && \
-	  ./buildconf --with-apr=../$(apr_srcdir) && \
+	  ./buildconf $(with_apr) && \
 	cd ..
 
 preconfig-aprutil: preconfig-apr $(aprutil_srcdir)/configure
-
 endif
 
+ifndef httpd_srcdir
+preconfig-httpd: preconfig-aprutil
+else
 $(httpd_srcdir)/configure: $(httpd_srcdir)/configure.in 
 	cd $(httpd_srcdir) && \
-	  ./buildconf --with-apr=../$(apr_srcdir) $(with_aprutil) && \
+	  ./buildconf $(with_apr) $(with_aprutil) && \
 	cd ..
 
 preconfig-httpd: preconfig-aprutil $(httpd_srcdir)/configure
+endif
 
 ifndef tcnative_srcdir
-preconfig-tcnative:
-
+preconfig-tcnative: pre-preconfig
 else
 $(tcnative_srcdir)/native/configure: $(tcnative_srcdir)/native/configure.in 
 	cd $(tcnative_srcdir)/native && \
@@ -76,18 +83,24 @@ $(tcnative_srcdir)/native/configure: $(tcnative_srcdir)/native/configure.in
 	cd ../..
 
 preconfig-tcnative: preconfig-apr $(tcnative_srcdir)/native/configure
-
 endif
 
 preconfig-httpdtest: pre-preconfig
 #	Apparently a noop
 
+ifndef openssl_srcdir
+preconfig-openssl: pre-preconfig
+else
 preconfig-openssl: pre-preconfig
 	cd $(openssl_srcdir) && \
 	  ./Configure dist shared && \
 	  $(MAKE) depend && \
 	cd ..
+endif
 
+ifndef nghttp2_srcdir
+preconfig-nghttp2: pre-preconfig
+else
 $(nghttp2_srcdir)/configure: $(nghttp2_srcdir)/configure.ac
 	cd $(nghttp2_srcdir) && \
 	   autoreconf -i && \
@@ -96,6 +109,7 @@ $(nghttp2_srcdir)/configure: $(nghttp2_srcdir)/configure.ac
 	cd ..
 
 preconfig-nghttp2: pre-preconfig $(nghttp2_srcdir)/configure
+endif
 
 preconfig-brotli: pre-preconfig
 #	Noop, except perhaps if premake5/bazel support vpath builds
