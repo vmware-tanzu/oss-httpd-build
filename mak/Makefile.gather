@@ -399,7 +399,7 @@ gather-libxml2-release: pre-manifest
 	libxml2_srcpath=http://xmlsoft.org/sources && \
 	libxml2_pkg=`wget -q -O - $$libxml2_srcpath/ | sed -n '/<a href="\(libxml2-[0-9.]*\.tar\.gz\)"/{s#.*href="\([^"]*\).*#\1#;h};$$!b;g;p'` && \
 	libxml2_srcdir=`echo $$libxml2_pkg | sed 's#\(libxml2-.*\)\.tar\.gz#\1#;'` && \
-	libxml2_ver=`echo $$libxml2_pkg | sed 's#libxml2-\(.*\)#\1#;'` && \
+	libxml2_ver=`echo $$libxml2_srcdir | sed 's#libxml2-\(.*\)#\1#;'` && \
 	if test ! -f pkgs/$$libxml2_pkg; then \
 	  cd pkgs && \
 	  wget -nv $$libxml2_srcpath/$$libxml2_pkg && \
