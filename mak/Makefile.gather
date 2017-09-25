@@ -136,9 +136,9 @@ gather-apr-release: pre-manifest
 	echo apr_ver=$$apr_ver >>$(BLD)-manifest-vars
 
 gather-apr-1xbranch: pre-manifest
-	apr_srcpath=https://svn.apache.org/repos/asf/apr/apr/branches/1.7.x && \
+	apr_srcpath=https://svn.apache.org/repos/asf/apr/apr/branches/1.6.x && \
 	apr_rev=`svn info $$apr_srcpath | sed -n '/Last Changed Rev: \([0-9]\+\)/{s#.*: ##;p}'` && \
-	apr_ver=1.7.x-$$apr_rev && \
+	apr_ver=1.6.x-$$apr_rev && \
 	apr_srcdir=apr-$$apr_ver && \
 	if test ! -d $$apr_srcdir ; then \
 	  svn co -q $$apr_srcpath $$apr_srcdir; \
