@@ -53,15 +53,15 @@ next-major or minor development trees.
  dst/                    Resulting intermediate binary packages
     {httpd-pkg}{tag}/    Temporary installation for testing and relocation
 
- out/                    Final binary package
+ pkg/                    Final binary package
     {httpd-pkg}{tag}/    Relocateable binaries for distribution
 
 == Platform Requirements
 
 The development toolchain package group from the respective OS distribution
-is required to build this package. In addition, a number of stable, well-maintained
-components are leveraged, rather than building and installing
-potentially conflicting versions.
+is required to build this package. In addition, a number of stable,
+well-maintained components are leveraged from the OS distribution, rather than
+building and installing potentially conflicting versions.
 
 On all platforms, in order to run `Makefile.test` there is a list of CPAN
 dependencies required to invoke the perl-based `Apache::Test` framework.
@@ -177,7 +177,8 @@ typically not need to be overridden.
 
 The TARGET directory, `/opt/pivotal/webserver/$(httpd_srcdir)$(TAG)` would
 typically not be overridden, and refers to the anticipated installation
-path of the resulting package.
+path of the resulting package. Use this to ensure the generated suexec
+binaries are recognized as valid.
 
 == Phase 4: Test Source and Intermediate Installation
 
@@ -194,7 +195,7 @@ against the intermediate installation in the $DESTDIR path.
 
 == Phase 5: Package Installation Binaries
 
- $ cd dst/
+ $ cd pkg/
  $ make -f ../mak/Makefile.package [BLD={type}] [TAG={-suffix}]
 
 Copy the intermediate/temporary installation httpd server and dependent
@@ -202,5 +203,39 @@ binaries into the `dst/webserver/` tree to rewrite configurations files and
 scripts with as relocatable paths, add the instance management scripts,
 split the debugging symbols from the binaries, and tar up the package.
 
-This makefile must be run from the `dst` (not source or build) subdirectory.
+This makefile is run from the `pkg` (not `src`, `bld` or `dst`) subdirectory.
+Note that running this in the `dst` subdirectory will wipe out the last build
+target directory; please use caution.
+
+Distribute the resulting .tar.bz2 files as desired.
+
+== Installation Phase ==
+
+Installing these binaries to a target machine consists of untarring the package,
+relocating references to the desired installation path and creating a symlink
+to use as the 'generic' reference to the now-current httpd.
+
+ $ mkdir -p /opt/pivotal/webserver
+ $ cd /opt/pivotal/webserver
+ $ tar -xjvf {pkgname}
+ $ ./httpd-2.4.29{tag}/bin/fixrootpath.pl
+ $ ln -sf httpd-2.4.29{tag} httpd-2.4
+
+Packages may be installed in parallel; in order to switch the running httpd
+version, simply reassign the symlink to the desired version and restart the
+server instances.
+
+== Instance Creation ==
+
+To create an instance /opt/pivotal/webserver/{hostname}, use the following
+commands;
+
+ $ cd /opt/pivotal/webserver
+ $ ./httpd-2.4/bin/newserver.pl --servername {hostname}
+
+The resulting directory includes `bin`, `conf`, `htdocs`, `cgi-bin`, `ssl`
+and `logs` subdirectories. The `bin` directory includes an environment script
+for consuming the instance's and then binaries distributed in `httpd-2.4/bin`,
+as well as an httpd control script `httpdctl`.
+
 
