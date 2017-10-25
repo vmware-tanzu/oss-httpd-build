@@ -21,20 +21,20 @@ components shipped with modern linux distributions
 which are reasonably stable and up to date. On Windows,
 every component must be built from source.
 
-The build target is /opt/pivotal/webserver/httpd-2.4/
+The build target is `/opt/pivotal/webserver/httpd-2.4/`
 on Linux and Windows, but is relocatable. Each has a
-long pathname, e.g. httpd-2.4.25-$bldno/ which is
+long pathname, e.g. `httpd-2.4.25-$bldno/` which is
 symlinked from the 'expected' path. Non-release builds
-have additional pathname components such as -snapshot,
--bleed, etc, and may have a TAG to distinguish two
+have additional pathname components such as `-snapshot`,
+`-bleed`, etc, and may have a TAG to distinguish two
 otherwise apparently identical builds.
 
-Build \{pkg} reflects the particular component, either
-the offical designation (httpd-2.4.25/), an indication
-of interim packages (httpd-2.4.26-rc1/), or the exact
-province of the file (httpd-2.4.26-dev-r1872199/)
+Build `\{pkg}` reflects the particular component, either
+the offical designation (`httpd-2.4.25/`), an indication
+of interim packages (`httpd-2.4.26-rc1/`), or the exact
+province of the file (`httpd-2.4.26-dev-r1872199/`)
 
-Several \{bld} schemas are expected; 'release' for the
+Several `\{bld}` schemas are expected; 'release' for the
 official packages, 'candidate' for packages anticipated
 for release, 'snapshot' for the working trees of the
 component's current maintenance trees, and 'bleed' for
@@ -58,53 +58,64 @@ next-major or minor development trees.
 
 == Platform Requirements
 
-The development toolchain / package group from the respective OS distribution
-is required to build this package. In addition, a number of stable, well
-maintained components are leveraged, rather than building and installing
+The development toolchain package group from the respective OS distribution
+is required to build this package. In addition, a number of stable, well-maintained
+components are leveraged, rather than building and installing
 potentially conflicting versions.
 
-On all platforms, in order to run Makefile.test there is a list of CPAN
-dependencies required to invoke the perl-based Apache::Test framework.
-These can be found under src/httpdtest-trunk/README after first running
-the Makefile.gather phase. An immediate goal of this toolchain is to
+On all platforms, in order to run `Makefile.test` there is a list of CPAN
+dependencies required to invoke the perl-based `Apache::Test` framework.
+These can be found under `src/httpdtest-trunk/README` after first running
+the `Makefile.gather` phase. An immediate goal of this toolchain is to
 automate the local provisioning of those dependencies if not installed.
 
 === RedHat or Fedora Linux development package dependencies:
 
 For all steps the complete group of development tools is recommended, e.g.;
 
- yum groupinstall 'C Development Tools and Libraries'
+ $ yum groupinstall 'C Development Tools and Libraries'
 
 or simply;
 
- yum groupinstall 'Development Tools'
+ $ yum groupinstall 'Development Tools'
 
 Additional required tools which may not be included by default;
 
- yum install cmake imake
+ $ yum install cmake imake
 
-For the actual Makefile.build phase, a number of system component -devel
+For the actual `Makefile.build` phase, a number of system component -devel
 packages are needed.
 
- yum install libuuid-devel expat-devel libxml2-devel lua-devel pcre-devel zlib-devel
+ $ yum install libuuid-devel expat-devel libxml2-devel lua-devel pcre-devel zlib-devel
 
 These base packages are required for deployment (and are incidently installed
 with the -devel packages above; most are already present by default);
 
- yum install libuuid expat libxml2 lua pcre zlib 
+ $ yum install libuuid expat libxml2 lua pcre zlib 
 
-* Note that following RHEL 7 / Fedora 21, yum becomes the dnf utility.
+* Note that following RHEL 7 / Fedora 21, `yum` becomes the `dnf` utility.
 The package names have remained the same.
 
 === Ubuntu or Debian development package dependencies:
 
- apt-get install build-essential subversion xutils-dev cmake libtool
- apt-get install libexpat1-dev libxml2-dev zlib1g-dev liblua5.2-0 libpcre3-dev
+ $ apt-get -y install \
+     build-essential \
+     cmake \
+     git \
+     subversion \
+     xutils-dev\
+     libexpat1-dev \
+     liblua5.2-0 \
+     libtool \
+     libpcre3-dev \
+     libxml2-dev \
+     zlib1g-dev \
+     wget
 
 == Phase 1: Gather Sources
 
  $ cd src/
- $ make -f Makefile.gather [BLD={type}]
+ $ make -f ../mak/Makefile.gather [BLD={type}]
 
 BLD defines the build type: release - candidate - snapshot - bleed
 (case sensitive) where release is the default.
@@ -117,33 +128,33 @@ a fetch / update, if from a most recent release package, it fetches and
 unpacks the package. The source directory tree is designed for parallelism,
 the different build types may coexist in the same source tree.
 
-This makefile is run first from the source directory root (e.g. src/),
+This makefile is run first from the source directory root (e.g. `src/`),
 and must be performed only upon updates to the source packages.
 The resulting manifest can be compared to the previously created manifest
 to determine if the sources have been updated.
 
-Makefile.preconfig should follow immediately when the manifest changes.
+`Makefile.preconfig` should follow immediately when the manifest changes.
 
 == Phase 2: Preconfigure Sources
 
  $ cd src/
- $ make -f Makefile.preconfig [BLD={type}]
+ $ make -f ../mak/Makefile.preconfig [BLD={type}]
 
 Prepare configuration scripts of packages, particularly from source control
 where autoconf etc have not been invoked yet.
 
-This makefile is run after Makefile.gather from the source directory root,
+This makefile is run after `Makefile.gather` from the source directory root,
 and must be performed following updates to the source packages as indicated
 by manifest changes. Only source code packages corresponding to the specific
 BLD target are updated.
 
 The result of this step is suitable for archive, or escrow and distribution
-to multiple build systems, beginning at the Makefile.build step.
+to multiple build systems, beginning at the `Makefile.build` step.
 
 == Phase 3: Build Sources
 
  $ cd bld/
- $ make -f Makefile.build [BLD={type}] [TAG={-suffix}]
+ $ make -f ../mak/Makefile.build [BLD={type}] [TAG={-suffix}]
 
 Build all components described by the manifest into the intermediate/
 temporary installation tree, using that intermediate tree as the component
@@ -153,25 +164,25 @@ TAG defines the target directory and package name suffix such as a datestamp,
 checkout revision, or continuous build revision number. By default there is
 no suffix tag.
 
-This makefile is run after Makefile.gather and Makefile.preconfig and may
+This makefile is run after `Makefile.gather` and `Makefile.preconfig` and may
 be based on a snapshot of the build tree from those two previous steps from
 another continuous build job.
 
 This makefile must be run from the build (not source) subdirectory, such
-as bld/. The build tree uses the same component directory names as the
+as `bld/`. The build tree uses the same component directory names as the
 source tree. The components are initially installed into the DESTDIR
-which is the ../dst/httpd component directory name with the TAG variable
-suffixed. SRCDIR references the source tree (typically ../src) and would
+which is the `../dst/httpd` component directory name with the TAG variable
+suffixed. SRCDIR references the source tree (typically `../src`) and would
 typically not need to be overridden.
 
-The TARGET directory, /opt/pivotal/webserver/$(httpd_srcdir)$(TAG) would
+The TARGET directory, `/opt/pivotal/webserver/$(httpd_srcdir)$(TAG)` would
 typically not be overridden, and refers to the anticipated installation
 path of the resulting package.
 
 == Phase 4: Test Source and Intermediate Installation
 
  $ cd bld/
- $ make -f Makefile.test [BLD={type}] [TAG={-suffix}]
+ $ make -f ../mak/Makefile.test [BLD={type}] [TAG={-suffix}]
 
 Test all components described by the manifest and the intermediate/
 temporary installation httpd server.
@@ -184,13 +195,12 @@ against the intermediate installation in the $DESTDIR path.
 == Phase 5: Package Installation Binaries
 
  $ cd dst/
- $ make -f Makefile.package [BLD={type}] [TAG={-suffix}]
+ $ make -f ../mak/Makefile.package [BLD={type}] [TAG={-suffix}]
 
 Copy the intermediate/temporary installation httpd server and dependent
-binaries into the dst/webserver/ tree to rewrite configurations files and
+binaries into the `dst/webserver/` tree to rewrite configurations files and
 scripts with as relocatable paths, add the instance management scripts,
 split the debugging symbols from the binaries, and tar up the package.
 
-This makefile must be run from the dst (not source or build) subdirectory.
- 
+This makefile must be run from the `dst` (not source or build) subdirectory.
 
