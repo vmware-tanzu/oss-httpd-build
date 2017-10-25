@@ -20,6 +20,7 @@
 #
 # BLD defines the build type: release - candidate - snapshot - bleed
 # TAG defines the target directory and package name suffixes
+# OPT declares optimization of verified parallel builds (-j4 by default)
 #
 # This makefile is run after Makefile.gather and Makefile.preconfig
 #
@@ -30,6 +31,7 @@
 
 BLD=release
 TAG=
+OPT=-j4
 SRCDIR=$(shell cd ..; pwd)/src
 
 include $(SRCDIR)/$(BLD)-manifest-vars
@@ -58,8 +60,8 @@ $(apr_srcdir)/Makefile: build-openssl $(SRCDIR)/$(apr_srcdir)/configure
 
 build-apr: $(apr_srcdir)/Makefile
 	cd $(apr_srcdir) && \
-	  make -j && \
-	  make -j install && \
+	  make $(OPT) && \
+	  make $(OPT) install && \
 	cd ..
 
 ifndef aprutil_srcdir
@@ -85,8 +87,8 @@ $(aprutil_srcdir)/Makefile: build-openssl build-apr \
 
 build-aprutil: build-apr $(aprutil_srcdir)/Makefile
 	cd $(aprutil_srcdir) && \
-	  make -j && \
-	  make -j install && \
+	  make $(OPT) && \
+	  make $(OPT) install && \
 	cd ..
 
 endif
@@ -120,8 +122,8 @@ $(openssl_srcdir)/Makefile: $(SRCDIR)/$(openssl_srcdir)/Configure
 
 build-openssl: $(openssl_srcdir)/Makefile
 	cd $(openssl_srcdir) && \
-	  make -j && \
-	  make -j install && \
+	  make $(OPT) && \
+	  make $(OPT) install && \
 	cd ..
 
 endif
@@ -141,8 +143,8 @@ $(brotli_srcdir)/Makefile: $(SRCDIR)/$(brotli_srcdir)
 
 build-brotli: $(brotli_srcdir)/Makefile
 	cd $(brotli_srcdir) && \
-	  make -j && \
-	  make -j install && \
+	  make $(OPT) && \
+	  make $(OPT) install && \
 	cd ..
 
 endif
@@ -157,8 +159,8 @@ $(nghttp2_srcdir)/Makefile: $(SRCDIR)/$(nghttp2_srcdir)/configure
 
 build-nghttp2: $(nghttp2_srcdir)/Makefile
 	cd $(nghttp2_srcdir) && \
-	  make -j && \
-	  make -j install && \
+	  make $(OPT) && \
+	  make $(OPT) install && \
 	cd ..
 
 $(httpd_srcdir)/Makefile: build-apr build-aprutil build-openssl \
@@ -192,8 +194,8 @@ $(httpd_srcdir)/Makefile: build-apr build-aprutil build-openssl \
 
 build-httpd: $(httpd_srcdir)/Makefile
 	cd $(httpd_srcdir) && \
-	  make -j && \
-	  make -j install && \
+	  make $(OPT) && \
+	  make $(OPT) install && \
 	  sed "s/\(LoadModule mpm_\(worker\|prefork\)\)/#\1/" \
 		< $(DESTDIR)/conf/original/httpd.conf \
 		> $(DESTDIR)/conf/httpd.conf && \
@@ -215,8 +217,8 @@ $(tcnative_srcdir)/Makefile: build-apr build-openssl \
 
 build-tcnative: $(tcnative_srcdir)/Makefile
 	cd $(tcnative_srcdir) && \
-	  make -j && \
-	  make -j install && \
+	  make $(OPT) && \
+	  make $(OPT) install && \
 	cd ..
 
 endif
