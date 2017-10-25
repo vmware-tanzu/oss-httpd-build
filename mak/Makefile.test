@@ -38,9 +38,11 @@ all: test-openssl test-apr test-aprutil test-nghttp2 test-brotli test-httpd \
 pre-test:
 
 test-apr: pre-test
+ifdef apr_srcdir
 	cd $(apr_srcdir) && \
 	  make test && \
 	cd ..
+endif
 
 test-aprutil: pre-test
 ifdef aprutil_srcdir
@@ -50,25 +52,25 @@ ifdef aprutil_srcdir
 endif
 
 test-openssl: pre-test
+ifdef openssl_srcdir
 	cd $(openssl_srcdir) && \
 	  make test && \
 	cd ..
+endif
 
-ifndef brotli_srcdir
-test-brotli:
-
-else
 test-brotli: pre-test
+ifdef brotli_srcdir
 	cd $(brotli_srcdir) && \
 	  make test && \
 	cd ..
-
 endif
 
 test-nghttp2: pre-test
+ifdef nghttp2_srcdir
 	cd $(nghttp2_srcdir) && \
 	  make check && \
 	cd ..
+endif
 
 $(httpdtest_srcdir)/t/TEST: pre-test
 	-mkdir $(httpdtest_srcdir) 2>/dev/null
@@ -79,15 +81,12 @@ $(httpdtest_srcdir)/t/TEST: pre-test
 
 test-httpd: $(httpdtest_srcdir)/t/TEST
 	cd $(httpdtest_srcdir) && \
-	  t/TEST -apxs $(DESTDIR)/bin/apxs -httpd $(DESTDIR)/bin/apachectl && \
+	  t/TEST -apxs $(DESTDIR)/bin/apxs -httpd $(DESTDIR)/bin/apachectl \
+		 -servername localhost && \
 	cd ..
 
-ifndef tcnative_srcdir
-test-tcnative:
-
-else
-# TBD
 test-tcnative: pre-test
-
+ifdef tcnative_srcdir
+# TBD
 endif
 
