@@ -64,6 +64,22 @@ gather-httpd-release: pre-manifest
 	echo httpd_srcdir=$$httpd_srcdir >>$(BLD)-manifest-vars && \
 	echo httpd_ver=$$httpd_ver >>$(BLD)-manifest-vars
 
+gather-httpd-rc: pre-manifest
+	httpd_srcpath=https://httpd.apache.org/dev/dist && \
+	httpd_pkg=`wget -q -O - $$httpd_srcpath/ | sed -n '/<a href="\(httpd-2\.4\.[0-9]*\.tar\.bz2\)"/{s#.*href="\([^"]*\).*#\1#;h};$$!b;g;p'` && \
+	httpd_ver=`echo $$httpd_pkg | sed 's#httpd-\(.*\)\.tar\.bz2#\1#;'` && \
+	httpd_srcdir=httpd-$$httpd_ver && \
+	if test ! -f pkgs/$$httpd_pkg; then \
+	  cd pkgs && \
+	  wget -nv $$httpd_srcpath/$$httpd_pkg && \
+	  wget -nv $$httpd_srcpath/$$httpd_pkg.asc && \
+	  cd .. && \
+          tar -xjf pkgs/$$httpd_pkg; \
+	fi && \
+	echo httpd_srcpath=$$httpd_srcpath >>$(BLD)-manifest-vars && \
+	echo httpd_srcdir=$$httpd_srcdir >>$(BLD)-manifest-vars && \
+	echo httpd_ver=$$httpd_ver >>$(BLD)-manifest-vars
+
 gather-httpd-2xbranch: pre-manifest
 	httpd_srcpath=https://svn.apache.org/repos/asf/httpd/httpd/branches/2.4.x && \
 	httpd_rev=`svn info $$httpd_srcpath | sed -n '/Last Changed Rev: \([0-9]\+\)/{s#.*: ##;p}'` && \
@@ -135,6 +151,22 @@ gather-apr-release: pre-manifest
 	echo apr_srcdir=$$apr_srcdir >>$(BLD)-manifest-vars && \
 	echo apr_ver=$$apr_ver >>$(BLD)-manifest-vars
 
+gather-apr-rc: pre-manifest
+	apr_srcpath=https://apr.apache.org/dev/dist && \
+	apr_pkg=`wget -q -O - $$apr_srcpath/ | sed -n '/<a href="\(apr-1\.[0-9]\.[0-9]*\.tar\.bz2\)"/{s#.*href="\([^"]*\).*#\1#;h};$$!b;g;p'` && \
+	apr_ver=`echo $$apr_pkg | sed 's#apr-\(.*\)\.tar\.bz2#\1#;'` && \
+	apr_srcdir=apr-$$apr_ver && \
+	if test ! -f pkgs/$$apr_pkg; then \
+	  cd pkgs && \
+	  wget -nv $$apr_srcpath/$$apr_pkg && \
+	  wget -nv $$apr_srcpath/$$apr_pkg.asc && \
+	  cd .. && \
+	  tar -xjf pkgs/$$apr_pkg; \
+	fi && \
+	echo apr_srcpath=$$apr_srcpath >>$(BLD)-manifest-vars && \
+	echo apr_srcdir=$$apr_srcdir >>$(BLD)-manifest-vars && \
+	echo apr_ver=$$apr_ver >>$(BLD)-manifest-vars
+
 gather-apr-1xbranch: pre-manifest
 	apr_srcpath=https://svn.apache.org/repos/asf/apr/apr/branches/1.6.x && \
 	apr_rev=`svn info $$apr_srcpath | sed -n '/Last Changed Rev: \([0-9]\+\)/{s#.*: ##;p}'` && \
@@ -162,6 +194,21 @@ gather-apr-trunk: pre-manifest
 
 gather-aprutil-release: pre-manifest
 	aprutil_srcpath=https://www.apache.org/dist/apr && \
+	aprutil_pkg=`wget -q -O - $$aprutil_srcpath/ | sed -n '/<a href="\(apr-util-1\.[0-9]\.[0-9]*\.tar\.bz2\)"/{s#.*href="\([^"]*\).*#\1#;h};$$!b;g;p'` && \
+	aprutil_ver=`echo $$aprutil_pkg | sed 's#apr-util-\(.*\)\.tar\.bz2#\1#;'` && \
+	if test ! -f pkgs/$$aprutil_pkg; then \
+	  cd pkgs && \
+	  wget -nv $$aprutil_srcpath/$$aprutil_pkg && \
+	  wget -nv $$aprutil_srcpath/$$aprutil_pkg.asc && \
+	  cd .. && \
+	  tar -xjf pkgs/$$aprutil_pkg; \
+	fi && \
+	echo aprutil_srcpath=$$aprutil_srcpath >>$(BLD)-manifest-vars && \
+	echo aprutil_srcdir=apr-util-$$aprutil_ver >>$(BLD)-manifest-vars && \
+	echo aprutil_ver=$$aprutil_ver >>$(BLD)-manifest-vars
+
+gather-aprutil-rc: pre-manifest
+	aprutil_srcpath=https://apr.apache.org/dev/dist && \
 	aprutil_pkg=`wget -q -O - $$aprutil_srcpath/ | sed -n '/<a href="\(apr-util-1\.[0-9]\.[0-9]*\.tar\.bz2\)"/{s#.*href="\([^"]*\).*#\1#;h};$$!b;g;p'` && \
 	aprutil_ver=`echo $$aprutil_pkg | sed 's#apr-util-\(.*\)\.tar\.bz2#\1#;'` && \
 	if test ! -f pkgs/$$aprutil_pkg; then \
@@ -310,6 +357,21 @@ gather-apriconv-release: pre-manifest
 	echo apriconv_srcdir=apr-iconv-$$apriconv_ver >>$(BLD)-manifest-vars && \
 	echo apriconv_ver=$$apriconv_ver >>$(BLD)-manifest-vars
 
+gather-apriconv-rc: pre-manifest
+	apriconv_srcpath=https://apr.apache.org/dev/dist && \
+	apriconv_pkg=`wget -q -O - $$apriconv_srcpath/ | sed -n '/<a href="\(apr-iconv-1\.[0-9]\.[0-9]*\.tar\.bz2\)"/{s#.*href="\([^"]*\).*#\1#;h};$$!b;g;p'` && \
+	apriconv_ver=`echo $$apriconv_pkg | sed 's#apr-iconv-\(.*\)\.tar\.bz2#\1#;'` && \
+	if test ! -f pkgs/$$apriconv_pkg; then \
+	  cd pkgs && \
+	  wget -nv $$apriconv_srcpath/$$apriconv_pkg && \
+	  wget -nv $$apriconv_srcpath/$$apriconv_pkg.asc && \
+	  cd .. && \
+	  tar -xjf pkgs/$$apriconv_pkg; \
+	fi && \
+	echo apriconv_srcpath=$$apriconv_srcpath >>$(BLD)-manifest-vars && \
+	echo apriconv_srcdir=apr-iconv-$$apriconv_ver >>$(BLD)-manifest-vars && \
+	echo apriconv_ver=$$apriconv_ver >>$(BLD)-manifest-vars
+
 gather-apriconv-1xbranch: pre-manifest
 	apriconv_srcpath=https://svn.apache.org/repos/asf/apr/apr-iconv/trunk && \
 	apriconv_rev=`svn info $$apriconv_srcpath | sed -n '/Last Changed Rev: \([0-9]\+\)/{s#.*: ##;p}'` && \
@@ -411,7 +473,7 @@ gather-libxml2-release: pre-manifest
 	echo libxml2_srcdir=$$libxml2_srcdir >>$(BLD)-manifest-vars && \
 	echo libxml2_ver=$$libxml2_ver >>$(BLD)-manifest-vars
 
-gather-libxml2-candidate: pre-manifest
+gather-libxml2-rc: pre-manifest
 	libxml2_srcpath=http://xmlsoft.org/sources && \
 	libxml2_ver=`wget -q -O - $$libxml2_srcpath/ | sed -n '/<a href="LATEST_LIBXML2_IS_/{s#.*href="LATEST_LIBXML2_IS_\([^"]*\)".*#\1#;p;q}'` && \
 	libxml2_srcdir=libxml2-$$libxml2_ver && \
@@ -505,8 +567,8 @@ gather-linux-release: gather-core-release
 	rm $(BLD)-manifest-vars.sav
 
 
-gather-core-candidate: gather-apr-release gather-aprutil-release \
-		      gather-httpd-release gather-openssl-release \
+gather-core-candidate: gather-apr-rc gather-aprutil-rc \
+		      gather-httpd-rc gather-openssl-release \
 		      gather-nghttp2-release gather-brotli-release \
 		      gather-httpdtest-trunk
 
@@ -517,7 +579,7 @@ gather-linux-candidate: gather-core-candidate
 
 gather-complete-candidate: gather-core-candidate \
 		      gather-expat-release gather-pcre-release \
-		      gather-apriconv-release gather-libxml2-candidate \
+		      gather-apriconv-rc gather-libxml2-release \
 		      gather-lua-release gather-zlib-release
 	mv $(BLD)-manifest-vars $(BLD)-manifest-vars.sav
 	LC_COLLATE=C sort < $(BLD)-manifest-vars.sav > $(BLD)-manifest-vars
