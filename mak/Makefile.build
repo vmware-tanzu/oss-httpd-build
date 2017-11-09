@@ -163,6 +163,13 @@ build-nghttp2: $(nghttp2_srcdir)/Makefile
 	  make $(OPT) install && \
 	cd ..
 
+# Explicitly enabling version and unixd as built-in on Unix, enabling suexec,
+# cgi for prefork configs, and authnz-fcgi and proxy-http2 for early adopters.
+#
+# Explicitly disabling dialup, echo and reflector as experimental/test
+# and disabling ldap because lber depends on openssl, and the system openssl
+# used by openldap conflicts with the most modern openssl in this build
+#
 $(httpd_srcdir)/Makefile: build-apr build-aprutil build-openssl \
 			  build-brotli build-nghttp2 \
 			  $(SRCDIR)/$(httpd_srcdir)/configure
@@ -181,6 +188,9 @@ $(httpd_srcdir)/Makefile: build-apr build-aprutil build-openssl \
 		 --enable-version=static \
 		 --disable-authnz-ldap \
 		 --disable-ldap \
+		 --disable-dialup \
+		 --disable-echo \
+		 --disable-reflector \
 		 --enable-cgi=shared \
 		 --enable-authnz-fcgi=shared \
 		 --enable-proxy-http2=shared \

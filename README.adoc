@@ -63,11 +63,13 @@ is required to build this package. In addition, a number of stable,
 well-maintained components are leveraged from the OS distribution, rather than
 building and installing potentially conflicting versions.
 
-On all platforms, in order to run `Makefile.test` there is a list of CPAN
-dependencies required to invoke the perl-based `Apache::Test` framework.
-These can be found under `src/httpdtest-trunk/README` after first running
-the `Makefile.gather` phase. An immediate goal of this toolchain is to
-automate the local provisioning of those dependencies if not installed.
+On all platforms, pre-install the `Text::Template` package from CPAN to assure
+you are building OpenSSL with the latest tools. In order to run `Makefile.test`
+there is a list of CPAN dependencies required to invoke the perl-based
+`Apache::Test` framework. These can be found under `src/httpdtest-trunk/README`
+after first running the `Makefile.gather` phase. (An immediate goal of this
+toolchain is to automate the local provisioning of those dependencies if not
+already installed.)
 
 === RedHat or Fedora Linux development package dependencies:
 
@@ -105,12 +107,24 @@ The package names have remained the same.
      subversion \
      xutils-dev\
      libexpat1-dev \
-     liblua5.2-0 \
+     lua5.3 \
      libtool \
      libpcre3-dev \
      libxml2-dev \
      zlib1g-dev \
      wget
+
+=== Microsoft Windows dependencies
+
+Visual Studio (2015 or 2017 recommended)
+NASM Assembler
+ActiveState or Strawberry Perl
+unxutils or gnuwin32 Windows-native unix command line tools 
+(Note mingw and cygwin are not supported)
+Info-zip command line zip
+curl and awk (or name gawk from unxutils as awk)
+Subversion and GIT command line tools
+Microsoft Visual Studio 2017 or 2015
 
 == Phase 1: Gather Sources
 
