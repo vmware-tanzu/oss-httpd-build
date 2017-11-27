@@ -54,6 +54,9 @@ collect-httpd: pre-package
 	perl ../instance-conf/httpd-2.4/bin/fixrootpath.pl \
 		--srcdir=/opt/pivotal/webserver/httpd-2.4 \
 		--dstdir=@@PRODUCT_ROOT@@/$(httpd_srcdir)$(TAG) $(PKGDIR)
+	perl ../instance-conf/httpd-2.4/bin/fixrootpath.pl \
+		--srcdir="^SSLRandomSeed" \
+		--dstdir="#SSLRandomSeed" $(PKGDIR)\_instance\conf
 	del $(PKGDIR)\bin\pcre*.exe
 	del $(PKGDIR)\bin\runtest.exe
 	del $(PKGDIR)\bin\runsuite.exe
