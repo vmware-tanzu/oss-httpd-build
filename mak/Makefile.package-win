@@ -66,14 +66,14 @@ prepare-instance: collect-httpd
 	mv $(PKGDIR)\cgi-bin $(PKGDIR)\_instance\cgi-bin
 	mv $(PKGDIR)\htdocs $(PKGDIR)\_instance\htdocs
 	mv $(PKGDIR)\logs $(PKGDIR)\_instance\logs
-	# The global binary directory ssl/ contents are not relocated
+#	The global binary directory ssl/ contents are not relocated
 	mkdir $(PKGDIR)\_instance\ssl
-	copy ..\instance-conf\httpd-2.4\bin\*.pl $(PKGDIR)/bin/
-	copy ..\instance-conf\httpd-2.4\bin\*.ps1 $(PKGDIR)/bin/
-	xcopy /s/v/e ..\instance-conf\httpd-2.4\_instance\* $(PKGDIR)/_instance/
-	rm $(PKGDIR)/_instance/bin/*.sh
+	copy ..\instance-conf\httpd-2.4\bin\*.pl $(PKGDIR)\bin\ 
+	copy ..\instance-conf\httpd-2.4\bin\*.ps1 $(PKGDIR)\bin\ 
+	xcopy /s/v/e/i ..\instance-conf\httpd-2.4\_instance\* $(PKGDIR)\_instance\ 
+	del $(PKGDIR)\_instance\bin\*.sh
 
-package-httpd: collect-httpd strip-symbols prepare-instance
+package-httpd: collect-httpd prepare-instance
 	zip -9 -r -X $(PKGDIR).zip $(PKGDIR)
 
 
