@@ -1,0 +1,79 @@
+# Pivotal OSS Build Schema for Apache HTTP Server
+#
+# Copyright (c) 2017 Pivotal Software, Inc.
+#
+# Pivotal licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# Makefile.package : Convert the target build from a fixed to a relocatable
+#                    package, adding the instance deployment schema.
+#
+# BLD defines the build type: release - candidate - snapshot - bleed
+# TAG defines the target directory and package name suffixes
+# OPT declares optimization of verified parallel builds (-j4 by default)
+#
+# This makefile is run after Makefile.build
+#
+# This makefile must be run from the package (not build or dest) subdirectory,
+# the build tree uses the same component directory names as the source tree
+# The binary components are collected from the DESTDIR which is the
+# ../dst/httpd component directory name with the TAG variable suffixed
+# and prepared into the PKGDIR (httpd{TAG}) directory of the current tree
+
+BLD=release
+TAG=
+
+SRCDIR=C:\Users\wrowe\dev\oss-httpd-build\src
+
+!INCLUDE $(SRCDIR)/$(BLD)-manifest-vars
+
+DESTDIR=C:\Users\wrowe\dev\oss-httpd-build\dst\$(httpd_srcdir)$(TAG)
+PKGDIR=$(httpd_srcdir)$(TAG)
+
+OBJCOPY=objcopy
+
+all: package-httpd
+
+pre-package:
+	-rd /s/q $(PKGDIR) 2>/dev/null
+
+collect-httpd: pre-package
+	xcopy /s/v/e/i $(DESTDIR) $(PKGDIR)
+	perl ../instance-conf/httpd-2.4/bin/fixrootpath.pl \
+		--srcdir=$(DESTDIR) \
+		--dstdir=@@PRODUCT_ROOT@@/$(httpd_srcdir)$(TAG) $(PKGDIR)
+	perl ../instance-conf/httpd-2.4/bin/fixrootpath.pl \
+		--srcdir=/opt/pivotal/webserver/httpd-2.4 \
+		--dstdir=@@PRODUCT_ROOT@@/$(httpd_srcdir)$(TAG) $(PKGDIR)
+	del $(PKGDIR)\bin\pcre*.exe
+	del $(PKGDIR)\bin\runtest.exe
+	del $(PKGDIR)\bin\runsuite.exe
+	del $(PKGDIR)\bin\test*.exe
+	del $(PKGDIR)\bin\xml*.exe
+
+prepare-instance: collect-httpd
+	mkdir $(PKGDIR)\_instance
+	mv $(PKGDIR)\conf $(PKGDIR)\_instance\conf
+	mv $(PKGDIR)\cgi-bin $(PKGDIR)\_instance\cgi-bin
+	mv $(PKGDIR)\htdocs $(PKGDIR)\_instance\htdocs
+	mv $(PKGDIR)\logs $(PKGDIR)\_instance\logs
+	# The global binary directory ssl/ contents are not relocated
+	mkdir $(PKGDIR)\_instance\ssl
+	copy ..\instance-conf\httpd-2.4\bin\*.pl $(PKGDIR)/bin/
+	copy ..\instance-conf\httpd-2.4\bin\*.ps1 $(PKGDIR)/bin/
+	xcopy /s/v/e ..\instance-conf\httpd-2.4\_instance\* $(PKGDIR)/_instance/
+	rm $(PKGDIR)/_instance/bin/*.sh
+
+package-httpd: collect-httpd strip-symbols prepare-instance
+	zip -9 -r -X $(PKGDIR).zip $(PKGDIR)
+
+
