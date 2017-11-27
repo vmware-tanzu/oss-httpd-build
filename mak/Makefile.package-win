@@ -54,9 +54,6 @@ collect-httpd: pre-package
 	perl ../instance-conf/httpd-2.4/bin/fixrootpath.pl \
 		--srcdir=/opt/pivotal/webserver/httpd-2.4 \
 		--dstdir=@@PRODUCT_ROOT@@/$(httpd_srcdir)$(TAG) $(PKGDIR)
-	perl ../instance-conf/httpd-2.4/bin/fixrootpath.pl \
-		--srcdir="^SSLRandomSeed" \
-		--dstdir="#SSLRandomSeed" $(PKGDIR)\_instance\conf
 	del $(PKGDIR)\bin\pcre*.exe
 	del $(PKGDIR)\bin\runtest.exe
 	del $(PKGDIR)\bin\runsuite.exe
@@ -64,6 +61,7 @@ collect-httpd: pre-package
 	del $(PKGDIR)\bin\xml*.exe
 
 prepare-instance: collect-httpd
+	echo a > .a
 	mkdir $(PKGDIR)\_instance
 	mv $(PKGDIR)\conf $(PKGDIR)\_instance\conf
 	mv $(PKGDIR)\cgi-bin $(PKGDIR)\_instance\cgi-bin
@@ -73,8 +71,12 @@ prepare-instance: collect-httpd
 	mkdir $(PKGDIR)\_instance\ssl
 	copy ..\instance-conf\httpd-2.4\bin\*.pl $(PKGDIR)\bin\ 
 	copy ..\instance-conf\httpd-2.4\bin\*.ps1 $(PKGDIR)\bin\ 
-	xcopy /s/v/e/i ..\instance-conf\httpd-2.4\_instance\* $(PKGDIR)\_instance\ 
+	xcopy /s/v/e/i ..\instance-conf\httpd-2.4\_instance\* $(PKGDIR)\_instance\ <.a
 	del $(PKGDIR)\_instance\bin\*.sh
+	perl ../instance-conf/httpd-2.4/bin/fixrootpath.pl \
+		--srcdir="^SSLRandomSeed" \
+		--dstdir="#SSLRandomSeed" $(PKGDIR)\_instance\conf
+	del .a
 
 package-httpd: collect-httpd prepare-instance
 	zip -9 -r -X $(PKGDIR).zip $(PKGDIR)
