@@ -54,6 +54,9 @@ collect-httpd: pre-package
 	perl ../instance-conf/httpd-2.4/bin/fixrootpath.pl \
 		--srcdir=/opt/pivotal/webserver/httpd-2.4 \
 		--dstdir=@@PRODUCT_ROOT@@/$(httpd_srcdir)$(TAG) $(PKGDIR)
+!IFDEF VCRUNTIME
+	copy $(VCToolsRedistDir)\vcruntime*.dll $(PKGDIR)\bin\ 
+!ENDIF
 	del $(PKGDIR)\bin\pcre*.exe
 	del $(PKGDIR)\bin\runtest.exe
 	del $(PKGDIR)\bin\runsuite.exe
