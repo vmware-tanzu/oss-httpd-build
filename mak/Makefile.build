@@ -45,6 +45,7 @@ pre-build:
 	-mkdir -p $(DSTDIR) 2>/dev/null
 	echo $(SRCDIR)
 
+
 $(apr_srcdir)/Makefile: build-openssl $(SRCDIR)/$(apr_srcdir)/configure
 	-mkdir $(apr_srcdir) 2>/dev/null
 	cd $(apr_srcdir) && \
@@ -64,10 +65,10 @@ build-apr: $(apr_srcdir)/Makefile
 	  make $(OPT) install && \
 	cd ..
 
+
 ifndef aprutil_srcdir
 with_aprutil=
 build-aprutil: build-apr
-
 else
 with_aprutil=--with-apr-util=$(DESTDIR)
 $(aprutil_srcdir)/Makefile: build-openssl build-apr \
@@ -90,8 +91,8 @@ build-aprutil: build-apr $(aprutil_srcdir)/Makefile
 	  make $(OPT) && \
 	  make $(OPT) install && \
 	cd ..
-
 endif
+
 
 # Ancient openssl 1.0.2 did not support vpath builds or concurrent builds
 ifeq "$(patsubst 1.0.%,,$(openssl_ver))" ""
@@ -110,7 +111,6 @@ build-openssl: $(openssl_srcdir)/Makefile
 	  make && \
 	  make install && \
 	cd ..
-
 else
 $(openssl_srcdir)/Makefile: $(SRCDIR)/$(openssl_srcdir)/Configure
 	-mkdir $(openssl_srcdir) 2>/dev/null
@@ -125,12 +125,11 @@ build-openssl: $(openssl_srcdir)/Makefile
 	  make $(OPT) && \
 	  make $(OPT) install && \
 	cd ..
-
 endif
+
 
 ifndef brotli_srcdir
 build-brotli:
-
 else
 $(brotli_srcdir)/Makefile: $(SRCDIR)/$(brotli_srcdir)
 	-mkdir $(brotli_srcdir) 2>/dev/null
@@ -146,8 +145,8 @@ build-brotli: $(brotli_srcdir)/Makefile
 	  make $(OPT) && \
 	  make $(OPT) install && \
 	cd ..
-
 endif
+
 
 $(nghttp2_srcdir)/Makefile: $(SRCDIR)/$(nghttp2_srcdir)/configure
 	-mkdir $(nghttp2_srcdir) 2>/dev/null
@@ -211,9 +210,9 @@ build-httpd: $(httpd_srcdir)/Makefile
 		> $(DESTDIR)/conf/httpd.conf && \
 	cd ..
 
+
 ifndef tcnative_srcdir
 build-tcnative:
-
 else
 $(tcnative_srcdir)/Makefile: build-apr build-openssl \
 			     $(SRCDIR)/$(tcnative_srcdir)/native/configure
@@ -230,6 +229,6 @@ build-tcnative: $(tcnative_srcdir)/Makefile
 	  make $(OPT) && \
 	  make $(OPT) install && \
 	cd ..
-
 endif
+
 
