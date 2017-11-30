@@ -36,29 +36,18 @@ In order to build httpd from scratch, see additional details at the github oss-h
 
 The following components are included in this 2.4.29-171109 build; those marked (\*) are not compiled on RHEL 7 and Ubuntu 16.04, but the OS Vendor's distribution packages are used, instead:
 
-\* Apache HTTP Server 2.4.29
-
-\* Apache APR library 1.6.3
-
-\* Apache APR-iconv library 1.2.2 (\*)
-
-\* Apache APR-util library 1.6.1
-
-\* brotli compression library 1.0.1
-
-\* libexpat 2.2.5 (\*)
-
-\* libxml2 2.9.7 (\*)
-
-\* Lua language 5.3.4 (\*)
-
-\* nghttp2 library 1.27.0
-
-\* OpenSSL library 1.1.0g
-
-\* PCRE library 8.41 (\*)
-
-\* Zlib compression library 1.2.11 (\*)
+* Apache HTTP Server 2.4.29
+* Apache APR library 1.6.3
+* Apache APR-iconv library 1.2.2 (\*)
+* Apache APR-util library 1.6.1
+* brotli compression library 1.0.1
+* libexpat 2.2.5 (\*)
+* libxml2 2.9.7 (\*)
+* Lua language 5.3.4 (\*)
+* nghttp2 library 1.27.0
+* OpenSSL library 1.1.0g
+* PCRE library 8.41 (\*)
+* Zlib compression library 1.2.11 (\*)
 
 ## **RHEL 7 Users**
 
