@@ -141,14 +141,15 @@ $ bin/httpdctl start
 ```
 
 Windows users (in PowerShell as user Administrator);
-
+```
 PS C:\> cd \Pivotal\WebServer  
 PS C:\Pivotal\WebServer> httpd-2.4\bin\newserver.ps1 --server {hostname}  
 PS C:\Pivotal\WebServer> cd {hostname}  
 PS C:\Pivotal\WebServer\example.com> bin\httpdctl.ps1 install  
 PS C:\Pivotal\WebServer\example.com> bin\httpdctl.ps1 start
+```
 
-Modify the {host}/conf/ files to customize the server behavior. Use the httpdenv script in the bin directory of the instance to have access to the various tools shipped in the httpd-2.4 bin directory;
+Modify the files in `{hostname}/conf/` to customize the server behavior. Use the httpdenv script in the bin directory of the instance to have access to the various tools shipped in the httpd-2.4 bin directory;
 ```
 $ . bin/httpdenv.sh
 ```
@@ -158,5 +159,5 @@ Or on Windows;
 PS C:\Pivotal\WebServer\example.com> bin\httpdenv.ps1
 ```
 
-The httpdctl uninstall command will remove the service from automatic startup at boot time.
+The `httpdctl uninstall` command will remove the service from automatic startup at boot time.
 
