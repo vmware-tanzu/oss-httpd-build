@@ -110,11 +110,20 @@ During an upgrade, restart each server instance individually and verify the corr
 
 Unix users, running as root;
 
-$ mkdir -p /opt/pivotal/webserver$ cd /opt/pivotal/webserver$ tar -xjvf *path-to*/httpd-2.4.29-171109-*{arch}*.tar.bz2$ ln -s httpd-2.4.29-171109 httpd-2.4$ httpd-2.4/bin/fixrootpath.pl httpd-2.4.29-171109
+$ mkdir -p /opt/pivotal/webserver  
+$ cd /opt/pivotal/webserver  
+$ tar -xjvf *path-to*/httpd-2.4.29-171109-*{arch}*.tar.bz2  
+$ ln -s httpd-2.4.29-171109 httpd-2.4  
+$ httpd-2.4/bin/fixrootpath.pl httpd-2.4.29-171109
 
 Windows users (running as Administrator);
 
-C:\> mkdir \Pivotal\WebServerC:\> cd \Pivotal\WebServerC:\Pivotal\WebServer> unzip *path-to*\httpd-2.4.29-171109-windows.zipC:\Pivotal\WebServer> mklink /d httpd-2.4 httpd-2.4.29-171109C:\Pivotal\WebServer> powershellPS C:\...\WebServer> httpd-2.4\bin\fixrootpath.ps1 httpd-2.4.29-171109
+C:\> mkdir \Pivotal\WebServer  
+C:\> cd \Pivotal\WebServer  
+C:\Pivotal\WebServer> unzip *path-to*\httpd-2.4.29-171109-windows.zip  
+C:\Pivotal\WebServer> mklink /d httpd-2.4 httpd-2.4.29-171109  
+C:\Pivotal\WebServer> powershell  
+PS C:\...\WebServer> httpd-2.4\bin\fixrootpath.ps1 httpd-2.4.29-171109
 
 Windows users should note that extracting the zip file contents from a remote drive using the File Explorer results in untrusted executable files and scripts. Copy the .zip file to a local drive before using the File Explorer extraction tool.
 
@@ -124,11 +133,19 @@ This distribution of Apache HTTP Server is parameterized to allow multiple insta
 
 Unix users, running as root;
 
-$ cd /opt/pivotal/webserver$ httpd-2.4/bin/newserver.ps1 --server *{host}*$ cd *{host}*$ bin/httpdctl install$ bin/httpdctl start
+$ cd /opt/pivotal/webserver  
+$ httpd-2.4/bin/newserver.ps1 --server *{host}  
+*$ cd *{host}*  
+$ bin/httpdctl install  
+$ bin/httpdctl start
 
 Windows users (in PowerShell as user Administrator);
 
-PS C:\> cd \Pivotal\WebServerPS C:\Pivotal\WebServer> httpd-2.4\bin\newserver.ps1 --server *{host}*PS C:\Pivotal\WebServer> cd *{host}*PS C:\Pivotal\WebServer\example.com> bin\httpdctl.ps1 installPS C:\Pivotal\WebServer\example.com> bin\httpdctl.ps1 start
+PS C:\> cd \Pivotal\WebServer  
+PS C:\Pivotal\WebServer> httpd-2.4\bin\newserver.ps1 --server *{host}  
+*PS C:\Pivotal\WebServer> cd *{host}  
+*PS C:\Pivotal\WebServer\example.com> bin\httpdctl.ps1 install  
+PS C:\Pivotal\WebServer\example.com> bin\httpdctl.ps1 start
 
 Modify the {host}/conf/ files to customize the server behavior. Use the httpdenv script in the bin directory of the instance to have access to the various tools shipped in the httpd-2.4 bin directory;
 
