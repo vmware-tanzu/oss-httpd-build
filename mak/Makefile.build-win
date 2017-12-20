@@ -28,24 +28,23 @@
 # The components are initially installed into the DESTDIR which is the
 # ../dst/httpd component directory name with the TAG variable suffixed.
 
-ARCH=Windows
 BLD=release
 TAG=
 SRCDIR=C:\Users\wrowe\dev\oss-httpd-build\src
 
 !INCLUDE $(SRCDIR)\$(BLD)-manifest-vars
 
-DESTDIR=C:\Users\wrowe\dev\oss-httpd-build\dst\$(httpd_srcdir)$(TAG)
-TARGET=C:\pivotal\webserver\$(httpd_srcdir)$(TAG)
-
-!IF "$(ARCH)" == "Windows"
-CMAKE_DEFAULTS=-G "NMake Makefiles" -D CMAKE_BUILD_TYPE=RelWithDebInfo -D CMAKE_COLOR_MAKEFILE=OFF 
-PREFER_CMAKE=1
-!ELSE
-CMAKE_DEFAULTS=-G "Unix Makefiles"
-PREFER_CMAKE=0
+!IF [FOR /F "usebackq" %d in (`cmd.exe /c "cd .. & cd"`) DO ECHO ROOTDIR=%d > rootdir.include] == 0
+!INCLUDE rootdir.include
+!IF [del rootdir.include] == 0
+!ENDIF
 !ENDIF
 
+DESTDIR=$(ROOTDIR)\dst\$(httpd_srcdir)$(TAG)
+TARGET=C:\pivotal\webserver\$(httpd_srcdir)$(TAG)
+
+CMAKE_DEFAULTS=-G "NMake Makefiles" -D CMAKE_BUILD_TYPE=RelWithDebInfo -D CMAKE_COLOR_MAKEFILE=OFF 
+PREFER_CMAKE=1
 
 all: build-httpd
 
@@ -65,7 +64,6 @@ $(expat_srcdir)/Makefile:  $(SRCDIR)/$(expat_srcdir)/expat/CMakeLists.txt
 		-D BUILD_shared=OFF -D CMAKE_INSTALL_PREFIX=$(DESTDIR) \
 		$(SRCDIR)/$(expat_srcdir)/expat && \
 	cd ..
-#		-D CMAKE_INSTALL_LIBDIR=bin \
 
 build-expat: $(expat_srcdir)/Makefile
 	cd $(expat_srcdir) && \
