@@ -39,11 +39,34 @@ include $(SRCDIR)/$(BLD)-manifest-vars
 DESTDIR=$(shell cd ..; pwd)/dst/$(httpd_srcdir)$(TAG)
 TARGET=/opt/pivotal/webserver/$(httpd_srcdir)$(TAG)
 
-all: build-httpd build-tcnative
+CMAKE_DEFAULTS=-G "Unix Makefiles" -D CMAKE_COLOR_MAKEFILE=OFF
+PREFER_CMAKE=0
+
+all: build-httpd
 
 pre-build:
-	-mkdir -p $(DSTDIR) 2>/dev/null
+	-mkdir -p $(DESTDIR) 2>/dev/null
 	echo $(SRCDIR)
+
+
+ifndef expat_srcdir
+with_expat=
+build-expat:
+else
+with_expat=--with-expat=$(DESTDIR)
+$(expat_srcdir)/Makefile: $(SRCDIR)/$(expat_srcdir)/expat/configure
+        -mkdir $(expat_srcdir) 2>/dev/null
+        cd $(expat_srcdir) && \
+	  $(SRCDIR)/$(expat_srcdir)/expat/configure \
+		 --prefix=$(DESTDIR) && \
+        cd ..
+
+build-expat: $(expat_srcdir)/Makefile
+	cd $(expat_srcdir) && \
+	  make $(OPT) && \
+	  make $(OPT) install && \
+	cd ..
+endif
 
 
 $(apr_srcdir)/Makefile: build-openssl $(SRCDIR)/$(apr_srcdir)/configure
