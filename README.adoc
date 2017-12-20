@@ -32,7 +32,7 @@ otherwise apparently identical builds.
 Build `\{pkg}` reflects the particular component, either
 the offical designation (`httpd-2.4.25/`), an indication
 of interim packages (`httpd-2.4.26-rc1/`), or the exact
-province of the file (`httpd-2.4.26-dev-r1872199/`)
+province of the file (`httpd-2.4.26-dev-r1872199/`).
 
 Several `\{bld}` schemas are expected; 'release' for the
 official packages, 'candidate' for packages anticipated
@@ -116,26 +116,29 @@ The package names have remained the same.
 
 === Microsoft Windows dependencies
 
-Visual Studio (2015 or 2017 recommended)
-NASM Assembler
-ActiveState or Strawberry Perl
-unxutils or gnuwin32 Windows-native unix command line tools 
+ . Microsoft Visual Studio 2017 or 2015
+ . NASM Assembler
+ . ActiveState or Strawberry Perl
+ . unxutils or gnuwin32 Windows-native unix command line tools 
 (Note mingw and cygwin are not supported)
-Info-zip command line zip
-curl and awk (or name gawk from unxutils as awk)
-Subversion and GIT command line tools
-Microsoft Visual Studio 2017 or 2015
+ . Info-zip command line zip
+ . curl and awk (or name gawk from unxutils as awk)
+ . Subversion and GIT command line tools
 
 == Phase 1: Gather Sources
 
  $ cd src/
- $ make -f ../mak/Makefile.gather [BLD={type}]
+ $ make -f ../mak/Makefile.gather [BLD={type}] [GRP=complete]
 
 BLD defines the build type: release - candidate - snapshot - bleed
 (case sensitive) where release is the default.
 
 Gathers source code packages or (source checkouts) for all packages
 into the source tree, and generates a version and directory name manifest.
+
+This will gather all components if GRP=complete is specified, otherwise
+the linux system package sources of expat, lua, pcre, libxml2 and zlib
+will not be gathered or compiled.
 
 Each component is designed for persistence, if from git or svn it performs
 a fetch / update, if from a most recent release package, it fetches and
