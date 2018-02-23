@@ -400,6 +400,36 @@ gather-apriconv-1xbranch: pre-manifest
 	echo apriconv_ver=$$apriconv_ver >>$(BLD)-manifest-vars
 
 
+gather-curl-release: pre-manifest
+	curl_srcpath=https://curl.haxx.se/download && \
+	curl_pkg=`wget -q -O - $$curl_srcpath/ | sed -n '/<a href="\(curl-7\.[0-9.]*\.tar\.bz2\)"/{s#.*href="\([^"]*\).*#\1#;h};$$!b;g;p'` && \
+	curl_ver=`echo $$curl_pkg | sed 's#curl-\(.*\)\.tar\.bz2#\1#;'` && \
+	curl_srcdir=curl-$$curl_ver && \
+	if test ! -f pkgs/$$curl_pkg; then \
+	  cd pkgs && \
+	  wget -nv $$curl_srcpath/$$curl_pkg && \
+	  wget -nv $$curl_srcpath/$$curl_pkg.asc && \
+	  cd .. && \
+          tar -xjf pkgs/$$curl_pkg; \
+	fi && \
+	echo curl_srcpath=$$curl_srcpath >>$(BLD)-manifest-vars && \
+	echo curl_srcdir=$$curl_srcdir >>$(BLD)-manifest-vars && \
+	echo curl_ver=$$curl_ver >>$(BLD)-manifest-vars
+
+gather-curl-master: pre-manifest
+	curl_srcpath=https://github.com/curl && \
+	curl_ver=2.x-git && \
+	curl_srcdir=curl-$$curl_ver && \
+	if test ! -d $$curl_srcdir ; then \
+	  git clone -q $$curl_srcpath.git $$curl_srcdir; \
+	else \
+	  cd $$curl_srcdir && git fetch -q && cd ..; \
+	fi && \
+	echo curl_srcpath=$$curl_srcpath >>$(BLD)-manifest-vars && \
+	echo curl_srcdir=$$curl_srcdir >>$(BLD)-manifest-vars && \
+	echo curl_ver=$$curl_ver >>$(BLD)-manifest-vars
+
+
 gather-expat-release: pre-manifest
 	expat_srcpath=https://github.com/libexpat/libexpat/releases && \
 	expat_ver=`wget -q -O - $$expat_srcpath | sed -n 's#^.*<a href=".*\/archive\/R_\(.*\)\.tar\.gz".*$$#\1#;t once;$$!b;:once;p;q;'` && \
@@ -612,7 +642,7 @@ gather-zlib-master: pre-manifest
 gather-core-release:  gather-apr-release gather-aprutil-release \
 		      gather-httpd-release gather-openssl-release \
 		      gather-nghttp2-release gather-brotli-release \
-		      gather-httpdtest-trunk
+		      gather-curl-release gather-httpdtest-trunk
 
 gather-complete-release: gather-core-release \
 		      gather-expat-release gather-pcre-release \
@@ -632,7 +662,7 @@ gather-linux-release: gather-core-release
 gather-core-candidate: gather-apr-rc gather-aprutil-rc \
 		      gather-httpd-rc gather-openssl-candidate \
 		      gather-nghttp2-release gather-brotli-release \
-		      gather-httpdtest-trunk
+		      gather-curl-release gather-httpdtest-trunk
 
 gather-linux-candidate: gather-core-candidate
 	mv $(BLD)-manifest-vars $(BLD)-manifest-vars.sav
@@ -650,15 +680,15 @@ gather-complete-candidate: gather-core-candidate \
 
 
 gather-core-snapshot: gather-apr-1xbranch gather-aprutil-1xbranch \
-		      gather-httpd-2xbranch gather-openssl-110branch \
-		      gather-nghttp2-master gather-brotli-master \
-		      gather-httpdtest-trunk
-
-gather-complete-snapshot: gather-core-snapshot \
 		      gather-expat-master gather-pcre-trunk \
 		      gather-apriconv-1xbranch gather-libxml2-master \
-		      gather-lua-release gather-zlib-master \
-		      gather-jansson-master
+		      gather-httpd-2xbranch gather-openssl-110branch \
+		      gather-nghttp2-master gather-brotli-master \
+		      gather-curl-master gather-httpdtest-trunk \
+		      gather-zlib-master gather-jansson-master
+
+gather-complete-snapshot: gather-core-snapshot \
+		      gather-lua-release
 	mv $(BLD)-manifest-vars $(BLD)-manifest-vars.sav
 	LC_COLLATE=C sort < $(BLD)-manifest-vars.sav > $(BLD)-manifest-vars
 	rm $(BLD)-manifest-vars.sav
@@ -672,12 +702,12 @@ gather-linux-snapshot: gather-core-snapshot
 gather-core-bleed:    gather-apr-trunk gather-pcre2-trunk \
 		      gather-httpd-trunk gather-openssl-master \
 		      gather-nghttp2-master gather-brotli-master \
-		      gather-httpdtest-trunk
+		      gather-expat-master gather-libxml2-master \
+		      gather-curl-master gather-jansson-master \
+		      gather-zlib-master gather-httpdtest-trunk
 
 gather-complete-bleed: gather-core-bleed \
-		      gather-expat-master gather-libxml2-master \
-		      gather-lua-release gather-zlib-master \
-		      gather-jansson-master
+		      gather-lua-release
 	mv $(BLD)-manifest-vars $(BLD)-manifest-vars.sav
 	LC_COLLATE=C sort < $(BLD)-manifest-vars.sav > $(BLD)-manifest-vars
 	rm $(BLD)-manifest-vars.sav
