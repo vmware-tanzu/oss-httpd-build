@@ -37,6 +37,7 @@ all: prepare-linux
 pre-preconfig:
 	echo Preparing $(BLD) Source Trees
 
+
 ifndef apr_srcdir
 preconfig-apr: pre-preconfig
 with_apr=
@@ -50,6 +51,21 @@ $(apr_srcdir)/configure: $(apr_srcdir)/configure.in
 preconfig-apr: pre-preconfig $(apr_srcdir)/configure
 endif
 
+
+ifndef apriconv_srcdir
+with_apriconv=
+preconfig-apriconv: preconfig-apr
+else
+with_apriconv=--with-apr-iconv=../$(apriconv_srcdir)
+$(apriconv_srcdir)/configure: $(apriconv_srcdir)/configure.in 
+	cd $(apriconv_srcdir) && \
+	  ./buildconf $(with_apr) && \
+	cd ..
+
+preconfig-apriconv: preconfig-apr $(apriconv_srcdir)/configure
+endif
+
+
 ifndef aprutil_srcdir
 with_aprutil=
 preconfig-aprutil: preconfig-apr
@@ -57,11 +73,12 @@ else
 with_aprutil=--with-apr-util=../$(aprutil_srcdir)
 $(aprutil_srcdir)/configure: $(aprutil_srcdir)/configure.in 
 	cd $(aprutil_srcdir) && \
-	  ./buildconf $(with_apr) && \
+	  ./buildconf $(with_apr) $(with_apriconv)&& \
 	cd ..
 
 preconfig-aprutil: preconfig-apr $(aprutil_srcdir)/configure
 endif
+
 
 ifndef httpd_srcdir
 preconfig-httpd: preconfig-aprutil
@@ -74,6 +91,7 @@ $(httpd_srcdir)/configure: $(httpd_srcdir)/configure.in
 preconfig-httpd: preconfig-aprutil $(httpd_srcdir)/configure
 endif
 
+
 ifndef tcnative_srcdir
 preconfig-tcnative: pre-preconfig
 else
@@ -85,8 +103,10 @@ $(tcnative_srcdir)/native/configure: $(tcnative_srcdir)/native/configure.in
 preconfig-tcnative: preconfig-apr $(tcnative_srcdir)/native/configure
 endif
 
+
 preconfig-httpdtest: pre-preconfig
 #	Apparently a noop
+
 
 ifndef openssl_srcdir
 preconfig-openssl: pre-preconfig
@@ -97,6 +117,7 @@ preconfig-openssl: pre-preconfig
 	  $(MAKE) depend && \
 	cd ..
 endif
+
 
 ifndef nghttp2_srcdir
 preconfig-nghttp2: pre-preconfig
@@ -111,13 +132,27 @@ $(nghttp2_srcdir)/configure: $(nghttp2_srcdir)/configure.ac
 preconfig-nghttp2: pre-preconfig $(nghttp2_srcdir)/configure
 endif
 
+
+ifndef brotli_srcdir
 preconfig-brotli: pre-preconfig
-#	Noop, except perhaps if premake5/bazel support vpath builds
+else
+$(brotli_srcdir)/configure: $(brotli_srcdir)/configure.ac
+	cd $(brotli_srcdir) && \
+	  ./bootstrap && \
+	  autoreconf -i --force && \
+	  automake && \
+	  autoconf && \
+	cd ..
+
+preconfig-brotli: pre-preconfig $(brotli_srcdir)/configure
+endif
+
 
 ifndef expat_srcdir
 preconfig-expat: pre-preconfig
 else
-$(expat_srcdir)/expat/configure: $(expat_srcdir)/expat/configure.ac
+$(expat_srcdir)/expat/configure: $(expat_srcdir)/expat/configure.ac \
+				 $(expat_srcdir)/expat/Makefile.am
 	cd $(expat_srcdir)/expat && \
 	  ./buildconf.sh && \
 	cd ../..
@@ -125,16 +160,32 @@ $(expat_srcdir)/expat/configure: $(expat_srcdir)/expat/configure.ac
 preconfig-expat: pre-preconfig $(expat_srcdir)/expat/configure
 endif
 
+
+ifndef jansson_srcdir
+preconfig-jansson: pre-preconfig
+else
+$(jansson_srcdir)/configure: $(jansson_srcdir)/configure.ac
+	cd $(jansson_srcdir) && \
+	  autoreconf -i --force && \
+	  automake && \
+	  autoconf && \
+	cd ..
+
+preconfig-jansson: pre-preconfig $(jansson_srcdir)/configure
+endif
+
+
 ifndef pcre_srcdir
 preconfig-pcre: pre-preconfig
 else
 $(pcre_srcdir)/configure: $(pcre_srcdir)/configure.ac
 	cd $(pcre_srcdir) && \
-	  NOCONFIGURE=1 ./autogen.sh && \
+	  ./autogen.sh && \
 	cd ..
 
 preconfig-pcre: pre-preconfig $(pcre_srcdir)/configure
 endif
+
 
 ifndef libxml2_srcdir
 preconfig-libxml2: pre-preconfig
@@ -147,12 +198,16 @@ $(libxml2_srcdir)/configure: $(libxml2_srcdir)/configure.ac
 preconfig-libxml2: pre-preconfig $(libxml2_srcdir)/configure
 endif
 
+
+preconfig-zlib: pre-preconfig
+
+
 preconfig-lua: pre-preconfig
 
-preconfig-apriconv: pre-preconfig
 
-prepare-linux: preconfig-apr preconfig-aprutil preconfig-httpd \
+prepare-linux: preconfig-apr preconfig-apriconv preconfig-aprutil \
 		preconfig-httpdtest preconfig-openssl preconfig-nghttp2 \
 		preconfig-brotli preconfig-expat preconfig-pcre \
-		preconfig-apriconv preconfig-libxml2 preconfig-lua \
-		preconfig-tcnative 
+		preconfig-zlib preconfig-libxml2 preconfig-lua \
+		preconfig-jansson \
+		preconfig-httpd preconfig-tcnative 
