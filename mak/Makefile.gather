@@ -417,7 +417,7 @@ gather-curl-release: pre-manifest
 	echo curl_ver=$$curl_ver >>$(BLD)-manifest-vars
 
 gather-curl-master: pre-manifest
-	curl_srcpath=https://github.com/curl && \
+	curl_srcpath=https://github.com/curl/curl && \
 	curl_ver=2.x-git && \
 	curl_srcdir=curl-$$curl_ver && \
 	if test ! -d $$curl_srcdir ; then \
