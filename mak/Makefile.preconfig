@@ -148,6 +148,18 @@ preconfig-brotli: pre-preconfig $(brotli_srcdir)/configure
 endif
 
 
+ifndef curl_srcdir
+preconfig-curl: pre-preconfig
+else
+$(curl_srcdir)/configure: $(curl_srcdir)/configure.ac
+	cd $(curl_srcdir) && \
+	  ./buildconf && \
+	cd ..
+
+preconfig-curl: pre-preconfig $(curl_srcdir)/configure
+endif
+
+
 ifndef expat_srcdir
 preconfig-expat: pre-preconfig
 else
@@ -209,5 +221,5 @@ prepare-linux: preconfig-apr preconfig-apriconv preconfig-aprutil \
 		preconfig-httpdtest preconfig-openssl preconfig-nghttp2 \
 		preconfig-brotli preconfig-expat preconfig-pcre \
 		preconfig-zlib preconfig-libxml2 preconfig-lua \
-		preconfig-jansson \
-		preconfig-httpd preconfig-tcnative 
+		preconfig-curl preconfig-jansson preconfig-httpd \
+		preconfig-tcnative 
