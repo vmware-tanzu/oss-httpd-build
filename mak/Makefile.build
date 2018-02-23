@@ -52,14 +52,30 @@ pre-build:
 ifndef expat_srcdir
 with_expat=
 build-expat:
+else ifeq "$(PREFER_CMAKE)" "1"
+with_expat=--with-expat=$(DESTDIR)
+$(expat_srcdir)/Makefile:  $(SRCDIR)/$(expat_srcdir)/expat/CMakeLists.txt
+	-mkdir $(expat_srcdir) 2>/dev/null
+	cd $(expat_srcdir) && \
+	  cmake $(CMAKE_DEFAULTS) -D BUILD_tests=OFF -D BUILD_tools=OFF \
+		-D BUILD_shared=OFF -D CMAKE_INSTALL_PREFIX=$(DESTDIR) \
+		$(SRCDIR)/$(expat_srcdir)/expat && \
+	cd ..
+
+build-expat: $(expat_srcdir)/Makefile
+	cd $(expat_srcdir) && \
+	  make $(OPT) && \
+	  make $(OPT) install && \
+	cd ..
 else
 with_expat=--with-expat=$(DESTDIR)
 $(expat_srcdir)/Makefile: $(SRCDIR)/$(expat_srcdir)/expat/configure
-        -mkdir $(expat_srcdir) 2>/dev/null
-        cd $(expat_srcdir) && \
+	-mkdir $(expat_srcdir) 2>/dev/null
+	cd $(expat_srcdir) && \
+	  DOCBOOK_TO_MAN=db2x_docbook2man \
 	  $(SRCDIR)/$(expat_srcdir)/expat/configure \
-		 --prefix=$(DESTDIR) && \
-        cd ..
+		--prefix=$(DESTDIR) && \
+	cd ..
 
 build-expat: $(expat_srcdir)/Makefile
 	cd $(expat_srcdir) && \
@@ -69,7 +85,7 @@ build-expat: $(expat_srcdir)/Makefile
 endif
 
 
-$(apr_srcdir)/Makefile: build-openssl $(SRCDIR)/$(apr_srcdir)/configure
+$(apr_srcdir)/Makefile: build-openssl build-expat $(SRCDIR)/$(apr_srcdir)/configure
 	-mkdir $(apr_srcdir) 2>/dev/null
 	cd $(apr_srcdir) && \
 	  $(SRCDIR)/$(apr_srcdir)/configure \
@@ -89,17 +105,42 @@ build-apr: $(apr_srcdir)/Makefile
 	cd ..
 
 
+ifndef apriconv_srcdir_is_broken
+with_apriconv=
+build-apriconv: build-apr
+else
+with_apriconv=--with-apr-iconv=$(DESTDIR)
+
+$(apriconv_srcdir)/Makefile: $(SRCDIR)/$(apriconv_srcdir)/configure
+	-mkdir $(apriconv_srcdir) 2>/dev/null
+	cd $(apriconv_srcdir) && \
+	  $(SRCDIR)/$(apriconv_srcdir)/configure \
+		 --with-apr=$(DESTDIR) \
+		 --with-installbuilddir=\$${prefix}/build \
+		 --includedir=\$${prefix}/include \
+		 --prefix=$(DESTDIR) && \
+	cd ..
+
+build-apriconv: $(apriconv_srcdir)/Makefile
+	cd $(apriconv_srcdir) && \
+	  make $(OPT) && \
+	  make $(OPT) install && \
+	cd ..
+endif
+
+
 ifndef aprutil_srcdir
 with_aprutil=
 build-aprutil: build-apr
 else
 with_aprutil=--with-apr-util=$(DESTDIR)
-$(aprutil_srcdir)/Makefile: build-openssl build-apr \
+$(aprutil_srcdir)/Makefile: build-openssl build-expat build-apr build-apriconv \
 			    $(SRCDIR)/$(aprutil_srcdir)/configure
 	-mkdir $(aprutil_srcdir) 2>/dev/null
 	cd $(aprutil_srcdir) && \
 	  $(SRCDIR)/$(aprutil_srcdir)/configure \
 		 --with-apr=$(DESTDIR) \
+		 $(with_apriconv) \
 		 --with-openssl=$(DESTDIR) \
 		 --with-crypto \
 		 --without-ldap \
@@ -113,6 +154,26 @@ build-aprutil: build-apr $(aprutil_srcdir)/Makefile
 	cd $(aprutil_srcdir) && \
 	  make $(OPT) && \
 	  make $(OPT) install && \
+	cd ..
+endif
+
+
+ifndef libxml2_srcdir
+with_libxml2=
+build-libxml2:
+else
+with_libxml2=--with-libxml2=$(DESTDIR)
+$(libxml2_srcdir)/Makefile: $(SRCDIR)/$(libxml2_srcdir)
+	-mkdir $(libxml2_srcdir) 2>/dev/null
+	cd $(libxml2_srcdir) && \
+	  $(SRCDIR)/$(libxml2_srcdir)/configure prefix=$(DESTDIR) \
+		--without-python && \
+	cd ..
+
+build-libxml2: $(libxml2_srcdir)/Makefile
+	cd $(libxml2_srcdir) && \
+	  $(MAKE) && \
+	  $(MAKE) install && \
 	cd ..
 endif
 
@@ -151,10 +212,73 @@ build-openssl: $(openssl_srcdir)/Makefile
 endif
 
 
+ifndef pcre_srcdir
+with_pcre=
+build-pcre:
+else
+ifeq "$(PREFER_CMAKE)" "1"
+with_pcre=--with-pcre=$(DESTDIR)
+$(pcre_srcdir)/Makefile:  $(SRCDIR)/$(pcre_srcdir)/CMakeLists.txt
+	-mkdir $(pcre_srcdir) 2>/dev/null
+	cd $(pcre_srcdir) && \
+	  cmake $(CMAKE_DEFAULTS) \
+		-D BUILD_SHARED_LIBS=ON -D CMAKE_INSTALL_PREFIX=$(DESTDIR) \
+		$(SRCDIR)/$(pcre_srcdir) && \
+	cd ..
+else
+$(pcre_srcdir)/Makefile: $(SRCDIR)/$(pcre_srcdir)/configure
+	-mkdir $(pcre_srcdir) 2>/dev/null
+	cd $(pcre_srcdir) && \
+	  $(SRCDIR)/$(pcre_srcdir)/configure \
+		 --prefix=$(DESTDIR) && \
+	cd ..
+endif
+
+build-pcre: $(pcre_srcdir)/Makefile
+	cd $(pcre_srcdir) && \
+	  $(MAKE) && \
+	  $(MAKE) install && \
+	cd ..
+endif
+
+
+ifndef zlib_srcdir
+build-zlib:
+
+else
+ifeq "$(PREFER_CMAKE)" "1"
+$(zlib_srcdir)/Makefile: $(SRCDIR)/$(zlib_srcdir)/CMakeLists.txt
+	-mkdir $(zlib_srcdir) 2>/dev/null
+	cd $(zlib_srcdir) && \
+	  cmake $(CMAKE_DEFAULTS) \
+		-D CMAKE_INSTALL_PREFIX=$(DESTDIR) \
+		$(SRCDIR)/$(zlib_srcdir) && \
+	cd ..
+else
+$(zlib_srcdir)/Makefile: $(SRCDIR)/$(zlib_srcdir)/configure
+	-mkdir $(zlib_srcdir) 2>/dev/null
+	cd $(zlib_srcdir) && \
+	  $(SRCDIR)/$(zlib_srcdir)/configure \
+		 --prefix=$(DESTDIR) && \
+	cd ..
+endif
+
+build-zlib: $(zlib_srcdir)/Makefile
+	cd $(zlib_srcdir) && \
+	  $(MAKE) && \
+	  $(MAKE) install && \
+	cd ..
+endif
+
+
+# Nothing yet - the default is nonsense. Need to work out a suitable schema
+build-lua:
+
+
 ifndef brotli_srcdir
 build-brotli:
 else
-$(brotli_srcdir)/Makefile: $(SRCDIR)/$(brotli_srcdir)
+$(brotli_srcdir)/Makefile: $(SRCDIR)/$(brotli_srcdir)/CMakeLists.txt
 	-mkdir $(brotli_srcdir) 2>/dev/null
 	cd $(brotli_srcdir) && \
 	  cmake -G "Unix Makefiles" \
@@ -193,13 +317,15 @@ build-nghttp2: $(nghttp2_srcdir)/Makefile
 # used by openldap conflicts with the most modern openssl in this build
 #
 $(httpd_srcdir)/Makefile: build-apr build-aprutil build-openssl \
-			  build-brotli build-nghttp2 \
+			  build-pcre build-libxml2 build-zlib \
+			  build-brotli build-lua build-nghttp2 \
 			  $(SRCDIR)/$(httpd_srcdir)/configure
 	-mkdir $(httpd_srcdir) 2>/dev/null
 	cd $(httpd_srcdir) && \
 	  $(SRCDIR)/$(httpd_srcdir)/configure \
 		 --prefix=$(DESTDIR) \
-		 --with-apr=$(DESTDIR) $(with_aprutil) \
+		 --with-apr=$(DESTDIR) \
+		 $(with_aprutil) \
 		 --with-openssl=$(DESTDIR) \
 		 --with-nghttp2=$(DESTDIR) \
 		 --with-brotli=$(DESTDIR) \
