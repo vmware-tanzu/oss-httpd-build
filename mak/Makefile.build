@@ -88,7 +88,7 @@ endif
 ifndef openssl_srcdir
 with_ssl=
 with_openssl=
-build_openssl:
+build-openssl:
 else ifeq "$(patsubst 1.0.%,,$(openssl_ver))" ""
 with_ssl=--with-ssl=$(DESTDIR)
 with_openssl=--with-openssl=$(DESTDIR)
@@ -126,10 +126,19 @@ build-openssl: $(openssl_srcdir)/Makefile
 endif
 
 
-$(apr_srcdir)/Makefile: build-openssl build-expat $(SRCDIR)/$(apr_srcdir)/configure
+# Disabing option checking here, so apr-util-1 options can be passed to apr-1
+# These options must be given to the monolithic apr-2 config
+ifndef apr_srcdir
+with_apr=
+build-apr:
+else
+with_apr=--with-apr=$(DESTDIR)
+$(apr_srcdir)/Makefile: build-openssl build-expat \
+			$(SRCDIR)/$(apr_srcdir)/configure
 	-mkdir $(apr_srcdir) 2>/dev/null
 	cd $(apr_srcdir) && \
 	  $(SRCDIR)/$(apr_srcdir)/configure \
+		 --disable-option-checking \
 		 $(with_openssl) \
 		 $(with_expat) \
 		 --without-nss \
@@ -144,6 +153,7 @@ build-apr: $(apr_srcdir)/Makefile
 	  make $(OPT) && \
 	  make $(OPT) install && \
 	cd ..
+endif
 
 
 ifndef apriconv_srcdir_is_fixed
@@ -151,12 +161,11 @@ with_apriconv=
 build-apriconv: build-apr
 else
 with_apriconv=--with-apr-iconv=$(DESTDIR)
-
 $(apriconv_srcdir)/Makefile: $(SRCDIR)/$(apriconv_srcdir)/configure
 	-mkdir $(apriconv_srcdir) 2>/dev/null
 	cd $(apriconv_srcdir) && \
 	  $(SRCDIR)/$(apriconv_srcdir)/configure \
-		 --with-apr=$(DESTDIR) \
+		 $(with_apr) \
 		 --includedir=\$${prefix}/include \
 		 --prefix=$(DESTDIR) && \
 	cd ..
@@ -179,7 +188,7 @@ $(aprutil_srcdir)/Makefile: build-openssl build-expat build-apr build-apriconv \
 	-mkdir $(aprutil_srcdir) 2>/dev/null
 	cd $(aprutil_srcdir) && \
 	  $(SRCDIR)/$(aprutil_srcdir)/configure \
-		 --with-apr=$(DESTDIR) \
+		 $(with_apr) \
 		 $(with_apriconv) \
 		 $(with_openssl) \
 		 $(with_expat) \
@@ -446,7 +455,7 @@ $(httpd_srcdir)/Makefile: build-openssl build-apr build-aprutil \
 	  $(SRCDIR)/$(httpd_srcdir)/configure \
 		 --prefix=$(DESTDIR) \
 		 $(with_openssl) \
-		 --with-apr=$(DESTDIR) \
+		 $(with_apr) \
 		 $(with_aprutil) \
 		 $(with_brotli) \
 		 $(with_jansson) \
@@ -495,8 +504,8 @@ $(tcnative_srcdir)/Makefile: build-apr build-openssl \
 	-mkdir $(tcnative_srcdir) 2>/dev/null
 	cd $(tcnative_srcdir) && \
 	  $(SRCDIR)/$(tcnative_srcdir)/native/configure \
-		 --with-apr=$(DESTDIR) \
-		 --with-ssl=$(DESTDIR) \
+		 $(with_apr) \
+		 $(with_ssl) \
 		 --prefix=$(DESTDIR) && \
 	cd ..
 
