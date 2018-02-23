@@ -253,6 +253,21 @@ gather-openssl-release: pre-manifest
 	echo openssl_srcdir=openssl-$$openssl_ver >>$(BLD)-manifest-vars && \
 	echo openssl_ver=$$openssl_ver >>$(BLD)-manifest-vars
 
+gather-openssl-candidate: pre-manifest
+	openssl_srcpath=https://www.openssl.org/source && \
+	openssl_pkg=`wget -q -O - $$openssl_srcpath/ | sed 's#.*<a href="\(openssl-1\.1\.1[a-z0-9-]*\.tar\.gz\)".*#\1#p;d;'` && \
+	openssl_ver=`echo $$openssl_pkg | sed 's#openssl-\(.*\)\.tar\.gz#\1#;'` && \
+	if test ! -f pkgs/$$openssl_pkg; then \
+	  cd pkgs && \
+	  wget -nv $$openssl_srcpath/$$openssl_pkg && \
+	  wget -nv $$openssl_srcpath/$$openssl_pkg.asc && \
+	  cd .. && \
+	  tar -xzf pkgs/$$openssl_pkg; \
+	fi && \
+	echo openssl_srcpath=$$openssl_srcpath >>$(BLD)-manifest-vars && \
+	echo openssl_srcdir=openssl-$$openssl_ver >>$(BLD)-manifest-vars && \
+	echo openssl_ver=$$openssl_ver >>$(BLD)-manifest-vars
+
 gather-openssl-110branch: pre-manifest
 	openssl_srcpath=https://github.com/openssl/openssl && \
 	openssl_ver=1.1.0-git && \
@@ -432,6 +447,22 @@ gather-pcre-release: pre-manifest
 	echo pcre_srcdir=$$pcre_srcdir >>$(BLD)-manifest-vars && \
 	echo pcre_ver=$$pcre_ver >>$(BLD)-manifest-vars
 
+gather-pcre-candidate: pre-manifest
+	pcre_srcpath=https://ftp.pcre.org/pub/pcre/Testing/ && \
+	pcre_pkg=`wget -q -O - $$pcre_srcpath/ | sed -n '/<a href="\(pcre-8\.[0-9]*-RC[0-9]*\.tar\.bz2\)"/{s#.*href="\([^"]*\).*#\1#;h};$$!b;g;p'` && \
+	pcre_srcdir=`echo $$pcre_pkg | sed 's#\(pcre-.*\)\.tar\.bz2#\1#;'` && \
+	pcre_ver=`echo $$pcre_srcdir | sed 's#pcre-\(.*\)#\1#;'` && \
+	if test ! -f pkgs/$$pcre_pkg; then \
+	  cd pkgs && \
+	  wget -nv $$pcre_srcpath/$$pcre_pkg && \
+	  wget -nv $$pcre_srcpath/$$pcre_pkg.sig && \
+	  cd .. && \
+	  tar -xjf pkgs/$$pcre_pkg; \
+	fi && \
+	echo pcre_srcpath=$$pcre_srcpath >>$(BLD)-manifest-vars && \
+	echo pcre_srcdir=$$pcre_srcdir >>$(BLD)-manifest-vars && \
+	echo pcre_ver=$$pcre_ver >>$(BLD)-manifest-vars
+
 gather-pcre-trunk: pre-manifest
 	pcre_srcpath=svn://vcs.exim.org/pcre/code/trunk && \
 	pcre_rev=`svn info $$pcre_srcpath | sed -n '/Last Changed Rev: \([0-9]\+\)/{s#.*: ##;p}'` && \
@@ -455,6 +486,36 @@ gather-pcre2-trunk: pre-manifest
 	echo pcre_srcpath=$$pcre_srcpath >>$(BLD)-manifest-vars && \
 	echo pcre_srcdir=$$pcre_srcdir >>$(BLD)-manifest-vars && \
 	echo pcre_ver=$$pcre_ver >>$(BLD)-manifest-vars
+
+
+gather-jansson-release: pre-manifest
+	jansson_srcpath=http://www.digip.org/jansson/releases && \
+	jansson_pkg=`wget -q -O - $$jansson_srcpath/ | sed -n '/<a href="\(jansson-2\.[0-9]*\.tar\.bz2\)"/{s#.*href="\([^"]*\).*#\1#;h};$$!b;g;p'` && \
+	jansson_ver=`echo $$jansson_pkg | sed 's#jansson-\(.*\)\.tar\.bz2#\1#;'` && \
+	jansson_srcdir=jansson-$$jansson_ver && \
+	if test ! -f pkgs/$$jansson_pkg; then \
+	  cd pkgs && \
+	  wget -nv $$jansson_srcpath/$$jansson_pkg && \
+	  wget -nv $$jansson_srcpath/$$jansson_pkg.asc && \
+	  cd .. && \
+          tar -xjf pkgs/$$jansson_pkg; \
+	fi && \
+	echo jansson_srcpath=$$jansson_srcpath >>$(BLD)-manifest-vars && \
+	echo jansson_srcdir=$$jansson_srcdir >>$(BLD)-manifest-vars && \
+	echo jansson_ver=$$jansson_ver >>$(BLD)-manifest-vars
+
+gather-jansson-master: pre-manifest
+	jansson_srcpath=https://github.com/akheron/jansson && \
+	jansson_ver=2.x-git && \
+	jansson_srcdir=jansson-$$jansson_ver && \
+	if test ! -d $$jansson_srcdir ; then \
+	  git clone -q $$jansson_srcpath.git $$jansson_srcdir; \
+	else \
+	  cd $$jansson_srcdir && git fetch -q && cd ..; \
+	fi && \
+	echo jansson_srcpath=$$jansson_srcpath >>$(BLD)-manifest-vars && \
+	echo jansson_srcdir=$$jansson_srcdir >>$(BLD)-manifest-vars && \
+	echo jansson_ver=$$jansson_ver >>$(BLD)-manifest-vars
 
 
 gather-libxml2-release: pre-manifest
@@ -556,7 +617,8 @@ gather-core-release:  gather-apr-release gather-aprutil-release \
 gather-complete-release: gather-core-release \
 		      gather-expat-release gather-pcre-release \
 		      gather-apriconv-release gather-libxml2-release \
-		      gather-lua-release gather-zlib-release
+		      gather-lua-release gather-zlib-release \
+		      gather-jansson-release
 	mv $(BLD)-manifest-vars $(BLD)-manifest-vars.sav
 	LC_COLLATE=C sort < $(BLD)-manifest-vars.sav > $(BLD)-manifest-vars
 	rm $(BLD)-manifest-vars.sav
@@ -568,7 +630,7 @@ gather-linux-release: gather-core-release
 
 
 gather-core-candidate: gather-apr-rc gather-aprutil-rc \
-		      gather-httpd-rc gather-openssl-release \
+		      gather-httpd-rc gather-openssl-candidate \
 		      gather-nghttp2-release gather-brotli-release \
 		      gather-httpdtest-trunk
 
@@ -578,9 +640,10 @@ gather-linux-candidate: gather-core-candidate
 	rm $(BLD)-manifest-vars.sav
 
 gather-complete-candidate: gather-core-candidate \
-		      gather-expat-release gather-pcre-release \
+		      gather-expat-release gather-pcre-candidate \
 		      gather-apriconv-rc gather-libxml2-release \
-		      gather-lua-release gather-zlib-release
+		      gather-lua-release gather-zlib-release \
+		      gather-jansson-release
 	mv $(BLD)-manifest-vars $(BLD)-manifest-vars.sav
 	LC_COLLATE=C sort < $(BLD)-manifest-vars.sav > $(BLD)-manifest-vars
 	rm $(BLD)-manifest-vars.sav
@@ -594,7 +657,8 @@ gather-core-snapshot: gather-apr-1xbranch gather-aprutil-1xbranch \
 gather-complete-snapshot: gather-core-snapshot \
 		      gather-expat-master gather-pcre-trunk \
 		      gather-apriconv-1xbranch gather-libxml2-master \
-		      gather-lua-release gather-zlib-master
+		      gather-lua-release gather-zlib-master \
+		      gather-jansson-master
 	mv $(BLD)-manifest-vars $(BLD)-manifest-vars.sav
 	LC_COLLATE=C sort < $(BLD)-manifest-vars.sav > $(BLD)-manifest-vars
 	rm $(BLD)-manifest-vars.sav
@@ -612,7 +676,8 @@ gather-core-bleed:    gather-apr-trunk gather-pcre2-trunk \
 
 gather-complete-bleed: gather-core-bleed \
 		      gather-expat-master gather-libxml2-master \
-		      gather-lua-release gather-zlib-master
+		      gather-lua-release gather-zlib-master \
+		      gather-jansson-master
 	mv $(BLD)-manifest-vars $(BLD)-manifest-vars.sav
 	LC_COLLATE=C sort < $(BLD)-manifest-vars.sav > $(BLD)-manifest-vars
 	rm $(BLD)-manifest-vars.sav
