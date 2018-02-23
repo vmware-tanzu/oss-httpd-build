@@ -418,7 +418,7 @@ gather-curl-release: pre-manifest
 
 gather-curl-master: pre-manifest
 	curl_srcpath=https://github.com/curl/curl && \
-	curl_ver=2.x-git && \
+	curl_ver=7.x-git && \
 	curl_srcdir=curl-$$curl_ver && \
 	if test ! -d $$curl_srcdir ; then \
 	  git clone -q $$curl_srcpath.git $$curl_srcdir; \
