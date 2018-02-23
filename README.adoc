@@ -88,31 +88,44 @@ Additional required tools which may not be included by default;
 For the actual `Makefile.build` phase, a number of system component -devel
 packages are needed.
 
- $ yum install libuuid-devel expat-devel libxml2-devel lua-devel pcre-devel zlib-devel
+ $ yum install libuuid-devel expat-devel jansson-devel libxml2-devel lua-devel pcre-devel zlib-devel
 
 These base packages are required for deployment (and are incidently installed
 with the -devel packages above; most are already present by default);
 
- $ yum install libuuid expat libxml2 lua pcre zlib 
+ $ yum install libuuid expat jansson libxml2 lua pcre zlib 
 
 * Note that following RHEL 7 / Fedora 21, `yum` becomes the `dnf` utility.
 The package names have remained the same.
 
 === Ubuntu or Debian development package dependencies:
 
+Additional required tools which may not be included by default;
+
  $ apt-get -y install \
      build-essential \
      cmake \
      git \
-     subversion \
-     xutils-dev\
-     libexpat1-dev \
-     lua5.3 \
      libtool \
+     subversion \
+     wget \
+     xutils-dev
+
+For the actual `Makefile.build` phase, a number of system component -devel
+packages are needed.
+
+ $ apt-get -y install \
+     libexpat1-dev \
+     libjansson-dev \
      libpcre3-dev \
      libxml2-dev \
-     zlib1g-dev \
-     wget
+     lua5.3 \
+     zlib1g-dev
+
+These base packages are required for deployment (and are incidently installed
+with the -devel packages above; most are already present by default);
+
+ $ apt-get -y install libexpat1 libjansson4 libpcre3 libxml2 liblua5.3-0 
 
 === Microsoft Windows dependencies
 
