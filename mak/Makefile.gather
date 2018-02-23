@@ -268,13 +268,14 @@ gather-openssl-candidate: pre-manifest
 	echo openssl_srcdir=openssl-$$openssl_ver >>$(BLD)-manifest-vars && \
 	echo openssl_ver=$$openssl_ver >>$(BLD)-manifest-vars
 
-gather-openssl-110branch: pre-manifest
+# Toggle to checkout OpenSSL_1_1_1-stable, once 1.2.0 becomes master
+gather-openssl-111branch: pre-manifest
 	openssl_srcpath=https://github.com/openssl/openssl && \
-	openssl_ver=1.1.0-git && \
+	openssl_ver=1.1.1-git && \
 	openssl_srcdir=openssl-$$openssl_ver && \
 	if test ! -d $$openssl_srcdir ; then \
 	  git clone -q $$openssl_srcpath.git $$openssl_srcdir && \
-	  cd $$openssl_srcdir && git checkout OpenSSL_1_1_0-stable && cd ..; \
+	  cd $$openssl_srcdir && git checkout master && cd ..; \
 	else \
 	  cd $$openssl_srcdir && git fetch -q && cd ..; \
 	fi && \
@@ -682,7 +683,7 @@ gather-complete-candidate: gather-core-candidate \
 gather-core-snapshot: gather-apr-1xbranch gather-aprutil-1xbranch \
 		      gather-expat-master gather-pcre-trunk \
 		      gather-apriconv-1xbranch gather-libxml2-master \
-		      gather-httpd-2xbranch gather-openssl-110branch \
+		      gather-httpd-2xbranch gather-openssl-111branch \
 		      gather-nghttp2-master gather-brotli-master \
 		      gather-curl-master gather-httpdtest-trunk \
 		      gather-zlib-master gather-jansson-master
