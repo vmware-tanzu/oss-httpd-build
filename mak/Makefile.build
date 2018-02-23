@@ -85,14 +85,55 @@ build-expat: $(expat_srcdir)/Makefile
 endif
 
 
+ifndef openssl_srcdir
+with_ssl=
+with_openssl=
+build_openssl:
+else ifeq "$(patsubst 1.0.%,,$(openssl_ver))" ""
+with_ssl=--with-ssl=$(DESTDIR)
+with_openssl=--with-openssl=$(DESTDIR)
+$(openssl_srcdir)/Makefile: $(firstword $(MAKEFILE_LIST)) \
+			    $(SRCDIR)/$(openssl_srcdir)
+	-mkdir $(openssl_srcdir) 2>/dev/null
+	cp -prf $(SRCDIR)/$(openssl_srcdir)/* $(openssl_srcdir)/
+	cd $(openssl_srcdir) && \
+	  ./config --prefix=$(DESTDIR) shared \
+		   -I$(DESTDIR)/include -L$(DESTDIR)/lib \
+		   -Wl,-rpath,$(TARGET)/lib && \
+	cd ..
+
+build-openssl: $(openssl_srcdir)/Makefile
+	cd $(openssl_srcdir) && \
+	  make && \
+	  make install && \
+	cd ..
+else
+with_ssl=--with-ssl=$(DESTDIR)
+with_openssl=--with-openssl=$(DESTDIR)
+$(openssl_srcdir)/Makefile: $(SRCDIR)/$(openssl_srcdir)/Configure
+	-mkdir $(openssl_srcdir) 2>/dev/null
+	cd $(openssl_srcdir) && \
+	  $(SRCDIR)/$(openssl_srcdir)/config shared \
+		 --libdir=lib --prefix=$(DESTDIR) \
+		 -Wl,-rpath,$(TARGET)/lib && \
+	cd ..
+
+build-openssl: $(openssl_srcdir)/Makefile
+	cd $(openssl_srcdir) && \
+	  make $(OPT) && \
+	  make $(OPT) install && \
+	cd ..
+endif
+
+
 $(apr_srcdir)/Makefile: build-openssl build-expat $(SRCDIR)/$(apr_srcdir)/configure
 	-mkdir $(apr_srcdir) 2>/dev/null
 	cd $(apr_srcdir) && \
 	  $(SRCDIR)/$(apr_srcdir)/configure \
-		 --with-openssl=$(DESTDIR) \
+		 $(with_openssl) \
+		 $(with_expat) \
+		 --without-nss \
 		 --with-crypto \
-		 --without-ldap \
-		 --without-lber \
 		 --with-installbuilddir=\$${prefix}/build \
 		 --includedir=\$${prefix}/include \
 		 --prefix=$(DESTDIR) && \
@@ -105,7 +146,7 @@ build-apr: $(apr_srcdir)/Makefile
 	cd ..
 
 
-ifndef apriconv_srcdir_is_broken
+ifndef apriconv_srcdir_is_fixed
 with_apriconv=
 build-apriconv: build-apr
 else
@@ -116,7 +157,6 @@ $(apriconv_srcdir)/Makefile: $(SRCDIR)/$(apriconv_srcdir)/configure
 	cd $(apriconv_srcdir) && \
 	  $(SRCDIR)/$(apriconv_srcdir)/configure \
 		 --with-apr=$(DESTDIR) \
-		 --with-installbuilddir=\$${prefix}/build \
 		 --includedir=\$${prefix}/include \
 		 --prefix=$(DESTDIR) && \
 	cd ..
@@ -141,11 +181,12 @@ $(aprutil_srcdir)/Makefile: build-openssl build-expat build-apr build-apriconv \
 	  $(SRCDIR)/$(aprutil_srcdir)/configure \
 		 --with-apr=$(DESTDIR) \
 		 $(with_apriconv) \
-		 --with-openssl=$(DESTDIR) \
-		 --with-crypto \
+		 $(with_openssl) \
+		 $(with_expat) \
+		 --without-nss \
 		 --without-ldap \
 		 --without-lber \
-		 --with-installbuilddir=\$${prefix}/build \
+		 --with-crypto \
 		 --includedir=\$${prefix}/include \
 		 --prefix=$(DESTDIR) && \
 	cd ..
@@ -158,126 +199,11 @@ build-aprutil: build-apr $(aprutil_srcdir)/Makefile
 endif
 
 
-ifndef libxml2_srcdir
-with_libxml2=
-build-libxml2:
-else
-with_libxml2=--with-libxml2=$(DESTDIR)
-$(libxml2_srcdir)/Makefile: $(SRCDIR)/$(libxml2_srcdir)
-	-mkdir $(libxml2_srcdir) 2>/dev/null
-	cd $(libxml2_srcdir) && \
-	  $(SRCDIR)/$(libxml2_srcdir)/configure prefix=$(DESTDIR) \
-		--without-python && \
-	cd ..
-
-build-libxml2: $(libxml2_srcdir)/Makefile
-	cd $(libxml2_srcdir) && \
-	  $(MAKE) && \
-	  $(MAKE) install && \
-	cd ..
-endif
-
-
-# Ancient openssl 1.0.2 did not support vpath builds or concurrent builds
-ifeq "$(patsubst 1.0.%,,$(openssl_ver))" ""
-$(openssl_srcdir)/Makefile: $(firstword $(MAKEFILE_LIST)) \
-			    $(SRCDIR)/$(openssl_srcdir)
-	-mkdir $(openssl_srcdir) 2>/dev/null
-	cp -prf $(SRCDIR)/$(openssl_srcdir)/* $(openssl_srcdir)/
-	cd $(openssl_srcdir) && \
-	  ./config --prefix=$(DESTDIR) shared \
-		   -I$(DESTDIR)/include -L$(DESTDIR)/lib \
-		   -Wl,-rpath,$(TARGET)/lib && \
-	cd ..
-
-build-openssl: $(openssl_srcdir)/Makefile
-	cd $(openssl_srcdir) && \
-	  make && \
-	  make install && \
-	cd ..
-else
-$(openssl_srcdir)/Makefile: $(SRCDIR)/$(openssl_srcdir)/Configure
-	-mkdir $(openssl_srcdir) 2>/dev/null
-	cd $(openssl_srcdir) && \
-	  $(SRCDIR)/$(openssl_srcdir)/config shared \
-		 --libdir=lib --prefix=$(DESTDIR) \
-		 -Wl,-rpath,$(TARGET)/lib && \
-	cd ..
-
-build-openssl: $(openssl_srcdir)/Makefile
-	cd $(openssl_srcdir) && \
-	  make $(OPT) && \
-	  make $(OPT) install && \
-	cd ..
-endif
-
-
-ifndef pcre_srcdir
-with_pcre=
-build-pcre:
-else
-ifeq "$(PREFER_CMAKE)" "1"
-with_pcre=--with-pcre=$(DESTDIR)
-$(pcre_srcdir)/Makefile:  $(SRCDIR)/$(pcre_srcdir)/CMakeLists.txt
-	-mkdir $(pcre_srcdir) 2>/dev/null
-	cd $(pcre_srcdir) && \
-	  cmake $(CMAKE_DEFAULTS) \
-		-D BUILD_SHARED_LIBS=ON -D CMAKE_INSTALL_PREFIX=$(DESTDIR) \
-		$(SRCDIR)/$(pcre_srcdir) && \
-	cd ..
-else
-$(pcre_srcdir)/Makefile: $(SRCDIR)/$(pcre_srcdir)/configure
-	-mkdir $(pcre_srcdir) 2>/dev/null
-	cd $(pcre_srcdir) && \
-	  $(SRCDIR)/$(pcre_srcdir)/configure \
-		 --prefix=$(DESTDIR) && \
-	cd ..
-endif
-
-build-pcre: $(pcre_srcdir)/Makefile
-	cd $(pcre_srcdir) && \
-	  $(MAKE) && \
-	  $(MAKE) install && \
-	cd ..
-endif
-
-
-ifndef zlib_srcdir
-build-zlib:
-
-else
-ifeq "$(PREFER_CMAKE)" "1"
-$(zlib_srcdir)/Makefile: $(SRCDIR)/$(zlib_srcdir)/CMakeLists.txt
-	-mkdir $(zlib_srcdir) 2>/dev/null
-	cd $(zlib_srcdir) && \
-	  cmake $(CMAKE_DEFAULTS) \
-		-D CMAKE_INSTALL_PREFIX=$(DESTDIR) \
-		$(SRCDIR)/$(zlib_srcdir) && \
-	cd ..
-else
-$(zlib_srcdir)/Makefile: $(SRCDIR)/$(zlib_srcdir)/configure
-	-mkdir $(zlib_srcdir) 2>/dev/null
-	cd $(zlib_srcdir) && \
-	  $(SRCDIR)/$(zlib_srcdir)/configure \
-		 --prefix=$(DESTDIR) && \
-	cd ..
-endif
-
-build-zlib: $(zlib_srcdir)/Makefile
-	cd $(zlib_srcdir) && \
-	  $(MAKE) && \
-	  $(MAKE) install && \
-	cd ..
-endif
-
-
-# Nothing yet - the default is nonsense. Need to work out a suitable schema
-build-lua:
-
-
 ifndef brotli_srcdir
+with_brotli=
 build-brotli:
 else
+with_brotli=--with-brotli=$(DESTDIR)
 $(brotli_srcdir)/Makefile: $(SRCDIR)/$(brotli_srcdir)/CMakeLists.txt
 	-mkdir $(brotli_srcdir) 2>/dev/null
 	cd $(brotli_srcdir) && \
@@ -295,6 +221,142 @@ build-brotli: $(brotli_srcdir)/Makefile
 endif
 
 
+ifndef jansson_srcdir
+with_jansson=
+build-jansson:
+else ifeq "$(PREFER_CMAKE)" "1"
+with_jansson=--with-jansson=$(DESTDIR)
+$(jansson_srcdir)/Makefile:  $(SRCDIR)/$(jansson_srcdir)/CMakeLists.txt
+	-mkdir $(jansson_srcdir) 2>/dev/null
+	cd $(jansson_srcdir) && \
+	  cmake $(CMAKE_DEFAULTS) \
+		-D BUILD_SHARED_LIBS=ON -D CMAKE_INSTALL_PREFIX=$(DESTDIR) \
+		$(SRCDIR)/$(jansson_srcdir) && \
+	cd ..
+
+build-jansson: $(jansson_srcdir)/Makefile
+	cd $(jansson_srcdir) && \
+	  $(MAKE) && \
+	  $(MAKE) install && \
+	cd ..
+else
+with_jansson=--with-jansson=$(DESTDIR)
+$(jansson_srcdir)/Makefile: $(SRCDIR)/$(jansson_srcdir)/configure
+	-mkdir $(jansson_srcdir) 2>/dev/null
+	cd $(jansson_srcdir) && \
+	  $(SRCDIR)/$(jansson_srcdir)/configure \
+		 --prefix=$(DESTDIR) && \
+	cd ..
+
+build-jansson: $(jansson_srcdir)/Makefile
+	cd $(jansson_srcdir) && \
+	  $(MAKE) && \
+	  $(MAKE) install && \
+	cd ..
+endif
+
+
+ifndef libxml2_srcdir
+with_libxml2=
+build-libxml2:
+else
+with_libxml2=--with-libxml2=$(DESTDIR)
+$(libxml2_srcdir)/Makefile: $(SRCDIR)/$(libxml2_srcdir)
+	-mkdir $(libxml2_srcdir) 2>/dev/null
+	cd $(libxml2_srcdir) && \
+	  $(SRCDIR)/$(libxml2_srcdir)/configure prefix=$(DESTDIR) \
+		--without-zlib \
+		--without-lzma \
+		--without-python && \
+	cd ..
+
+build-libxml2: $(libxml2_srcdir)/Makefile
+	cd $(libxml2_srcdir) && \
+	  $(MAKE) && \
+	  $(MAKE) install && \
+	cd ..
+endif
+
+
+# Nothing yet - the default is nonsense. Need to work out a suitable schema
+with_lua=
+build-lua:
+
+
+ifndef pcre_srcdir
+with_pcre=
+build-pcre:
+else ifeq "$(PREFER_CMAKE)" "1"
+with_pcre=--with-pcre=$(DESTDIR)
+$(pcre_srcdir)/Makefile:  $(SRCDIR)/$(pcre_srcdir)/CMakeLists.txt
+	-mkdir $(pcre_srcdir) 2>/dev/null
+	cd $(pcre_srcdir) && \
+	  cmake $(CMAKE_DEFAULTS) \
+		-D BUILD_SHARED_LIBS=ON -D CMAKE_INSTALL_PREFIX=$(DESTDIR) \
+		$(SRCDIR)/$(pcre_srcdir) && \
+	cd ..
+
+build-pcre: $(pcre_srcdir)/Makefile
+	cd $(pcre_srcdir) && \
+	  $(MAKE) && \
+	  $(MAKE) install && \
+	cd ..
+else
+$(pcre_srcdir)/Makefile: $(SRCDIR)/$(pcre_srcdir)/configure
+	-mkdir $(pcre_srcdir) 2>/dev/null
+	cd $(pcre_srcdir) && \
+	  $(SRCDIR)/$(pcre_srcdir)/configure \
+		 --prefix=$(DESTDIR) && \
+	cd ..
+
+build-pcre: $(pcre_srcdir)/Makefile
+	cd $(pcre_srcdir) && \
+	  $(MAKE) && \
+	  $(MAKE) install && \
+	cd ..
+endif
+
+
+ifndef zlib_srcdir
+with_zlib=
+build-zlib:
+else ifeq "$(PREFER_CMAKE)" "1"
+with_zlib=--with-zlib=$(DESTDIR)
+$(zlib_srcdir)/Makefile: $(SRCDIR)/$(zlib_srcdir)/CMakeLists.txt
+	-mkdir $(zlib_srcdir) 2>/dev/null
+	cd $(zlib_srcdir) && \
+	  cmake $(CMAKE_DEFAULTS) \
+		-D CMAKE_INSTALL_PREFIX=$(DESTDIR) \
+		$(SRCDIR)/$(zlib_srcdir) && \
+	cd ..
+
+build-zlib: $(zlib_srcdir)/Makefile
+	cd $(zlib_srcdir) && \
+	  $(MAKE) && \
+	  $(MAKE) install && \
+	cd ..
+else
+with_zlib=--with-zlib=$(DESTDIR)
+$(zlib_srcdir)/Makefile: $(SRCDIR)/$(zlib_srcdir)/configure
+	-mkdir $(zlib_srcdir) 2>/dev/null
+	cd $(zlib_srcdir) && \
+	  $(SRCDIR)/$(zlib_srcdir)/configure \
+		 --prefix=$(DESTDIR) && \
+	cd ..
+
+build-zlib: $(zlib_srcdir)/Makefile
+	cd $(zlib_srcdir) && \
+	  $(MAKE) && \
+	  $(MAKE) install && \
+	cd ..
+endif
+
+
+ifndef nghttp2_srcdir
+with_nghttp2=
+build-nghttp2:
+else
+with_nghttp2=--with-nghttp2=$(DESTDIR)
 $(nghttp2_srcdir)/Makefile: $(SRCDIR)/$(nghttp2_srcdir)/configure
 	-mkdir $(nghttp2_srcdir) 2>/dev/null
 	cd $(nghttp2_srcdir) && \
@@ -308,6 +370,64 @@ build-nghttp2: $(nghttp2_srcdir)/Makefile
 	  make $(OPT) && \
 	  make $(OPT) install && \
 	cd ..
+endif
+
+
+ifndef curl_srcdir
+with_curl=
+build-curl:
+else ifeq "$(PREFER_CMAKE)" "1"
+with_curl=--with-curl=$(DESTDIR)
+$(curl_srcdir)/Makefile:  $(SRCDIR)/$(curl_srcdir)/CMakeLists.txt
+	-mkdir $(curl_srcdir) 2>/dev/null
+	cd $(curl_srcdir) && \
+	  cmake $(CMAKE_DEFAULTS) \
+		-D BUILD_SHARED_LIBS=ON -D CMAKE_INSTALL_PREFIX=$(DESTDIR) \
+		$(SRCDIR)/$(curl_srcdir) && \
+	cd ..
+
+build-curl: $(curl_srcdir)/Makefile
+	cd $(curl_srcdir) && \
+	  $(MAKE) && \
+	  $(MAKE) install && \
+	cd ..
+else
+
+with_curl=--with-curl=$(DESTDIR)
+$(curl_srcdir)/Makefile: build-openssl build-zlib build-brotli build-nghttp2 \
+			 $(SRCDIR)/$(curl_srcdir)/configure
+	-mkdir $(curl_srcdir) 2>/dev/null
+	cd $(curl_srcdir) && \
+	  $(SRCDIR)/$(curl_srcdir)/configure \
+		 $(with_ssl) \
+		 $(with_zlib) \
+		 $(with_brotli) \
+		 $(with_nghttp2) \
+		 --without-gnutls \
+		 --without-polarssl \
+		 --without-mbedtls \
+		 --without-cyassl \
+		 --without-nss \
+		 --without-axtls \
+		 --without-libpsl \
+		 --without-libmetalink \
+		 --without-libssh2 \
+		 --without-gssapi \
+		 --without-libidn2 \
+		 --without-librtmp \
+		 --without-ldap-lib \
+		 --without-lber-lib \
+		 --without-zsh-functions-dir \
+		 --prefix=$(DESTDIR) && \
+	cd ..
+
+build-curl: $(curl_srcdir)/Makefile
+	cd $(curl_srcdir) && \
+	  $(MAKE) && \
+	  $(MAKE) install && \
+	cd ..
+endif
+
 
 # Explicitly enabling version and unixd as built-in on Unix, enabling suexec,
 # cgi for prefork configs, and authnz-fcgi and proxy-http2 for early adopters.
@@ -316,19 +436,26 @@ build-nghttp2: $(nghttp2_srcdir)/Makefile
 # and disabling ldap because lber depends on openssl, and the system openssl
 # used by openldap conflicts with the most modern openssl in this build
 #
-$(httpd_srcdir)/Makefile: build-apr build-aprutil build-openssl \
-			  build-pcre build-libxml2 build-zlib \
-			  build-brotli build-lua build-nghttp2 \
+$(httpd_srcdir)/Makefile: build-openssl build-apr build-aprutil \
+			  build-brotli build-jansson build-libxml2 \
+			  build-lua build-pcre build-zlib \
+			  build-nghttp2 build-curl \
 			  $(SRCDIR)/$(httpd_srcdir)/configure
 	-mkdir $(httpd_srcdir) 2>/dev/null
 	cd $(httpd_srcdir) && \
 	  $(SRCDIR)/$(httpd_srcdir)/configure \
 		 --prefix=$(DESTDIR) \
+		 $(with_openssl) \
 		 --with-apr=$(DESTDIR) \
 		 $(with_aprutil) \
-		 --with-openssl=$(DESTDIR) \
-		 --with-nghttp2=$(DESTDIR) \
-		 --with-brotli=$(DESTDIR) \
+		 $(with_brotli) \
+		 $(with_jansson) \
+		 $(with_libxml2) \
+		 $(with_lua) \
+		 $(with_pcre) \
+		 $(with_zlib) \
+		 $(with_nghttp2) \
+		 $(with_curl) \
 		 --enable-mods-shared=all \
 		 --enable-mpms-shared=all \
 		 --enable-load-all-modules \
