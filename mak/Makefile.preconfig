@@ -111,11 +111,13 @@ preconfig-httpdtest: pre-preconfig
 ifndef openssl_srcdir
 preconfig-openssl: pre-preconfig
 else
-preconfig-openssl: pre-preconfig
+$(openssl_srcdir)/Makefile: $(openssl_srcdir)/Configure 
 	cd $(openssl_srcdir) && \
 	  ./Configure dist shared && \
 	  $(MAKE) depend && \
 	cd ..
+
+preconfig-openssl: pre-preconfig $(openssl_srcdir)/Makefile
 endif
 
 
