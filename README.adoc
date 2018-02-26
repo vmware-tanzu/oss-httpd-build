@@ -88,7 +88,7 @@ Additional required tools which may not be included by default;
 For the actual `Makefile.build` phase, a number of system component -devel
 packages are needed.
 
- $ yum install libuuid-devel expat-devel jansson-devel libxml2-devel lua-devel pcre-devel zlib-devel
+ $ yum install libuuid-devel expat-devel jansson-devel libxml2-devel lua-devel pcre-devel zlib-devel docbook2X
 
 These base packages are required for deployment (and are incidently installed
 with the -devel packages above; most are already present by default);
@@ -105,6 +105,7 @@ Additional required tools which may not be included by default;
  $ apt-get -y install \
      build-essential \
      cmake \
+     docbook2x \
      git \
      libtool \
      subversion \
