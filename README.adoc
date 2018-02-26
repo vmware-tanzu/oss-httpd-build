@@ -108,6 +108,7 @@ Additional required tools which may not be included by default;
      docbook2x \
      git \
      libtool \
+     libtool-bin \
      subversion \
      wget \
      xutils-dev
