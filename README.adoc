@@ -16,14 +16,16 @@ limitations under the License.
 
 == Overview
 
-Builds are monolithic. These rely on many established
-components shipped with modern linux distributions
-which are reasonably stable and up to date. On Windows,
-every component must be built from source.
+This project provides a complete illustration of building
+the httpd project and its many component dependencies, as
+a monolithic package. These may rely on many established
+components updated in modern linux distributions, which
+are reasonably stable. On Windows, every dependency must
+be built from source.
 
 The build target is `/opt/pivotal/webserver/httpd-2.4/`
 on Linux and Windows, but is relocatable. Each has a
-long pathname, e.g. `httpd-2.4.25-$bldno/` which is
+longer pathname, e.g. `httpd-2.4.25-$bldno/` which is
 symlinked from the 'expected' path. Non-release builds
 have additional pathname components such as `-snapshot`,
 `-bleed`, etc, and may have a TAG to distinguish two
@@ -43,18 +45,24 @@ next-major or minor development trees.
  mak/                   Build script files
 
  src/                    Complete build sources
-    {pkg}/               Component source (for VPATH build)
+    \{pkg}/               Component source (for VPATH build)
     pkgs/                Source component package downloads
-    {bld}-manifest-vars  Description of {pkg} names and versions for {bld}
+    \{bld}-manifest-vars  Description of \{pkg} names and versions for \{bld}
 
  bld/                    Build trees of components by build type
-    {pkg}/               Component build tree (vpath or copied from src/)
+    \{pkg}/               Component build tree (vpath or copied from src/)
 
  dst/                    Resulting intermediate binary packages
-    {httpd-pkg}{tag}/    Temporary installation for testing and relocation
+    \{httpd-pkg}\{tag}/    Temporary installation for testing and relocation
 
  pkg/                    Final binary package
-    {httpd-pkg}{tag}/    Relocateable binaries for distribution
+    \{httpd-pkg}\{tag}/    Relocateable binaries for distribution
+
+The structure above can be problematic for running many
+different builds in parallel. Specifically, the configured
+bld/\{component}  can only be directed to one dst/ target
+path. If building multiple flavors, use parallel build
+directories, naming them as desired. 
 
 == Platform Requirements
 
@@ -90,6 +98,17 @@ packages are needed.
 
  $ yum install libuuid-devel expat-devel jansson-devel libxml2-devel lua-devel pcre-devel zlib-devel docbook2X
 
+Perl is used by the openssl documentation schema (Text::Template)
+and many Perl packages are used by the httpdtest perl framework.
+
+To deploy these using RHEL 7 packages, use
+
+ $ yum install perl-core perl-Text-Template perl-Module-Load-Conditional perl-HTTP-DAV perl-LWP-Protocol-https perl-AnyEvent-HTTP perl-Crypt-SSLeay perl-Net-SSLGlue perl-DateTime perl-Module-Build-Tiny perl-Test-LeakTrace perl-Test-TCP
+
+And finally use CPAN for the packages not distributed with the OS; 
+
+ $ cpan install Protocol::HTTP2::Client
+
 These base packages are required for deployment (and are incidently installed
 with the -devel packages above; most are already present by default);
 
@@ -124,6 +143,17 @@ packages are needed.
      lua5.3 \
      zlib1g-dev
 
+Perl is used by the openssl documentation schema (Text::Template)
+and many Perl packages are used by the httpdtest perl framework.
+
+To deploy these using Ubuntu 16.04 packages, use;
+
+ $ apt install perl-modules libtext-template-perl libcrypt-ssleay-perl libnet-sslglue-perl libhttp-dav-perl libanyevent-http-perl libdatetime-perl libmodule-build-perl libmodule-build-tiny-perl libtest-leaktrace-perl libtest-tcp-perl
+
+And finally use CPAN for the packages not distributed with the OS; 
+
+ $ cpan install Protocol::HTTP2::Client
+
 These base packages are required for deployment (and are incidently installed
 with the -devel packages above; most are already present by default);
 
@@ -143,7 +173,7 @@ with the -devel packages above; most are already present by default);
 == Phase 1: Gather Sources
 
  $ cd src/
- $ make -f ../mak/Makefile.gather [BLD={type}] [GRP=complete]
+ $ make -f ../mak/Makefile.gather [BLD=\{type}] [GRP=complete]
 
 BLD defines the build type: release - candidate - snapshot - bleed
 (case sensitive) where release is the default.
@@ -170,7 +200,7 @@ to determine if the sources have been updated.
 == Phase 2: Preconfigure Sources
 
  $ cd src/
- $ make -f ../mak/Makefile.preconfig [BLD={type}]
+ $ make -f ../mak/Makefile.preconfig [BLD=\{type}]
 
 Prepare configuration scripts of packages, particularly from source control
 where autoconf etc have not been invoked yet.
@@ -186,7 +216,7 @@ to multiple build systems, beginning at the `Makefile.build` step.
 == Phase 3: Build Sources
 
  $ cd bld/
- $ make -f ../mak/Makefile.build [BLD={type}] [TAG={-suffix}]
+ $ make -f ../mak/Makefile.build [BLD=\{type}] [TAG=\{-suffix}]
 
 Build all components described by the manifest into the intermediate/
 temporary installation tree, using that intermediate tree as the component
@@ -215,7 +245,7 @@ binaries are recognized as valid.
 == Phase 4: Test Source and Intermediate Installation
 
  $ cd bld/
- $ make -f ../mak/Makefile.test [BLD={type}] [TAG={-suffix}]
+ $ make -f ../mak/Makefile.test [BLD=\{type}] [TAG=\{-suffix}]
 
 Test all components described by the manifest and the intermediate/
 temporary installation httpd server.
@@ -228,7 +258,7 @@ against the intermediate installation in the $DESTDIR path.
 == Phase 5: Package Installation Binaries
 
  $ cd pkg/
- $ make -f ../mak/Makefile.package [BLD={type}] [TAG={-suffix}]
+ $ make -f ../mak/Makefile.package [BLD=\{type}] [TAG=\{-suffix}]
 
 Copy the intermediate/temporary installation httpd server and dependent
 binaries into the `dst/webserver/` tree to rewrite configurations files and
@@ -249,9 +279,9 @@ to use as the 'generic' reference to the now-current httpd.
 
  $ mkdir -p /opt/pivotal/webserver
  $ cd /opt/pivotal/webserver
- $ tar -xjvf {pkgname}
- $ ./httpd-2.4.29{tag}/bin/fixrootpath.pl
- $ ln -sf httpd-2.4.29{tag} httpd-2.4
+ $ tar -xjvf \{pkgname}
+ $ ./httpd-2.4.29\{tag}/bin/fixrootpath.pl
+ $ ln -sf httpd-2.4.29\{tag} httpd-2.4
 
 Packages may be installed in parallel; in order to switch the running httpd
 version, simply reassign the symlink to the desired version and restart the
@@ -259,11 +289,11 @@ server instances.
 
 == Instance Creation ==
 
-To create an instance /opt/pivotal/webserver/{hostname}, use the following
+To create an instance /opt/pivotal/webserver/\{hostname}, use the following
 commands;
 
  $ cd /opt/pivotal/webserver
- $ ./httpd-2.4/bin/newserver.pl --servername {hostname}
+ $ ./httpd-2.4/bin/newserver.pl --servername \{hostname}
 
 The resulting directory includes `bin`, `conf`, `htdocs`, `cgi-bin`, `ssl`
 and `logs` subdirectories. The `bin` directory includes an environment script
