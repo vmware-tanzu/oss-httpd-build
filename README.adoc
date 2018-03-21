@@ -34,7 +34,7 @@ otherwise apparently identical builds.
 Build `\{pkg}` reflects the particular component, either
 the offical designation (`httpd-2.4.25/`), an indication
 of interim packages (`httpd-2.4.26-rc1/`), or the exact
-province of the file (`httpd-2.4.26-dev-r1872199/`).
+provinance of the file (`httpd-2.4.26-dev-r1872199/`).
 
 Several `\{bld}` schemas are expected; 'release' for the
 official packages, 'candidate' for packages anticipated
@@ -45,24 +45,24 @@ next-major or minor development trees.
  mak/                   Build script files
 
  src/                    Complete build sources
-    \{pkg}/               Component source (for VPATH build)
+    {pkg}/               Component source (for VPATH build)
     pkgs/                Source component package downloads
-    \{bld}-manifest-vars  Description of \{pkg} names and versions for \{bld}
+    {bld}-manifest-vars  Description of {pkg} names and versions for {bld}
 
  bld/                    Build trees of components by build type
-    \{pkg}/               Component build tree (vpath or copied from src/)
+    {pkg}/               Component build tree (vpath or copied from src/)
 
  dst/                    Resulting intermediate binary packages
-    \{httpd-pkg}\{tag}/    Temporary installation for testing and relocation
+    {httpd-pkg}{tag}/    Temporary installation for testing and relocation
 
  pkg/                    Final binary package
     \{httpd-pkg}\{tag}/    Relocateable binaries for distribution
 
 The structure above can be problematic for running many
 different builds in parallel. Specifically, the configured
-bld/\{component}  can only be directed to one dst/ target
-path. If building multiple flavors, use parallel build
-directories, naming them as desired. 
+bld/\{component}  can only be --prefix directed at one dst/
+target path. If building multiple flavors, use parallel build
+trees, naming them as desired (e.g. bld-snapshot/, bld-bleed/.) 
 
 == Platform Requirements
 
@@ -140,7 +140,7 @@ packages are needed.
      libjansson-dev \
      libpcre3-dev \
      libxml2-dev \
-     lua5.3 \
+     liblua5.3-dev \
      zlib1g-dev
 
 Perl is used by the openssl documentation schema (Text::Template)
@@ -173,7 +173,7 @@ with the -devel packages above; most are already present by default);
 == Phase 1: Gather Sources
 
  $ cd src/
- $ make -f ../mak/Makefile.gather [BLD=\{type}] [GRP=complete]
+ $ make -f ../mak/Makefile.gather [BLD={type}] [GRP=complete]
 
 BLD defines the build type: release - candidate - snapshot - bleed
 (case sensitive) where release is the default.
@@ -200,7 +200,7 @@ to determine if the sources have been updated.
 == Phase 2: Preconfigure Sources
 
  $ cd src/
- $ make -f ../mak/Makefile.preconfig [BLD=\{type}]
+ $ make -f ../mak/Makefile.preconfig [BLD\{type}]
 
 Prepare configuration scripts of packages, particularly from source control
 where autoconf etc have not been invoked yet.
@@ -216,7 +216,7 @@ to multiple build systems, beginning at the `Makefile.build` step.
 == Phase 3: Build Sources
 
  $ cd bld/
- $ make -f ../mak/Makefile.build [BLD=\{type}] [TAG=\{-suffix}]
+ $ make -f ../mak/Makefile.build [BLD={type}] [TAG={-suffix}]
 
 Build all components described by the manifest into the intermediate/
 temporary installation tree, using that intermediate tree as the component
@@ -245,7 +245,7 @@ binaries are recognized as valid.
 == Phase 4: Test Source and Intermediate Installation
 
  $ cd bld/
- $ make -f ../mak/Makefile.test [BLD=\{type}] [TAG=\{-suffix}]
+ $ make -f ../mak/Makefile.test [BLD={type}] [TAG={-suffix}]
 
 Test all components described by the manifest and the intermediate/
 temporary installation httpd server.
@@ -258,7 +258,7 @@ against the intermediate installation in the $DESTDIR path.
 == Phase 5: Package Installation Binaries
 
  $ cd pkg/
- $ make -f ../mak/Makefile.package [BLD=\{type}] [TAG=\{-suffix}]
+ $ make -f ../mak/Makefile.package [BLD={type}] [TAG={-suffix}]
 
 Copy the intermediate/temporary installation httpd server and dependent
 binaries into the `dst/webserver/` tree to rewrite configurations files and
@@ -266,7 +266,7 @@ scripts with as relocatable paths, add the instance management scripts,
 split the debugging symbols from the binaries, and tar up the package.
 
 This makefile is run from the `pkg` (not `src`, `bld` or `dst`) subdirectory.
-Note that running this in the `dst` subdirectory will wipe out the last build
+WARNING; running this in the `dst` subdirectory will wipe out the last build
 target directory; please use caution.
 
 Distribute the resulting .tar.bz2 files as desired.
@@ -279,7 +279,7 @@ to use as the 'generic' reference to the now-current httpd.
 
  $ mkdir -p /opt/pivotal/webserver
  $ cd /opt/pivotal/webserver
- $ tar -xjvf \{pkgname}
+ $ tar -xjvf {pkgname}
  $ ./httpd-2.4.29\{tag}/bin/fixrootpath.pl
  $ ln -sf httpd-2.4.29\{tag} httpd-2.4
 
@@ -293,7 +293,7 @@ To create an instance /opt/pivotal/webserver/\{hostname}, use the following
 commands;
 
  $ cd /opt/pivotal/webserver
- $ ./httpd-2.4/bin/newserver.pl --servername \{hostname}
+ $ ./httpd-2.4/bin/newserver.pl --servername {hostname}
 
 The resulting directory includes `bin`, `conf`, `htdocs`, `cgi-bin`, `ssl`
 and `logs` subdirectories. The `bin` directory includes an environment script
