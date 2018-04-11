@@ -96,16 +96,19 @@ Additional required tools which may not be included by default;
 For the actual `Makefile.build` phase, a number of system component -devel
 packages are needed.
 
- $ yum install libuuid-devel expat-devel jansson-devel libxml2-devel lua-devel pcre-devel zlib-devel docbook2X
+ $ yum install libuuid-devel expat-devel jansson-devel libxml2-devel \
+                             lua-devel pcre-devel zlib-devel docbook2X
 
 Perl is used by the openssl documentation schema (Text::Template)
 and many Perl packages are used by the httpdtest perl framework.
-
 To deploy these using RHEL 7 packages, use
 
- $ yum install perl-core perl-Text-Template perl-Module-Load-Conditional perl-HTTP-DAV perl-LWP-Protocol-https perl-AnyEvent-HTTP perl-Crypt-SSLeay perl-Net-SSLGlue perl-DateTime perl-Module-Build-Tiny perl-Test-LeakTrace perl-Test-TCP
+ $ yum install perl-core perl-Text-Template perl-Module-Load-Conditional \
+     perl-HTTP-DAV perl-LWP-Protocol-https perl-AnyEvent-HTTP \
+     perl-Crypt-SSLeay perl-Net-SSLGlue perl-DateTime perl-Module-Build-Tiny \
+     perl-Test-LeakTrace perl-Test-TCP
 
-And finally use CPAN for the packages not distributed with the OS; 
+And use CPAN for the packages not distributed with the OS as listed above; 
 
  $ cpan install Protocol::HTTP2::Client
 
@@ -145,27 +148,26 @@ packages are needed.
 
 Perl is used by the openssl documentation schema (Text::Template)
 and many Perl packages are used by the httpdtest perl framework.
-
 To deploy these using Ubuntu 16.04 packages, use;
 
  $ apt install perl-modules libtext-template-perl libcrypt-ssleay-perl libnet-sslglue-perl libhttp-dav-perl libanyevent-http-perl libdatetime-perl libmodule-build-perl libmodule-build-tiny-perl libtest-leaktrace-perl libtest-tcp-perl
 
-And finally use CPAN for the packages not distributed with the OS; 
+And use CPAN for the packages not distributed with the OS as listed above; 
 
  $ cpan install Protocol::HTTP2::Client
 
 These base packages are required for deployment (and are incidently installed
 with the -devel packages above; most are already present by default);
 
- $ apt-get -y install libexpat1 libjansson4 libpcre3 libxml2 liblua5.3-0 
+ $ apt-get -y install libexpat1 libjansson4 libpcre3 libxml2 \
+     liblua5.3-0 zlib1g 
 
 === Microsoft Windows dependencies
 
  . Microsoft Visual Studio 2017 or 2015
  . NASM Assembler
  . ActiveState or Strawberry Perl
- . unxutils or gnuwin32 Windows-native unix command line tools 
-(Note mingw and cygwin are not supported)
+ . unxutils or gnuwin32 Windows-native unix command line tools (Note mingw and cygwin are not supported)
  . Info-zip command line zip
  . curl and awk (or name gawk from unxutils as awk)
  . Subversion and GIT command line tools
@@ -182,8 +184,8 @@ Gathers source code packages or (source checkouts) for all packages
 into the source tree, and generates a version and directory name manifest.
 
 This will gather all components if GRP=complete is specified, otherwise
-the linux system package sources of expat, lua, pcre, libxml2 and zlib
-will not be gathered or compiled.
+the linux system package sources of expat, lua, pcre, jansson, libxml2
+and zlib will not be gathered or compiled.
 
 Each component is designed for persistence, if from git or svn it performs
 a fetch / update, if from a most recent release package, it fetches and
