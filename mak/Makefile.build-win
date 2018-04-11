@@ -580,6 +580,7 @@ $(httpd_srcdir)/Makefile: build-apr build-aprutil build-openssl \
 !ENDIF
 
 build-httpd: $(httpd_srcdir)/Makefile
+	copy "$(SRCDIR)\$(httpd_srcdir)\modules\md\mod_md.h" "$(httpd_srcdir)"
 	cd $(httpd_srcdir) && \
 	  $(MAKE) $(OPT) && \
 	  $(MAKE) $(OPT) install && \
