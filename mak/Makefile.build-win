@@ -30,16 +30,17 @@
 
 BLD=release
 TAG=
-SRCDIR=C:\Users\wrowe\dev\oss-httpd-build\src
+SRCDIR=..\src
 
 !INCLUDE $(SRCDIR)\$(BLD)-manifest-vars
 
-!IF [FOR /F "usebackq" %d in (`cmd.exe /c "cd .. & cd"`) DO ECHO ROOTDIR=%d > rootdir.include] == 0
+!IF [FOR /F "usebackq" %d in (`cmd.exe /c "cd $(SRCDIR)\.. & cd"`) DO ECHO ROOTDIR=%d > rootdir.include] == 0
 !INCLUDE rootdir.include
 !IF [del rootdir.include] == 0
 !ENDIF
 !ENDIF
 
+SRCDIR=$(ROOTDIR)\src
 DESTDIR=$(ROOTDIR)\dst\$(httpd_srcdir)$(TAG)
 TARGET=C:\pivotal\webserver\$(httpd_srcdir)$(TAG)
 
@@ -50,7 +51,6 @@ all: build-httpd
 
 pre-build:
 	-mkdir -p $(DSTDIR) 2>/dev/null
-	echo $(SRCDIR)
 
 !IFNDEF expat_srcdir
 with_expat=

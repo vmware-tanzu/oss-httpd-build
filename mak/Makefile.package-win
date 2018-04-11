@@ -31,13 +31,19 @@
 
 BLD=release
 TAG=
+SRCDIR=..\src
 
-SRCDIR=C:\Users\wrowe\dev\oss-httpd-build\src
+!INCLUDE $(SRCDIR)\$(BLD)-manifest-vars
 
-!INCLUDE $(SRCDIR)/$(BLD)-manifest-vars
+!IF [FOR /F "usebackq" %d in (`cmd.exe /c "cd $(SRCDIR)\.. & cd"`) DO ECHO ROOTDIR=%d > rootdir.include] == 0
+!INCLUDE rootdir.include
+!IF [del rootdir.include] == 0
+!ENDIF
+!ENDIF
 
-DESTDIR=C:\Users\wrowe\dev\oss-httpd-build\dst\$(httpd_srcdir)$(TAG)
-PKGDIR=$(httpd_srcdir)$(TAG)
+SRCDIR=$(ROOTDIR)\src
+DESTDIR=$(ROOTDIR)\dst\$(httpd_srcdir)$(TAG)
+TARGET=C:\pivotal\webserver\$(httpd_srcdir)$(TAG)
 
 OBJCOPY=objcopy
 
