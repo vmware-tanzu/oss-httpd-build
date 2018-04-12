@@ -69,15 +69,15 @@ prepare-instance: collect-httpd
 	cp -prf ../instance-conf/httpd-2.4/_instance/* $(PKGDIR)/_instance/
 	rm $(PKGDIR)/_instance/bin/*.ps1
 # Un-windows any potentially DOS formatted utf8/crlf files;
-	LC_ALL=C sed -e '1s#^\xEF\xBB\x8F##;s#\r$$##;' \
+	LC_ALL=C sed -e '1s#^\xEF\xBB\xBF##;s#\r$$##;' \
 	   -i $(PKGDIR)/bin/fixrootpath.pl
-	LC_ALL=C sed -e '1s#^\xEF\xBB\x8F##;s#\r$$##;' \
+	LC_ALL=C sed -e '1s#^\xEF\xBB\xBF##;s#\r$$##;' \
 	   -i $(PKGDIR)/bin/newserver.pl
-	LC_ALL=C sed -e '1s#^\xEF\xBB\x8F##;s#\r$$##;' \
+	LC_ALL=C sed -e '1s#^\xEF\xBB\xBF##;s#\r$$##;' \
 	   -i $(PKGDIR)/bin/httpdenv.sh
-	LC_ALL=C sed -e '1s#^\xEF\xBB\x8F##;s#\r$$##;' \
+	LC_ALL=C sed -e '1s#^\xEF\xBB\xBF##;s#\r$$##;' \
 	   -i $(PKGDIR)/_instance/bin/httpdctl
-	LC_ALL=C sed -e '1s#^\xEF\xBB\x8F##;s#\r$$##;' \
+	LC_ALL=C sed -e '1s#^\xEF\xBB\xBF##;s#\r$$##;' \
 	   -i $(PKGDIR)/_instance/bin/httpdenv.sh
 
 strip-symbols:
