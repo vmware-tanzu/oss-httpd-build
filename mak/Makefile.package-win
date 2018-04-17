@@ -43,6 +43,7 @@ SRCDIR=..\src
 
 SRCDIR=$(ROOTDIR)\src
 DESTDIR=$(ROOTDIR)\dst\$(httpd_srcdir)$(TAG)
+PKGDIR=$(httpd_srcdir)$(TAG)
 TARGET=C:\pivotal\webserver\$(httpd_srcdir)$(TAG)
 
 OBJCOPY=objcopy
