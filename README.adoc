@@ -286,8 +286,8 @@ to use as the 'generic' reference to the now-current httpd.
  $ mkdir -p /opt/pivotal/webserver
  $ cd /opt/pivotal/webserver
  $ tar -xjvf {pkgname}
- $ ./httpd-2.4.29\{tag}/bin/fixrootpath.pl
- $ ln -sf httpd-2.4.29\{tag} httpd-2.4
+ $ ./httpd-2.4.29{tag}/bin/fixrootpath.pl
+ $ ln -sf httpd-2.4.29{tag} httpd-2.4
 
 Packages may be installed in parallel; in order to switch the running httpd
 version, simply reassign the symlink to the desired version and restart the
