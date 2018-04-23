@@ -25,7 +25,7 @@ be built from source.
 
 The build target is `/opt/pivotal/webserver/httpd-2.4/`
 on Linux and Windows, but is relocatable. Each has a
-longer pathname, e.g. `httpd-2.4.25-$bldno/` which is
+longer pathname, e.g. `httpd-2.4.33\{-bldno}/` which is
 symlinked from the 'expected' path. Non-release builds
 have additional pathname components such as `-snapshot`,
 `-bleed`, etc, and may have a TAG to distinguish two
@@ -56,7 +56,7 @@ next-major or minor development trees.
     {httpd-pkg}{tag}/    Temporary installation for testing and relocation
 
  pkg/                    Final binary package
-    \{httpd-pkg}\{tag}/    Relocateable binaries for distribution
+    {httpd-pkg}{tag}/    Relocateable binaries for distribution
 
 The structure above can be problematic for running many
 different builds in parallel. Specifically, the configured
@@ -202,10 +202,11 @@ to determine if the sources have been updated.
 == Phase 2: Preconfigure Sources
 
  $ cd src/
- $ make -f ../mak/Makefile.preconfig [BLD\{type}]
+ $ make -f ../mak/Makefile.preconfig [BLD={type}]
 
 Prepare configuration scripts of packages, particularly from source control
-where autoconf etc have not been invoked yet.
+where autoconf etc have not been invoked yet. Release and candidate source
+packages are already distributed with this step completed.
 
 This makefile is run after `Makefile.gather` from the source directory root,
 and must be performed following updates to the source packages as indicated
