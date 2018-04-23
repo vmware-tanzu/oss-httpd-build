@@ -24,12 +24,15 @@ are reasonably stable. On Windows, every dependency must
 be built from source.
 
 The build target is `/opt/pivotal/webserver/httpd-2.4/`
-on Linux and Windows, but is relocatable. Each has a
-longer pathname, e.g. `httpd-2.4.33\{-bldno}/` which is
-symlinked from the 'expected' path. Non-release builds
+on Linux and Windows, this is simply a symlink. Each has
+a longer pathname, e.g. `httpd-2.4.33{-bldno}/` which is
+symlinked from this httpd-2.4 path. Non-release builds
 have additional pathname components such as `-snapshot`,
 `-bleed`, etc, and may have a TAG to distinguish two
-otherwise apparently identical builds.
+otherwise apparently identical builds. By associating
+the httpd-2.4 symlink to an updated build, all of the
+associated server instances are redirected to the new
+release or test runtime at once.
 
 Build `\{pkg}` reflects the particular component, either
 the offical designation (`httpd-2.4.25/`), an indication
