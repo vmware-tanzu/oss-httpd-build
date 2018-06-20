@@ -1,4 +1,4 @@
-﻿#!/usr/bin/perl
+#!/usr/bin/perl
 #
 # Pivotal Instance Management Schema for Apache HTTP Server
 #
