@@ -123,7 +123,7 @@ This distribution of Apache HTTP Server is parameterized to allow multiple insta
 Unix users, running as root;
 ```
 $ cd /opt/pivotal/webserver  
-$ httpd-2.4/bin/newserver.ps1 --server {hostname}  
+$ httpd-2.4/bin/newserver.pl --server {hostname}  
 $ cd {hostname}  
 $ bin/httpdctl install  
 $ bin/httpdctl start
