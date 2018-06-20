@@ -62,10 +62,8 @@ my $STRIPDIR = $SUBSTDIR;
 my $URIROOT = '';
 
 $SUBSTDIR =~ s#\/+#\\\/\+#g;
-$SUBSTDIR =~ s#\\+#[\\\\\\\/]\+#g;
 $URIROOT = '(file\:)?\/\/' . $SUBSTDIR . "\\\/\+html\\\/\+";
 $STRIPDIR =~ s#\/+#\\\/\+#g;
-$STRIPDIR =~ s#\\+#[\\\\\\\/]\+#g;
 $STRIPDIR .= '\/+html\/+';
 
 my $BSDESTDIR = $DESTDIR;
