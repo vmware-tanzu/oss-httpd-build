@@ -299,7 +299,7 @@ To create an instance /opt/pivotal/webserver/\{hostname}, use the following
 commands;
 
  $ cd /opt/pivotal/webserver
- $ ./httpd-2.4/bin/newserver.pl --servername {hostname}
+ $ ./httpd-2.4/bin/newserver.pl --server {hostname}
 
 The resulting directory includes `bin`, `conf`, `htdocs`, `cgi-bin`, `ssl`
 and `logs` subdirectories. The `bin` directory includes an environment script
