@@ -32,7 +32,7 @@ In order to build httpd from scratch, see additional details at the github oss-h
 The following components are included in this 2.4.29-171109 build; those marked (\*) are not compiled on RHEL 7 and Ubuntu 16.04, but the OS Vendor's distribution packages are used, instead:
 
 * Apache HTTP Server 2.4.33  
-[http://www.apache.org/dist/httpd/CHANGES_2.4]
+[http://www.apache.org/dist/httpd/CHANGES_2.4]  
 [http://httpd.apache.org/security/vulnerabilities_24.html]
 * Apache APR library 1.6.3  
 [http://www.apache.org/dist/apr/CHANGES-APR-1.6]
@@ -43,28 +43,28 @@ The following components are included in this 2.4.29-171109 build; those marked 
 * brotli compression library 1.0.3  
 [https://github.com/google/brotli/releases]
 * Curl 7.59.0  
-[https://curl.haxx.se/changes.html]
+[https://curl.haxx.se/changes.html]  
 [https://curl.haxx.se/docs/security.html]
 * Jansson 2.11  (\*)  
 [https://jansson.readthedocs.io/en/2.11/changes.html]
 * libexpat 2.2.5 (\*)  
 [https://github.com/libexpat/libexpat/blob/R_2_2_5/expat/Changes]
 * libxml2 2.9.8 (\*)  
-[https://www.cvedetails.com/vulnerability-list/vendor_id-1962/product_id-3311/Xmlsoft-Libxml2.html]
+[https://www.cvedetails.com/vulnerability-list/vendor_id-1962/product_id-3311/Xmlsoft-Libxml2.html]  
 [http://www.xmlsoft.org/news.html] (out of date)
 * Lua language 5.3.4 (\*)  
-[https://www.cvedetails.com/vulnerability-list/vendor_id-13641/product_id-28436/LUA-LUA.html]
+[https://www.cvedetails.com/vulnerability-list/vendor_id-13641/product_id-28436/LUA-LUA.html]  
 [https://www.lua.org/bugs.html]
 * nghttp2 library 1.31.0  
 [https://github.com/nghttp2/nghttp2/releases]
 * OpenSSL library 1.1.0h  
-[https://www.openssl.org/news/vulnerabilities.html]
+[https://www.openssl.org/news/vulnerabilities.html]  
 [https://www.openssl.org/news/changelog.html]
 * PCRE library 8.42 (\*)  
-[https://www.cvedetails.com/vulnerability-list/vendor_id-3265/opdos-1/Pcre.html]
+[https://www.cvedetails.com/vulnerability-list/vendor_id-3265/opdos-1/Pcre.html]  
 [https://www.pcre.org/original/changelog.txt]
 * Zlib compression library 1.2.11 (\*)  
-[https://www.cvedetails.com/vulnerability-list/vendor_id-72/product_id-1820/GNU-Zlib.html]
+[https://www.cvedetails.com/vulnerability-list/vendor_id-72/product_id-1820/GNU-Zlib.html]  
 [https://zlib.net/ChangeLog.txt]
 
 ## **RHEL 7 Users**
