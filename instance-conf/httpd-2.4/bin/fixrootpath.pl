@@ -58,12 +58,15 @@ if (length($SUBSTDIR) < 2) {
 }
 
 my $STRIPDIR = $SUBSTDIR;
+if ($^O =~ /Win32/) {
+  $SUBSTDIR =~ s#[\/\\]+#[\\\/\\\\]\+#g;
+print $SUBSTDIR;
+} else {
+  $SUBSTDIR =~ s#\/+#\\\/\+#g;
+}
 
-my $URIROOT = '';
-
-$SUBSTDIR =~ s#\/+#\\\/\+#g;
-$URIROOT = '(file\:)?\/\/' . $SUBSTDIR . "\\\/\+html\\\/\+";
-$STRIPDIR =~ s#\/+#\\\/\+#g;
+my $URIROOT = '(file\:)?\/\/' . $SUBSTDIR . "\\\/\+html\\\/\+";
+my $STRIPDIR = $SUBSTDIR;
 $STRIPDIR .= '\/+html\/+';
 
 my $BSDESTDIR = $DESTDIR;

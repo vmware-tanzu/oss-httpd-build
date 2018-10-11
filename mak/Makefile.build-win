@@ -111,6 +111,7 @@ build-openssl: $(openssl_srcdir)/Makefile
 	cd $(openssl_srcdir) && \
 	  $(MAKE) && \
 	  $(MAKE) install && \
+	  copy /y $(SRCDIR)\$(openssl_srcdir)\ms\applink.c $(DESTDIR)\include\openssl\ && \
 	cd ..
 !ENDIF
 
