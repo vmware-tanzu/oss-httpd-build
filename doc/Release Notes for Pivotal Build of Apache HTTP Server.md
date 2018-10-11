@@ -5,20 +5,14 @@
 These release notes cover the following topics:
 
 * Package Description
-
 * Included Components
-
 * RHEL 7 Users
-
 * Ubuntu 16.04 Users
-
 * Microsoft Windows Users
-
 * Installation
-
 * Instance Creation
-
 * Updating Instances
+
 ## **Package Description**
 
 This package is a courtesy build of Pivotal's [https://github.com/appsuite/oss-httpd-build](https://github.com/appsuite/oss-httpd-build) framework, to provide a reference for customers of Pivotal's support for the open source Apache HTTP Server project. This includes Apache HTTP Server (httpd), along with a number of frequently updated library components (dependencies). These are distributed to the general public at [https://network.pivotal.io/products/p-apache-http-server](https://network.pivotal.io/products/p-apache-http-server).
@@ -37,39 +31,39 @@ In order to build httpd from scratch, see additional details at the github oss-h
 
 The following components are included in this 2.4.29-171109 build; those marked (\*) are not compiled on RHEL 7 and Ubuntu 16.04, but the OS Vendor's distribution packages are used, instead:
 
-* Apache HTTP Server 2.4.33
+* Apache HTTP Server 2.4.33  
 [http://www.apache.org/dist/httpd/CHANGES_2.4]
 [http://httpd.apache.org/security/vulnerabilities_24.html]
-* Apache APR library 1.6.3
+* Apache APR library 1.6.3  
 [http://www.apache.org/dist/apr/CHANGES-APR-1.6]
-* Apache APR-iconv library 1.2.2 (\*)
+* Apache APR-iconv library 1.2.2 (\*)  
 [http://www.apache.org/dist/apr/CHANGES-APR-ICONV-1.2]
-* Apache APR-util library 1.6.1
+* Apache APR-util library 1.6.1  
 [http://www.apache.org/dist/apr/CHANGES-APR-UTIL-1.6]
-* brotli compression library 1.0.3
+* brotli compression library 1.0.3  
 [https://github.com/google/brotli/releases]
-* Curl 7.59.0
+* Curl 7.59.0  
 [https://curl.haxx.se/changes.html]
 [https://curl.haxx.se/docs/security.html]
-* Jansson 2.11  (\*)
+* Jansson 2.11  (\*)  
 [https://jansson.readthedocs.io/en/2.11/changes.html]
-* libexpat 2.2.5 (\*)
+* libexpat 2.2.5 (\*)  
 [https://github.com/libexpat/libexpat/blob/R_2_2_5/expat/Changes]
-* libxml2 2.9.8 (\*)
+* libxml2 2.9.8 (\*)  
 [https://www.cvedetails.com/vulnerability-list/vendor_id-1962/product_id-3311/Xmlsoft-Libxml2.html]
 [http://www.xmlsoft.org/news.html] (out of date)
-* Lua language 5.3.4 (\*)
+* Lua language 5.3.4 (\*)  
 [https://www.cvedetails.com/vulnerability-list/vendor_id-13641/product_id-28436/LUA-LUA.html]
 [https://www.lua.org/bugs.html]
-* nghttp2 library 1.31.0
+* nghttp2 library 1.31.0  
 [https://github.com/nghttp2/nghttp2/releases]
-* OpenSSL library 1.1.0h
+* OpenSSL library 1.1.0h  
 [https://www.openssl.org/news/vulnerabilities.html]
 [https://www.openssl.org/news/changelog.html]
-* PCRE library 8.42 (\*)
+* PCRE library 8.42 (\*)  
 [https://www.cvedetails.com/vulnerability-list/vendor_id-3265/opdos-1/Pcre.html]
 [https://www.pcre.org/original/changelog.txt]
-* Zlib compression library 1.2.11 (\*)
+* Zlib compression library 1.2.11 (\*)  
 [https://www.cvedetails.com/vulnerability-list/vendor_id-72/product_id-1820/GNU-Zlib.html]
 [https://zlib.net/ChangeLog.txt]
 
