@@ -195,7 +195,7 @@ $ httpd-2.4/bin/newserver.pl –server={instance} –update
 $ {instance}/bin/httpdctl install
 $ {instance}/bin/httpdctl start
 ```
-Repeat steps 1-3 for each server instance.
+4. Repeat steps 1-3 for each server instance.
 
 Windows Users (in PowerShell 'Run as Administrator');
 
@@ -214,5 +214,5 @@ PS C:\...> httpd-2.4\bin\newserver.ps1 –server={instance} –update
 PS C:\Pivotal\WebServer> {instance}\bin\httpdctl install
 PS C:\Pivotal\WebServer> {instance}\bin\httpdctl start
 ```
-Repeat steps 1-3 for each server instance.
+4. Repeat steps 1-3 for each server instance.
 
