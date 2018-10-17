@@ -60,7 +60,6 @@ if (length($SUBSTDIR) < 2) {
 my $STRIPDIR = $SUBSTDIR;
 if ($^O =~ /Win32/) {
   $SUBSTDIR =~ s#[\/\\]+#[\\\/\\\\]\+#g;
-print $SUBSTDIR;
 } else {
   $SUBSTDIR =~ s#\/+#\\\/\+#g;
 }
