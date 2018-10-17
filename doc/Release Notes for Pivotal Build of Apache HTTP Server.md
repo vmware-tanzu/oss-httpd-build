@@ -1,4 +1,4 @@
-# **Release Notes for Pivotal Build of Apache HTTP Server httpd-2.4.33-180327**
+# **Release Notes for Pivotal Build of Apache HTTP Server httpd-2.4.35-180928**
 
 ## **What’s in the Release Notes**
 
@@ -19,9 +19,9 @@ This package is a courtesy build of Pivotal's [https://github.com/appsuite/oss-h
 
 This package is structured to allow parallel installation of multiple releases of Apache HTTP Server and related components. It contains one directory tree, labeled
 
-  httpd-2.4.33-180327
+  httpd-2.4.35-180928
 
-This represents the version of httpd and the effective date of all components bundled in the package, in this example, all components are current as of 27 March 2018.
+This represents the version of httpd and the effective date of all components bundled in the package, in this example, all components are current as of 28 September 2018.
 
 Unlike many httpd distributions, the end user instance configuration, server content and logs and are not modified in this directory tree. See the section on Instance Creation for details of creating a server instance with these user maintained files.
 
@@ -29,35 +29,35 @@ In order to build httpd from scratch, see additional details at the github oss-h
 
 ## **Included Components**
 
-The following components are included in this 2.4.29-171109 build; those marked (\*) are not compiled on RHEL 7 and Ubuntu 16.04, but the OS Vendor's distribution packages are used, instead:
+The following components are included in this 2.4.35-180928 build; those marked (\*) are not compiled on RHEL 7 and Ubuntu 16.04, but the OS Vendor's distribution packages are used, instead:
 
-* Apache HTTP Server 2.4.33  
+* Apache HTTP Server 2.4.35  
 [http://www.apache.org/dist/httpd/CHANGES_2.4]  
 [http://httpd.apache.org/security/vulnerabilities_24.html]
-* Apache APR library 1.6.3  
+* Apache APR library 1.6.5  
 [http://www.apache.org/dist/apr/CHANGES-APR-1.6]
 * Apache APR-iconv library 1.2.2 (\*)  
 [http://www.apache.org/dist/apr/CHANGES-APR-ICONV-1.2]
 * Apache APR-util library 1.6.1  
 [http://www.apache.org/dist/apr/CHANGES-APR-UTIL-1.6]
-* brotli compression library 1.0.3  
+* brotli compression library 1.0.6  
 [https://github.com/google/brotli/releases]
-* Curl 7.59.0  
+* Curl 7.61.1  
 [https://curl.haxx.se/changes.html]  
 [https://curl.haxx.se/docs/security.html]
 * Jansson 2.11  (\*)  
 [https://jansson.readthedocs.io/en/2.11/changes.html]
-* libexpat 2.2.5 (\*)  
-[https://github.com/libexpat/libexpat/blob/R_2_2_5/expat/Changes]
+* libexpat 2.2.6 (\*)  
+[https://github.com/libexpat/libexpat/blob/R_2_2_6/expat/Changes]
 * libxml2 2.9.8 (\*)  
 [https://www.cvedetails.com/vulnerability-list/vendor_id-1962/product_id-3311/Xmlsoft-Libxml2.html]  
 [http://www.xmlsoft.org/news.html] (out of date)
-* Lua language 5.3.4 (\*)  
+* Lua language 5.3.5 (\*)  
 [https://www.cvedetails.com/vulnerability-list/vendor_id-13641/product_id-28436/LUA-LUA.html]  
 [https://www.lua.org/bugs.html]
-* nghttp2 library 1.31.0  
+* nghttp2 library 1.33.0  
 [https://github.com/nghttp2/nghttp2/releases]
-* OpenSSL library 1.1.0h  
+* OpenSSL library 1.1.0i  
 [https://www.openssl.org/news/vulnerabilities.html]  
 [https://www.openssl.org/news/changelog.html]
 * PCRE library 8.42 (\*)  
@@ -125,19 +125,19 @@ Unix users (running as root);
 ```
 $ mkdir -p /opt/pivotal/webserver  
 $ cd /opt/pivotal/webserver  
-$ tar -xjvf {path-to}/httpd-2.4.33-180327-{arch}.tar.bz2  
-$ ln -s httpd-2.4.33-180327 httpd-2.4  
-$ httpd-2.4/bin/fixrootpath.pl 2.4.33-180327
+$ tar -xjvf {path-to}/httpd-2.4.35-180928-{arch}.tar.bz2  
+$ ln -s httpd-2.4.35-180928 httpd-2.4  
+$ httpd-2.4/bin/fixrootpath.pl 2.4.35-180928
 ```
 
 Windows users (in a Command window 'Run as Administrator');
 ```
 C:\> mkdir \Pivotal\WebServer  
 C:\> cd \Pivotal\WebServer  
-C:\Pivotal\WebServer> unzip {path-to}\httpd-2.4.33-180327-windows.zip  
-C:\Pivotal\WebServer> mklink /d httpd-2.4 httpd-2.4.33-180327  
+C:\Pivotal\WebServer> unzip {path-to}\httpd-2.4.35-180928-windows.zip  
+C:\Pivotal\WebServer> mklink /d httpd-2.4 httpd-2.4.35-180928  
 C:\Pivotal\WebServer> powershell  
-PS C:\Pivotal\WebServer> httpd-2.4\bin\fixrootpath.ps1 httpd-2.4.33-180327
+PS C:\Pivotal\WebServer> httpd-2.4\bin\fixrootpath.ps1 httpd-2.4.35-180928
 ```
 
 **Instance Creation**
