@@ -407,7 +407,8 @@ $(curl_srcdir)/Makefile: build-openssl build-zlib build-brotli build-nghttp2 \
 			 $(SRCDIR)/$(curl_srcdir)/configure
 	-mkdir $(curl_srcdir) 2>/dev/null
 	cd $(curl_srcdir) && \
-	  $(SRCDIR)/$(curl_srcdir)/configure \
+	  LD_LIBRARY_PATH=$(DESTDIR)/lib:$(LD_LIBRARY_PATH) \
+	    $(SRCDIR)/$(curl_srcdir)/configure \
 		 $(with_ssl) \
 		 $(with_zlib) \
 		 $(with_brotli) \
