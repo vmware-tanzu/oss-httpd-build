@@ -399,6 +399,7 @@ build-nghttp2: $(nghttp2_srcdir)/Makefile
 	cd $(nghttp2_srcdir) && \
 	  $(MAKE) && \
 	  $(MAKE) install && \
+	  move /y $(DESTDIR)\lib\*.dll $(DESTDIR)\bin && \
 	cd ..
 !ENDIF
 
