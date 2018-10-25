@@ -240,7 +240,7 @@ gather-aprutil-trunk: pre-manifest
 
 gather-openssl-release: pre-manifest
 	openssl_srcpath=https://www.openssl.org/source && \
-	openssl_pkg=`wget -q -O - $$openssl_srcpath/ | sed 's#.*<a href="\(openssl-1\.1\.0[a-z]*\.tar\.gz\)".*#\1#p;d;'` && \
+	openssl_pkg=`wget -q -O - $$openssl_srcpath/ | sed 's#.*<a href="\(openssl-1\.1\.1[a-z]*\.tar\.gz\)".*#\1#p;d;'` && \
 	openssl_ver=`echo $$openssl_pkg | sed 's#openssl-\(.*\)\.tar\.gz#\1#;'` && \
 	if test ! -f pkgs/$$openssl_pkg; then \
 	  cd pkgs && \
