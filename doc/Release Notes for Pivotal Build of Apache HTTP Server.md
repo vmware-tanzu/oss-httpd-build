@@ -40,7 +40,7 @@ The following components are included in this 2.4.35-180928 build; those marked 
 [http://www.apache.org/dist/apr/CHANGES-APR-ICONV-1.2]
 * Apache APR-util library 1.6.1  
 [http://www.apache.org/dist/apr/CHANGES-APR-UTIL-1.6]
-* brotli compression library 1.0.6  
+* brotli compression library 1.0.5  
 [https://github.com/google/brotli/releases]
 * Curl 7.61.1  
 [https://curl.haxx.se/changes.html]  
@@ -126,18 +126,17 @@ Unix users (running as root);
 $ mkdir -p /opt/pivotal/webserver  
 $ cd /opt/pivotal/webserver  
 $ tar -xjvf {path-to}/httpd-2.4.35-180928-{arch}.tar.bz2  
+$ httpd-2.4.35-180928/bin/fixrootpath.pl 2.4.35-180928  
 $ ln -s httpd-2.4.35-180928 httpd-2.4  
-$ httpd-2.4/bin/fixrootpath.pl 2.4.35-180928
 ```
 
 Windows users (in a Command window 'Run as Administrator');
 ```
 C:\> mkdir \Pivotal\WebServer  
 C:\> cd \Pivotal\WebServer  
-C:\Pivotal\WebServer> unzip {path-to}\httpd-2.4.35-180928-windows.zip  
+C:\Pivotal\WebServer> unzip {path-to}\httpd-2.4.35-180928-windows-x64.zip  
+C:\Pivotal\WebServer> powershell httpd-2.4.35-180928\bin\fixrootpath.ps1 httpd-2.4.35-180928  
 C:\Pivotal\WebServer> mklink /d httpd-2.4 httpd-2.4.35-180928  
-C:\Pivotal\WebServer> powershell  
-PS C:\Pivotal\WebServer> httpd-2.4\bin\fixrootpath.ps1 httpd-2.4.35-180928
 ```
 
 **Instance Creation**
