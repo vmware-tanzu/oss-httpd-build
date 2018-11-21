@@ -104,16 +104,17 @@ packages are needed.
 
 Perl is used by the openssl documentation schema (Text::Template)
 and many Perl packages are used by the httpdtest perl framework.
-To deploy these using RHEL 7 packages, use
+To deploy many of these using RHEL 7 packages, use
 
- $ yum install perl-core perl-Text-Template perl-Module-Load-Conditional \
+ $ yum install perl-core perl-Module-Load-Conditional \
      perl-HTTP-DAV perl-LWP-Protocol-https perl-AnyEvent-HTTP \
-     perl-Crypt-SSLeay perl-Net-SSLGlue perl-DateTime perl-Module-Build-Tiny \
-     perl-Test-LeakTrace perl-Test-TCP
+     perl-Crypt-SSLeay perl-Net-SSLGlue perl-DateTime \
+     perl-Module-Build-Tiny perl-Test-LeakTrace perl-Test-TCP
 
-And use CPAN for the packages not distributed with the OS as listed above; 
+And use CPAN for the packages not distributed with the OS as listed above
+(note the RHEL 7 package perl-Text-Template is too old for use by OpenSSL); 
 
- $ cpan install Protocol::HTTP2::Client
+ $ cpan install Text::Template Protocol::HTTP2::Client
 
 These base packages are required for deployment (and are incidently installed
 with the -devel packages above; most are already present by default);
