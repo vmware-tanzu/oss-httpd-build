@@ -1,0 +1,101 @@
+# Pivotal OSS Build Schema for Apache HTTP Server
+#
+# Copyright (C) 2017-Present Pivotal Software, Inc. All rights reserved.
+#
+# This program and the accompanying materials are made available under
+# the terms of the under the Apache License, Version 2.0 (the "License”);
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# Makefile.test : Run all tests against built packages
+#
+# BLD defines the group: release - candidate - snapshot - bleed
+#
+# TAG defines the target directory and package name suffixes
+#
+# This makefile must be run from the build (not source) subdirectory and
+# may occur at any point following the Makefile.build step.
+
+BLD=release
+TAG=
+SRCDIR=..\src
+
+!INCLUDE $(SRCDIR)\$(BLD)-manifest-vars
+
+!IF [FOR /F "usebackq" %d in (`cmd.exe /c "cd $(SRCDIR)\.. & cd"`) DO ECHO ROOTDIR=%d > rootdir.include] == 0
+!INCLUDE rootdir.include
+!IF [del rootdir.include] == 0
+!ENDIF
+!ENDIF
+
+SRCDIR=$(ROOTDIR)\src
+DESTDIR=$(ROOTDIR)\dst\$(httpd_srcdir)$(TAG)
+
+all: test-openssl test-apr test-aprutil test-nghttp2 test-brotli test-httpd \
+     test-tcnative
+
+pre-test:
+
+test-apr: pre-test
+!IFDEF apr_srcdir_still_broken
+	cd $(apr_srcdir) && \
+	  $(MAKE) check && \
+	cd ..
+!ENDIF
+
+test-aprutil: pre-test
+!IFDEF aprutil_srcdir_still_broken
+	cd $(aprutil_srcdir) && \
+	  $(MAKE) check && \
+	cd ..
+!ENDIF
+
+test-openssl: pre-test
+	cd $(openssl_srcdir) && \
+	  $(MAKE) test && \
+	cd ..
+
+# Brotli several tests are failing
+test-brotli: pre-test
+!IFDEF brotli_srcdir
+	-cd $(brotli_srcdir) && \
+	  $(MAKE) test
+	cd ..
+!ENDIF
+
+test-nghttp2: pre-test
+# possibly just LF->CRLF issues, ignore retval
+!IFDEF nghttp2_srcdir_libs_only_test_is_broken
+	-cd $(nghttp2_srcdir) && \
+	  $(MAKE) test && \
+	cd ..
+!ENDIF
+
+# Omiting -apxs $(DESTDIR)/bin/apxs.bat for the time being
+$(httpdtest_srcdir)/t/TEST: pre-test
+	-mkdir $(httpdtest_srcdir) 2>/dev/null
+	xcopy /s/v/e $(SRCDIR)\$(httpdtest_srcdir) $(httpdtest_srcdir) && \
+	cd $(httpdtest_srcdir) && \
+	  perl Makefile.PL && \
+	cd ..
+
+# Omiting -apxs $(DESTDIR)/bin/apxs.bat for the time being
+test-httpd: $(httpdtest_srcdir)/t/TEST
+	cd $(httpdtest_srcdir) && \
+	  perl t/TEST -httpd $(DESTDIR)\bin\httpd.exe \
+		 -servername localhost && \
+	cd ..
+
+test-tcnative: pre-test
+!IFDEF tcnative_srcdir
+# TBD
+!ENDIF
+
