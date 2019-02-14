@@ -167,6 +167,7 @@ preconfig-expat: pre-preconfig
 else
 $(expat_srcdir)/expat/configure: $(expat_srcdir)/expat/configure.ac \
 				 $(expat_srcdir)/expat/Makefile.am
+	-mkdir $(expat_srcdir)/expat/m4 2>/dev/null
 	cd $(expat_srcdir)/expat && \
 	  ./buildconf.sh && \
 	cd ../..
