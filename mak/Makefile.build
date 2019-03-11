@@ -75,7 +75,7 @@ with_expat=--with-expat=$(DESTDIR)
 $(expat_srcdir)/Makefile: $(SRCDIR)/$(expat_srcdir)/expat/configure
 	-mkdir $(expat_srcdir) 2>/dev/null
 	cd $(expat_srcdir) && \
-	  DOCBOOK_TO_MAN=`which docbook2x-man db2x_docbook2man xmlto | sed "s#xmlto#xmlto man --skip-validation#"` \
+	  DOCBOOK_TO_MAN=`which docbook2x-man db2x_docbook2man xmlto | sed "s#xmlto#xmlto man --skip-validation#;1q"` \
 	  $(SRCDIR)/$(expat_srcdir)/expat/configure \
 		--prefix=$(DESTDIR) && \
 	cd ..
