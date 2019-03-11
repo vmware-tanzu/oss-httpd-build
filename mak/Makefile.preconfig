@@ -108,7 +108,8 @@ preconfig-httpdtest: pre-preconfig
 #	Apparently a noop
 
 
-ifndef openssl_srcdir
+# Can no longer Configure dist for generic depends in 1.1.1b
+ifndef openssl_srcdir_not_needed
 preconfig-openssl: pre-preconfig
 else
 $(openssl_srcdir)/Makefile: $(openssl_srcdir)/Configure 
