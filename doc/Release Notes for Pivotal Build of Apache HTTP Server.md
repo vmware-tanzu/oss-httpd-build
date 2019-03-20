@@ -32,14 +32,14 @@ The following components are included in this 2.4.38-190122 build; those marked 
 In cases where the project does not maintain a reference to specific CVE's in an easily web accessible format the [https://www.cvedetails.com/vulnerability-list/](https://www.cvedetails.com/vulnerability-list/) database link is provided; this list is not endorsed as complete or comprehensive and is offered for convenience only.
 
 * Apache HTTP Server 2.4.38  
-[http://www.apache.org/dist/httpd/CHANGES_2.4]  
-[http://httpd.apache.org/security/vulnerabilities_24.html]
+[https://www.apache.org/dist/httpd/CHANGES_2.4]  
+[https://httpd.apache.org/security/vulnerabilities_24.html]
 * Apache APR library 1.6.5  
-[http://www.apache.org/dist/apr/CHANGES-APR-1.6]
+[https://www.apache.org/dist/apr/CHANGES-APR-1.6]
 * Apache APR-iconv library 1.2.2 (\*)  
-[http://www.apache.org/dist/apr/CHANGES-APR-ICONV-1.2]
+[https://www.apache.org/dist/apr/CHANGES-APR-ICONV-1.2]
 * Apache APR-util library 1.6.1  
-[http://www.apache.org/dist/apr/CHANGES-APR-UTIL-1.6]
+[https://www.apache.org/dist/apr/CHANGES-APR-UTIL-1.6]
 * brotli compression library 1.0.7  
 [https://github.com/google/brotli/releases]
 * Curl 7.63.0  
