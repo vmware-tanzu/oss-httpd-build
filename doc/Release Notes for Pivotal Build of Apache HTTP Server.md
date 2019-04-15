@@ -1,4 +1,6 @@
-# **Release Notes for Pivotal Build of Apache HTTP Server httpd-2.4.38-190122**
+﻿# **Release Notes for Pivotal Build of Apache HTTP Server httpd-2.4.39-190404**
+
+Updated: April 15, 2019
 
 ## **What’s in the Release Notes**
 
@@ -15,26 +17,26 @@ These release notes cover the following topics:
 
 ## **Package Description**
 
-This package is a courtesy build of Pivotal's [https://github.com/appsuite/oss-httpd-build](https://github.com/appsuite/oss-httpd-build) framework, to provide a reference for customers of Pivotal's support for the open source Apache HTTP Server project. This includes Apache HTTP Server (httpd), along with a number of frequently updated library components (dependencies). These are distributed to the general public at [https://network.pivotal.io/products/p-apache-http-server](https://network.pivotal.io/products/p-apache-http-server).
+This package is a courtesy build of Pivotal's [https://github.com/appsuite/oss-httpd-build](https://github.com/appsuite/oss-httpd-build) framework, to provide a reference for customers of Pivotal's support for the open source Apache HTTP Server project. This includes Apache HTTP Server (httpd), along with a number of frequently updated library components (dependencies). These are distributed to the general public from the [https://network.pivotal.io/products/p-apache-http-server](https://network.pivotal.io/products/p-apache-http-server) download location.
 
-This package is structured to allow parallel installation of multiple releases of Apache HTTP Server and related components. It contains one directory tree, labeled as httpd-2.4.38-190122 which represents the version of httpd and the effective date of all components bundled in the package, in this case, all components current as of 2019 January 22.
+This package is structured to allow parallel installation of multiple releases of Apache HTTP Server and related components. It contains one directory tree, labeled as httpd-2.4.39-190404 which represents the version of httpd and the effective date of all components bundled in the package, in this case, all components current as of 2019 April 4.
 
 Unlike many httpd distributions, the end user instance configuration, server content and logs and are not modified in this directory tree. See the section on Instance Creation for details of creating a server instance with these user maintained files.
 
 In order to build httpd from scratch, see additional details at Pivotal's [https://github.com/appsuite/oss-httpd-build](github oss-httpd-build) project. A tarball of unix sources and zipfile of windows sources is provided alongside the binary release downloads, for ready reference.
 
-Note packages prior to 2.4.37 included OpenSSL 1.1.0, while 2.4.37 and later include OpenSSL 1.1.1. This may cause issues for users who have compiled third-party modules linked to OpenSSL using the apxs utility and openssl library included with an older package. Users are advised to rebuild any such modules before combining them with these newer packages.
+Note that Pivotal convenience packages prior to 2.4.37 included OpenSSL 1.1.0, while 2.4.37 and later include OpenSSL 1.1.1. This may cause issues for users who have compiled third-party modules linked to OpenSSL using the apxs utility and openssl library included with an older package. Users are advised to rebuild any such modules before combining them with these newer packages.
 
 ## **Included Components**
 
-The following components are included in this 2.4.38-190122 build; those marked (\*) are not compiled on RHEL 7 and Ubuntu 16.04, but the OS Vendor's distribution packages are used, instead. Links to the user change notes and vulnerability indexes are illustrated below.
+The following components are included in this 2.4.39-190404 build; those marked (\*) are not compiled on RHEL 7 and Ubuntu 16.04, but the OS Vendor's distribution packages are used, instead. Links to the user change notes and vulnerability indexes are illustrated below.
 
 In cases where the project does not maintain a reference to specific CVE's in an easily web accessible format the [https://www.cvedetails.com/vulnerability-list/](https://www.cvedetails.com/vulnerability-list/) database link is provided; this list is not endorsed as complete or comprehensive and is offered for convenience only.
 
-* Apache HTTP Server 2.4.38  
+* Apache HTTP Server 2.4.39  
 [http://www.apache.org/dist/httpd/CHANGES_2.4]  
 [http://httpd.apache.org/security/vulnerabilities_24.html]
-* Apache APR library 1.6.5  
+* Apache APR library 1.7.0  
 [http://www.apache.org/dist/apr/CHANGES-APR-1.6]
 * Apache APR-iconv library 1.2.2 (\*)  
 [http://www.apache.org/dist/apr/CHANGES-APR-ICONV-1.2]
@@ -42,7 +44,7 @@ In cases where the project does not maintain a reference to specific CVE's in an
 [http://www.apache.org/dist/apr/CHANGES-APR-UTIL-1.6]
 * brotli compression library 1.0.7  
 [https://github.com/google/brotli/releases]
-* Curl 7.63.0  
+* Curl 7.64.1  
 [https://curl.haxx.se/changes.html]  
 [https://curl.haxx.se/docs/security.html]
 * Jansson 2.12  (\*)  
@@ -55,12 +57,12 @@ In cases where the project does not maintain a reference to specific CVE's in an
 * Lua language 5.3.5 (\*)  
 [https://www.cvedetails.com/vulnerability-list/vendor_id-13641/product_id-28436/LUA-LUA.html]  
 [https://www.lua.org/bugs.html]
-* nghttp2 library 1.36.0  
+* nghttp2 library 1.37.0  
 [https://github.com/nghttp2/nghttp2/releases]
-* OpenSSL library 1.1.1a  
+* OpenSSL library 1.1.1b  
 [https://www.openssl.org/news/vulnerabilities.html]  
 [https://www.openssl.org/news/changelog.html]
-* PCRE library 8.42 (\*)  
+* PCRE library 8.43 (\*)  
 [https://www.cvedetails.com/vulnerability-list/vendor_id-3265/opdos-1/Pcre.html]  
 [https://www.pcre.org/original/changelog.txt]
 * Zlib compression library 1.2.11 (\*)  
@@ -73,9 +75,7 @@ The RHEL 7 package requires several commonly installed packages to be available,
 ```
 $ yum install libuuid expat jansson libxml2 lua pcre zlib
 ```
-Please note the addition of the jansson package to this list since the 2.4.29-171109 release.
-
-In order to use the provided apxs utility, additional packages are required as indicated at the [https://github.com/appsuite/oss-httpd-build](https://github.com/appsuite/oss-httpd-build) README page.
+Please note the addition of the jansson package to this list since the 2.4.29-171109 release. In order to use the provided apxs utility, additional packages are required as indicated at the [https://github.com/appsuite/oss-httpd-build](https://github.com/appsuite/oss-httpd-build) README page.
 
 ## **Ubuntu 16.04 Users**
 
@@ -83,15 +83,13 @@ The Ubuntu 16.04 package requires several commonly installed packages to be avai
 ```
 $ apt-get -y install libexpat1 libjansson4 libpcre3 libxml2 liblua5.3-0 zlib1g
 ```
-Please note the addition of the libjansson4 package and corrected liblua5.3-0 and libxml2 package names to this list since the 2.4.29-171109 release.
-
-In order to use the provided apxs utility, additional packages are required as indicated at the [https://github.com/appsuite/oss-httpd-build](https://github.com/appsuite/oss-httpd-build) README page.
+Please note the addition of the libjansson4 package and corrected liblua5.3-0 and libxml2 package names to this list since the 2.4.29-171109 release. In order to use the provided apxs utility, additional packages are required as indicated at the [https://github.com/appsuite/oss-httpd-build](https://github.com/appsuite/oss-httpd-build) README page.
 
 ## **Microsoft Windows Users**
 
-This package is built using Visual C++ 19.11 and C Runtime version 14.11, components of Microsoft Visual Studio 2017. Windows Server 2016 and Windows Server 2012 are suitable for deployment. Windows 10 is suitable for developer evaluation but is not suitable for server deployment, as Microsoft restricts the Windows 10 license, limits aspects of the operating system including the Windows Sockets API, and tunes the process scheduler to deliver a better desktop experience.
+This package is built using Visual C++ 19.11 and C Runtime version 14.11, components of Microsoft Visual Studio 2017. Windows Server 2019, Windows Server 2016 and Windows Server 2012 are all suitable for deployment. Windows 10 is suitable for developer evaluation but is not suitable for server deployment, as Microsoft restricts the Windows 10 desktop license, limitings aspects of the operating system behavior including the Windows Sockets API, and tunes the process scheduler to deliver a better desktop experience.
 
-Users must obtain and install the "Microsoft Visual C++ Redistributable for Visual Studio 2017", x64 edition; [https://go.microsoft.com/fwlink/?LinkId=746572](https://go.microsoft.com/fwlink/?LinkId=746572) and observe the prerequisites noted for that package. Installing this package from Microsoft ensures that the runtime is updated by the Windows Update service for any new security vulnerabilities of the C Runtime itself.
+Users must obtain and install the "Microsoft Visual C++ Redistributable for Visual Studio 2019", x64 edition; [https://visualstudio.microsoft.com/downloads/](https://visualstudio.microsoft.com/downloads/) (currently this is listed under Other Tools and Frameworks, and provides support for Visual Studio 2015 and 2017 as well) and observe the prerequisites noted for that package. Installing this package from Microsoft ensures that the runtime is updated by the Windows Update service for any new security vulnerabilities of the C Runtime itself.
 
 This package relies upon Windows PowerShell to execute the httpd control scripts on Windows computers. All supported Windows versions have PowerShell installed by default, but specific installations of Windows may not. To check whether your version of Windows has PowerShell installed, go to Start > All Programs > Accessories and check for **Windows PowerShell** in the list.
 
@@ -125,18 +123,18 @@ Unix users (running as root);
 ```
 $ mkdir -p /opt/pivotal/webserver  
 $ cd /opt/pivotal/webserver  
-$ tar -xjvf {path-to}/httpd-2.4.38-190122-{arch}.tar.bz2  
-$ httpd-2.4.38-190122/bin/fixrootpath.pl httpd-2.4.38-190122  
-$ ln -s httpd-2.4.38-190122 httpd-2.4  
+$ tar -xjvf {path-to}/httpd-2.4.39-190404-{arch}.tar.bz2  
+$ httpd-2.4.39-190404/bin/fixrootpath.pl httpd-2.4.39-190404  
+$ ln -s httpd-2.4.39-190404 httpd-2.4  
 ```
 
 Windows users (in a Command window 'Run as Administrator');
 ```
 C:\> mkdir \Pivotal\WebServer  
 C:\> cd \Pivotal\WebServer  
-C:\Pivotal\WebServer> unzip {path-to}\httpd-2.4.38-190122-windows-x64.zip  
-C:\Pivotal\WebServer> powershell httpd-2.4.38-190122\bin\fixrootpath.ps1 httpd-2.4.38-190122  
-C:\Pivotal\WebServer> mklink /d httpd-2.4 httpd-2.4.38-190122  
+C:\Pivotal\WebServer> unzip {path-to}\httpd-2.4.39-190404-windows-x64.zip  
+C:\Pivotal\WebServer> powershell httpd-2.4.39-190404\bin\fixrootpath.ps1 httpd-2.4.39-190404  
+C:\Pivotal\WebServer> mklink /d httpd-2.4 httpd-2.4.39-190404  
 ```
 
 **Instance Creation**
