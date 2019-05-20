@@ -87,6 +87,31 @@ build-expat: $(expat_srcdir)/Makefile
 	cd ..
 endif
 
+# Once apr-util detects include/libxml2 as the include path, move this into
+# the ifndef below and uncomment the following assignments
+with_libxml2=
+with_aprexpat=$(with_expat)
+
+ifndef libxml2_srcdir
+build-libxml2:
+else
+#with_libxml2=--with-libxml2=$(DESTDIR)
+#with_aprexpat=
+$(libxml2_srcdir)/Makefile: $(SRCDIR)/$(libxml2_srcdir)
+	-mkdir $(libxml2_srcdir) 2>/dev/null
+	cd $(libxml2_srcdir) && \
+	  $(SRCDIR)/$(libxml2_srcdir)/configure prefix=$(DESTDIR) \
+		--without-zlib \
+		--without-lzma \
+		--without-python && \
+	cd ..
+
+build-libxml2: $(libxml2_srcdir)/Makefile
+	cd $(libxml2_srcdir) && \
+	  $(MAKE) && \
+	  $(MAKE) install && \
+	cd ..
+endif
 
 ifndef openssl_srcdir
 with_ssl=
@@ -194,7 +219,8 @@ $(aprutil_srcdir)/Makefile: build-openssl build-expat build-apr build-apriconv \
 		 $(with_apr) \
 		 $(with_apriconv) \
 		 $(with_openssl) \
-		 $(with_expat) \
+		 $(with_libxml2) \
+		 $(with_aprexpat) \
 		 --without-nss \
 		 --without-ldap \
 		 --without-lber \
@@ -203,7 +229,7 @@ $(aprutil_srcdir)/Makefile: build-openssl build-expat build-apr build-apriconv \
 		 --prefix=$(DESTDIR) && \
 	cd ..
 
-build-aprutil: build-apr $(aprutil_srcdir)/Makefile
+build-aprutil: $(aprutil_srcdir)/Makefile
 	cd $(aprutil_srcdir) && \
 	  make $(OPT) && \
 	  make $(OPT) install && \
@@ -262,28 +288,6 @@ $(jansson_srcdir)/Makefile: $(SRCDIR)/$(jansson_srcdir)/configure
 
 build-jansson: $(jansson_srcdir)/Makefile
 	cd $(jansson_srcdir) && \
-	  $(MAKE) && \
-	  $(MAKE) install && \
-	cd ..
-endif
-
-
-ifndef libxml2_srcdir
-with_libxml2=
-build-libxml2:
-else
-with_libxml2=--with-libxml2=$(DESTDIR)
-$(libxml2_srcdir)/Makefile: $(SRCDIR)/$(libxml2_srcdir)
-	-mkdir $(libxml2_srcdir) 2>/dev/null
-	cd $(libxml2_srcdir) && \
-	  $(SRCDIR)/$(libxml2_srcdir)/configure prefix=$(DESTDIR) \
-		--without-zlib \
-		--without-lzma \
-		--without-python && \
-	cd ..
-
-build-libxml2: $(libxml2_srcdir)/Makefile
-	cd $(libxml2_srcdir) && \
 	  $(MAKE) && \
 	  $(MAKE) install && \
 	cd ..
