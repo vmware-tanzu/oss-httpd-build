@@ -161,7 +161,7 @@ with_apr=
 build-apr:
 else
 with_apr=--with-apr=$(DESTDIR)
-$(apr_srcdir)/Makefile: build-openssl build-expat \
+$(apr_srcdir)/Makefile: build-openssl build-expat build-libxml2 \
 			$(SRCDIR)/$(apr_srcdir)/configure
 	-mkdir $(apr_srcdir) 2>/dev/null
 	cd $(apr_srcdir) && \
@@ -212,7 +212,8 @@ with_aprutil=
 build-aprutil: build-apr
 else
 with_aprutil=--with-apr-util=$(DESTDIR)
-$(aprutil_srcdir)/Makefile: build-openssl build-expat build-apr build-apriconv \
+$(aprutil_srcdir)/Makefile: build-openssl build-expat build-libxml2 \
+			    build-apr build-apriconv \
 			    $(SRCDIR)/$(aprutil_srcdir)/configure
 	-mkdir $(aprutil_srcdir) 2>/dev/null
 	cd $(aprutil_srcdir) && \
