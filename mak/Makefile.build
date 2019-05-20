@@ -168,7 +168,8 @@ $(apr_srcdir)/Makefile: build-openssl build-expat \
 	  $(SRCDIR)/$(apr_srcdir)/configure \
 		 --disable-option-checking \
 		 $(with_openssl) \
-		 $(with_expat) \
+		 $(with_libxml2) \
+		 $(with_aprexpat) \
 		 --without-nss \
 		 --with-crypto \
 		 --with-installbuilddir=\$${prefix}/build \
