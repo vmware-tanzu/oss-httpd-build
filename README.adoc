@@ -179,7 +179,7 @@ with the -devel packages above; most are already present by default);
 == Phase 1: Gather Sources
 
  $ cd src/
- $ make -f ../mak/Makefile.gather [BLD={type}] [GRP=complete]
+ $ make -f ../mak/Makefile.gather [BLD={type}] [GRP=complete] [targets]
 
 BLD defines the build type: release - candidate - snapshot - bleed
 (case sensitive) where release is the default.
@@ -189,7 +189,10 @@ into the source tree, and generates a version and directory name manifest.
 
 This will gather all components if GRP=complete is specified, otherwise
 the linux system package sources of expat, lua, pcre, jansson, libxml2
-and zlib will not be gathered or compiled.
+and zlib will not be gathered or compiled. Two packages not included in
+the GRP=complete all target are the "openldap" library for the httpd ldap
+modules and the Tomcat "tcnative" connector. Add these explicitly to the
+targets list followed by the explicit "all" target, as desired. 
 
 Each component is designed for persistence, if from git or svn it performs
 a fetch / update, if from a most recent release package, it fetches and

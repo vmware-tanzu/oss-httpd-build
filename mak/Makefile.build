@@ -154,6 +154,38 @@ build-openssl: $(openssl_srcdir)/Makefile
 endif
 
 
+ifndef openldap_srcdir
+with_openldap=--without-ldap --without-lber
+enable_ldap=--disable-ldap --disable-authnz-ldap
+build-openldap:
+else
+with_openldap=--with-ldap-lib=$(DESTDIR)/lib --with-ldap-include=$(DESTDIR)/include --with-ldap=ldap --with-lber=lber
+enable_ldap=--enable-ldap --enable-authnz-ldap
+
+$(openldap_srcdir)/Makefile: build-openssl \
+			     $(SRCDIR)/$(openldap_srcdir)/configure
+	-mkdir $(openldap_srcdir) 2>/dev/null
+	cd $(openldap_srcdir) && \
+	  CPPFLAGS="-I$(DESTDIR)/include $(CPPFLAGS)" \
+	  LDFLAGS="-L$(DESTDIR)/lib $(LDFLAGS)" \
+	  $(SRCDIR)/$(openldap_srcdir)/configure \
+		 --with-tls=openssl \
+		 --without-cyrus-sasl \
+		 --disable-ldbm \
+		 --disable-sasl \
+		 --disable-slapd \
+		 --disable-slurpd \
+		 --prefix=$(DESTDIR) && \
+	cd ..
+
+build-openldap: $(openldap_srcdir)/Makefile
+	cd $(openldap_srcdir) && \
+	  make $(OPT) && \
+	  make $(OPT) install && \
+	cd ..
+endif
+
+
 # Disabing option checking here, so apr-util-1 options can be passed to apr-1
 # These options must be given to the monolithic apr-2 config
 ifndef apr_srcdir
@@ -221,11 +253,10 @@ $(aprutil_srcdir)/Makefile: build-openssl build-expat build-libxml2 \
 		 $(with_apr) \
 		 $(with_apriconv) \
 		 $(with_openssl) \
+		 $(with_openldap) \
 		 $(with_libxml2) \
 		 $(with_aprexpat) \
 		 --without-nss \
-		 --without-ldap \
-		 --without-lber \
 		 --with-crypto \
 		 --includedir=\$${prefix}/include \
 		 --prefix=$(DESTDIR) && \
@@ -435,9 +466,8 @@ $(curl_srcdir)/Makefile: build-openssl build-zlib build-brotli build-nghttp2 \
 		 --without-gssapi \
 		 --without-libidn2 \
 		 --without-librtmp \
-		 --without-ldap-lib \
-		 --without-lber-lib \
 		 --without-zsh-functions-dir \
+                 $(with_openldap) \
 		 --prefix=$(DESTDIR) && \
 	cd ..
 
@@ -453,12 +483,11 @@ endif
 # cgi for prefork configs, and authnz-fcgi and proxy-http2 for early adopters.
 #
 # Explicitly disabling dialup, echo and reflector as experimental/test
-# and disabling ldap because lber depends on openssl, and the system openssl
-# used by openldap conflicts with the most modern openssl in this build
 #
-$(httpd_srcdir)/Makefile: build-openssl build-apr build-aprutil \
+$(httpd_srcdir)/Makefile: build-openssl build-openldap \
 			  build-brotli build-jansson build-libxml2 \
 			  build-lua build-pcre build-zlib \
+			  build-apr build-aprutil \
 			  build-nghttp2 build-curl \
 			  $(SRCDIR)/$(httpd_srcdir)/configure
 	-mkdir $(httpd_srcdir) 2>/dev/null
@@ -475,14 +504,14 @@ $(httpd_srcdir)/Makefile: build-openssl build-apr build-aprutil \
 		 $(with_pcre) \
 		 $(with_zlib) \
 		 $(with_nghttp2) \
+		 $(with_openldap) \
 		 $(with_curl) \
 		 --enable-mods-shared=all \
 		 --enable-mpms-shared=all \
 		 --enable-load-all-modules \
 		 --enable-unixd=static \
 		 --enable-version=static \
-		 --disable-authnz-ldap \
-		 --disable-ldap \
+		 $(enable_ldap) \
 		 --disable-dialup \
 		 --disable-echo \
 		 --disable-reflector \
