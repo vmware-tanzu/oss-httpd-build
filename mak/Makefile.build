@@ -494,7 +494,7 @@ $(httpd_srcdir)/Makefile: build-openssl build-openldap \
 	cd $(httpd_srcdir) && \
 	  $(SRCDIR)/$(httpd_srcdir)/configure \
 		 --prefix=$(DESTDIR) \
-		 $(with_openssl) \
+		 $(with_ssl) \
 		 $(with_apr) \
 		 $(with_aprutil) \
 		 $(with_brotli) \
