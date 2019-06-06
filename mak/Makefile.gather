@@ -429,6 +429,37 @@ gather-curl-master: pre-manifest
 	echo curl_ver=$$curl_ver >>$(BLD)-manifest-vars
 
 
+gather-openldap-release: pre-manifest
+	openldap_srcpath=https://gpl.savoirfairelinux.net/pub/mirrors/openldap/openldap-release && \
+	openldap_pkg=`wget -q -O - $$openldap_srcpath/ | sed -n '/<a href="\(openldap-2\.4\.[0-9]*\.tgz\)"/{s#.*href="\(.*\)\.tgz".*#\1#;h};$$!b;g;p'` && \
+	openldap_ver=`echo $$openldap_pkg | sed 's#openldap-\(.*\)#\1#;'` && \
+	openldap_srcdir=openldap-$$openldap_ver && \
+	if test ! -f pkgs/$$openldap_pkg.tgz; then \
+	  cd pkgs && \
+	  wget -nv $$openldap_srcpath/$$openldap_pkg.tgz && \
+	  wget -nv $$openldap_srcpath/$$openldap_pkg.sha1 && \
+	  cd .. && \
+          tar -xzf pkgs/$$openldap_pkg.tgz; \
+	fi && \
+	echo openldap_srcpath=$$openldap_srcpath.tgz >>$(BLD)-manifest-vars && \
+	echo openldap_srcdir=$$openldap_srcdir >>$(BLD)-manifest-vars && \
+	echo openldap_ver=$$openldap_ver >>$(BLD)-manifest-vars
+
+gather-openldap-master: pre-manifest
+	openldap_srcpath=git://git.openldap.org/openldap.git && \
+	openldap_ver=2_4 && \
+	openldap_srcdir=openldap_$$openldap_ver && \
+	if test ! -d $$openldap_srcdir ; then \
+	  git clone -q -b OPENLDAP_REL_ENG_$$openldap_ver \
+		    $$openldap_srcpath $$openldap_srcdir; \
+	else \
+	  cd $$openldap_srcdir && git fetch -q && cd ..; \
+	fi && \
+	echo openldap_srcpath=$$openldap_srcpath >>$(BLD)-manifest-vars && \
+	echo openldap_srcdir=$$openldap_srcdir >>$(BLD)-manifest-vars && \
+	echo openldap_ver=$$openldap_ver >>$(BLD)-manifest-vars
+
+
 gather-expat-release: pre-manifest
 	expat_srcpath=https://github.com/libexpat/libexpat/releases && \
 	expat_ver=`wget -q -O - $$expat_srcpath | sed -n 's#^.*<a href=".*\/archive\/R_\(.*\)\.tar\.gz".*$$#\1#;t once;$$!b;:once;p;q;'` && \
@@ -716,10 +747,25 @@ gather-linux-bleed:   gather-core-bleed
 	LC_COLLATE=C sort < $(BLD)-manifest-vars.sav > $(BLD)-manifest-vars
 	rm $(BLD)-manifest-vars.sav
 
-
 ifeq "$(BLD)" "release"
 tcnative: gather-tcnative-release
+
+openldap: gather-openldap-release
+
+else ifeq "$(BLD)" "candidate"
+tcnative: gather-tcnative-release
+
+openldap: gather-openldap-release
+
+else ifeq "$(BLD)" "snapshot"
+tcnative: gather-tcnative-trunk
+
+openldap: gather-openldap-master
+
 else
 tcnative: gather-tcnative-trunk
+
+openldap:
+
 endif
 
