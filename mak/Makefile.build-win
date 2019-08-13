@@ -1,4 +1,4 @@
-# Pivotal OSS Build Schema for Apache HTTP Server
+﻿# Pivotal OSS Build Schema for Apache HTTP Server
 #
 # Copyright (C) 2017-Present Pivotal Software, Inc. All rights reserved.
 #
@@ -50,7 +50,7 @@ PREFER_CMAKE=1
 all: build-httpd
 
 pre-build:
-	-mkdir -p $(DSTDIR) 2>/dev/null
+	-mkdir -p $(DSTDIR) 2>NUL
 
 !IFNDEF expat_srcdir
 with_expat=
@@ -58,7 +58,7 @@ build-expat:
 !ELSE
 with_expat=--with-expat=$(DESTDIR)
 $(expat_srcdir)/Makefile:  $(SRCDIR)/$(expat_srcdir)/expat/CMakeLists.txt
-	-mkdir $(expat_srcdir) 2>/dev/null
+	-mkdir $(expat_srcdir) 2>NUL
 	cd $(expat_srcdir) && \
 	  cmake $(CMAKE_DEFAULTS) -D BUILD_tests=OFF -D BUILD_tools=OFF \
 		-D BUILD_shared=OFF -D CMAKE_INSTALL_PREFIX=$(DESTDIR) \
@@ -92,7 +92,7 @@ build-openssl:
 $(openssl_srcdir)/Makefile: $(SRCDIR)/$(openssl_srcdir)
 #			    $(firstword $(MAKEFILE_LIST))
 			    
-	-mkdir $(openssl_srcdir) 2>/dev/null
+	-mkdir $(openssl_srcdir) 2>NUL
 	xcopy /s/v/e $(SRCDIR)\$(openssl_srcdir)\* $(openssl_srcdir)\ 
 	cd $(openssl_srcdir) && \
 	  perl ./Configure --prefix=$(DESTDIR) shared \
@@ -100,7 +100,7 @@ $(openssl_srcdir)/Makefile: $(SRCDIR)/$(openssl_srcdir)
 	cd ..
 !ELSE
 $(openssl_srcdir)/Makefile: $(SRCDIR)/$(openssl_srcdir)/Configure
-	-mkdir $(openssl_srcdir) 2>/dev/null
+	-mkdir $(openssl_srcdir) 2>NUL
 	cd $(openssl_srcdir) && \
 	  perl $(SRCDIR)/$(openssl_srcdir)/Configure shared \
 		 --libdir=lib --prefix=$(DESTDIR) --openssldir=$(DESTDIR)/ssl $(OPENSSL_ARCH) && \
@@ -119,7 +119,7 @@ build-openssl: $(openssl_srcdir)/Makefile
 !IF $(PREFER_CMAKE)
 $(apr_srcdir)/Makefile: build-openssl build-expat \
 			$(SRCDIR)/$(apr_srcdir)/CMakeLists.txt
-	-mkdir $(apr_srcdir) 2>/dev/null
+	-mkdir $(apr_srcdir) 2>NUL
 	cd $(apr_srcdir) && \
 	  cmake $(CMAKE_DEFAULTS) \
 		-D CMAKE_INSTALL_PREFIX=$(DESTDIR) \
@@ -128,7 +128,7 @@ $(apr_srcdir)/Makefile: build-openssl build-expat \
 !ELSE
 $(apr_srcdir)/Makefile: build-openssl build-expat \
 			$(SRCDIR)/$(apr_srcdir)/configure
-	-mkdir $(apr_srcdir) 2>/dev/null
+	-mkdir $(apr_srcdir) 2>NUL
 	cd $(apr_srcdir) && \
 	  $(SRCDIR)/$(apr_srcdir)/configure \
 		 --with-openssl=$(DESTDIR) \
@@ -162,12 +162,12 @@ with_apriconv=--with-apr-iconv=$(DESTDIR)
 !IF $(PREFER_CMAKE)
 # 1.2.x does not support vpath builds, and does not yet have a Makefile.win
 $(apriconv_srcdir)/Makefile.win: $(SRCDIR)\$(apriconv_srcdir)\build\modules.mk.win
-	-mkdir $(apriconv_srcdir) 2>/dev/null
+	-mkdir $(apriconv_srcdir) 2>NUL
 	xcopy /s/v/e/y $(SRCDIR)\$(apriconv_srcdir)\* $(apriconv_srcdir)\ 
-	sed "s# \([$$()_A-Za-z0-9\\]*\)\\\(l*i*b*apr-1.lib\) # /libpath:\1 \2 #;" \
+	sed "s# \([^= ]*\)\\\\\([lib]*apr-1\.lib\) # /libpath:\1 \2 #;" \
 		< $(SRCDIR)\$(apriconv_srcdir)\build\modules.mk.win \
 		> $(apriconv_srcdir)\build\modules.mk.win
-	sed "s#\".*\\\(libapr-1.lib\)\"# #;s#\(LINK32_FLAGS=\)\(.*\) /out#\1 libapr-1.lib \2 /libpath:..\\apr\\$(OUTDIR) /out#;" \
+	sed "s#"".*\\\\libapr-1.lib""# #;s#\(LINK32_FLAGS=\)\(.*\) /out#\1 libapr-1.lib \2 /libpath:..\\\\$(apr_srcdir)\\\\$$(OUTDIR) /out#;" \
 		< $(SRCDIR)\$(apriconv_srcdir)\libapriconv.mak \
 		> $(apriconv_srcdir)\libapriconv.mak
 	copy << $(apriconv_srcdir)\Makefile.win
@@ -216,7 +216,7 @@ build-apriconv: $(apriconv_srcdir)/Makefile.win build-apr
 !ELSE
 $(apriconv_srcdir)/Makefile: build-apr \
 			    $(SRCDIR)/$(apriconv_srcdir)/configure
-	-mkdir $(apriconv_srcdir) 2>/dev/null
+	-mkdir $(apriconv_srcdir) 2>NUL
 	cd $(apriconv_srcdir) && \
 	  $(SRCDIR)/$(apriconv_srcdir)/configure \
 		 --with-apr=$(DESTDIR) \
@@ -242,7 +242,7 @@ with_aprutil=--with-apr-util=$(DESTDIR)
 !IF $(PREFER_CMAKE)
 $(aprutil_srcdir)/Makefile: build-openssl build-expat build-apr build-apriconv \
 			    $(SRCDIR)/$(aprutil_srcdir)/CMakeLists.txt
-	-mkdir $(aprutil_srcdir) 2>/dev/null
+	-mkdir $(aprutil_srcdir) 2>NUL
 	cd $(aprutil_srcdir) && \
 	  cmake $(CMAKE_DEFAULTS) \
 		-D CMAKE_INSTALL_PREFIX=$(DESTDIR) \
@@ -252,7 +252,7 @@ $(aprutil_srcdir)/Makefile: build-openssl build-expat build-apr build-apriconv \
 !ELSE
 $(aprutil_srcdir)/Makefile: build-openssl build-expat build-apr build-apriconv \
 			    $(SRCDIR)/$(aprutil_srcdir)/configure
-	-mkdir $(aprutil_srcdir) 2>/dev/null
+	-mkdir $(aprutil_srcdir) 2>NUL
 	cd $(aprutil_srcdir) && \
 	  $(SRCDIR)/$(aprutil_srcdir)/configure \
 		 --with-apr=$(DESTDIR) \
@@ -280,7 +280,7 @@ build-pcre:
 !ELSE
 with_pcre=--with-pcre=$(DESTDIR)
 $(pcre_srcdir)/Makefile:  $(SRCDIR)/$(pcre_srcdir)/CMakeLists.txt
-	-mkdir $(pcre_srcdir) 2>/dev/null
+	-mkdir $(pcre_srcdir) 2>NUL
 	cd $(pcre_srcdir) && \
 	  cmake $(CMAKE_DEFAULTS) \
 		-D BUILD_SHARED_LIBS=ON -D CMAKE_INSTALL_PREFIX=$(DESTDIR) \
@@ -301,7 +301,7 @@ build-zlib:
 
 !ELSE
 $(zlib_srcdir)/Makefile: $(SRCDIR)/$(zlib_srcdir)
-	-mkdir $(zlib_srcdir) 2>/dev/null
+	-mkdir $(zlib_srcdir) 2>NUL
 	cd $(zlib_srcdir) && \
 	  cmake $(CMAKE_DEFAULTS) \
 		-D CMAKE_INSTALL_PREFIX=$(DESTDIR) \
@@ -322,7 +322,7 @@ build-brotli:
 
 !ELSE
 $(brotli_srcdir)/Makefile: $(SRCDIR)/$(brotli_srcdir)
-	-mkdir $(brotli_srcdir) 2>/dev/null
+	-mkdir $(brotli_srcdir) 2>NUL
 	cd $(brotli_srcdir) && \
 	  cmake $(CMAKE_DEFAULTS) \
 		-D CMAKE_INSTALL_LIBDIR=lib \
@@ -345,7 +345,7 @@ build-libxml2:
 !ELSE
 !IF $(PREFER_CMAKE)
 $(libxml2_srcdir)/Makefile: $(SRCDIR)/$(libxml2_srcdir)/win32/configure.js
-	-mkdir $(libxml2_srcdir) 2>/dev/null
+	-mkdir $(libxml2_srcdir) 2>NUL
 	xcopy /s/v/d/e "$(SRCDIR)\$(libxml2_srcdir)\*" "$(libxml2_srcdir)\"
 	cd $(libxml2_srcdir)\win32 && \
 	  cscript configure.js compiler=msvc prefix=$(DESTDIR) iconv=no \
@@ -359,7 +359,7 @@ build-libxml2: $(libxml2_srcdir)/Makefile
 	cd ..\..
 !ELSE
 $(libxml2_srcdir)/Makefile: $(SRCDIR)/$(libxml2_srcdir)
-	-mkdir $(libxml2_srcdir) 2>/dev/null
+	-mkdir $(libxml2_srcdir) 2>NUL
 	cd $(libxml2_srcdir) && \
 	  $(SRCDIR)/$(libxml2_srcdir)/configure prefix=$(DESTDIR) && \
 	cd ..
@@ -378,7 +378,7 @@ build-nghttp2:
 !ELSE
 !IF $(PREFER_CMAKE)
 $(nghttp2_srcdir)/Makefile: $(SRCDIR)/$(nghttp2_srcdir)/CMakeLists.txt
-	-mkdir $(nghttp2_srcdir) 2>/dev/null
+	-mkdir $(nghttp2_srcdir) 2>NUL
 	cd $(nghttp2_srcdir) && \
 	  cmake $(CMAKE_DEFAULTS) \
 		-D CMAKE_INSTALL_PREFIX=$(DESTDIR) \
@@ -387,7 +387,7 @@ $(nghttp2_srcdir)/Makefile: $(SRCDIR)/$(nghttp2_srcdir)/CMakeLists.txt
 	cd ..
 !ELSE
 $(nghttp2_srcdir)/Makefile: $(SRCDIR)/$(nghttp2_srcdir)/configure
-	-mkdir $(nghttp2_srcdir) 2>/dev/null
+	-mkdir $(nghttp2_srcdir) 2>NUL
 	cd $(nghttp2_srcdir) && \
 	  $(SRCDIR)/$(nghttp2_srcdir)/configure \
 		 --enable-lib-only \
@@ -542,7 +542,7 @@ $(httpd_srcdir)/Makefile: build-apr build-aprutil build-openssl \
 			  build-pcre build-libxml2 build-zlib \
 			  build-brotli build-lua build-nghttp2 \
 			  $(SRCDIR)/$(httpd_srcdir)/CMakeLists.txt
-	-mkdir $(httpd_srcdir) 2>/dev/null
+	-mkdir $(httpd_srcdir) 2>NUL
 	cd $(httpd_srcdir) && \
 	  cmake $(CMAKE_DEFAULTS) \
 		-D CMAKE_INSTALL_PREFIX=$(DESTDIR) \
@@ -553,7 +553,7 @@ $(httpd_srcdir)/Makefile: build-apr build-aprutil build-openssl \
 			  build-pcre build-libxml2 build-zlib \
 			  build-brotli build-lua build-nghttp2 \
 			  $(SRCDIR)/$(httpd_srcdir)/configure
-	-mkdir $(httpd_srcdir) 2>/dev/null
+	-mkdir $(httpd_srcdir) 2>NUL
 	cd $(httpd_srcdir) && \
 	  $(SRCDIR)/$(httpd_srcdir)/configure \
 		 --prefix=$(DESTDIR) \
@@ -596,7 +596,7 @@ build-tcnative:
 !ELSE
 $(tcnative_srcdir)/Makefile: build-apr build-openssl \
 			     $(SRCDIR)/$(tcnative_srcdir)/native/configure
-	-mkdir $(tcnative_srcdir) 2>/dev/null
+	-mkdir $(tcnative_srcdir) 2>NUL
 	cd $(tcnative_srcdir) && \
 	  $(SRCDIR)/$(tcnative_srcdir)/native/configure \
 		 --with-apr=$(DESTDIR) \
