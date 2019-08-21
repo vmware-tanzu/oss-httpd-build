@@ -288,11 +288,14 @@ $(aprutil_srcdir)/Makefile: build-openssl build-expat build-apr build-apriconv \
 	-mkdir $(aprutil_srcdir) 2>NUL
 	cd $(aprutil_srcdir) && \
 	  $(SRCDIR)/$(aprutil_srcdir)/configure \
-		 --with-apr=$(DESTDIR) \
-		 --with-openssl=$(DESTDIR) \
+		 $(with_apr) \
+		 $(with_apriconv) \
+		 $(with_openssl) \
+		 $(with_openldap) \
+		 $(with_libxml2) \
+		 $(with_aprexpat) \
+		 --without-nss \
 		 --with-crypto \
-		 --without-ldap \
-		 --without-lber \
 		 --with-installbuilddir=\$${prefix}/build \
 		 --includedir=\$${prefix}/include \
 		 --prefix=$(DESTDIR) && \
@@ -592,37 +595,114 @@ build-lua:
 !ENDIF
 
 
+!IFNDEF curl_srcdir
+with_curl=
+build-curl:
+!ELSE
 !IF $(PREFER_CMAKE)
-$(httpd_srcdir)/Makefile: build-apr build-aprutil build-openssl \
-			  build-pcre build-libxml2 build-zlib \
-			  build-brotli build-lua build-nghttp2 \
+with_curl=--with-curl=$(DESTDIR)
+$(curl_srcdir)/Makefile:  $(SRCDIR)/$(curl_srcdir)/CMakeLists.txt
+	-mkdir $(curl_srcdir) 2>NUL
+	cd $(curl_srcdir) && \
+	  cmake $(CMAKE_DEFAULTS) \
+		-D BUILD_SHARED_LIBS=ON -D CMAKE_INSTALL_PREFIX=$(DESTDIR) \
+		$(SRCDIR)\$(curl_srcdir) && \
+	cd ..
+
+build-curl: $(curl_srcdir)/Makefile
+	cd $(curl_srcdir) && \
+	  $(MAKE) && \
+	  $(MAKE) install && \
+	cd ..
+!ELSE
+with_curl=--with-curl=$(DESTDIR)
+$(curl_srcdir)/Makefile: build-openssl build-zlib build-jansson build-nghttp2 \
+			 $(SRCDIR)/$(curl_srcdir)/configure
+	-mkdir $(curl_srcdir) 2>NUL
+	cd $(curl_srcdir) && \
+	  LD_LIBRARY_PATH=$(DESTDIR)/lib:$(LD_LIBRARY_PATH) \
+	    $(SRCDIR)/$(curl_srcdir)/configure \
+		 $(with_ssl) \
+		 $(with_zlib) \
+		 $(with_brotli) \
+		 $(with_nghttp2) \
+		 --without-gnutls \
+		 --without-polarssl \
+		 --without-mbedtls \
+		 --without-cyassl \
+		 --without-nss \
+		 --without-axtls \
+		 --without-libpsl \
+		 --without-libmetalink \
+		 --without-libssh2 \
+		 --without-gssapi \
+		 --without-libidn2 \
+		 --without-librtmp \
+		 --without-zsh-functions-dir \
+                 $(with_openldap) \
+		 --prefix=$(DESTDIR) && \
+	cd ..
+
+build-curl: $(curl_srcdir)/Makefile
+	cd $(curl_srcdir) && \
+	  $(MAKE) && \
+	  $(MAKE) install && \
+	cd ..
+!ENDIF
+!ENDIF
+
+
+!IF $(PREFER_CMAKE)
+$(httpd_srcdir)/Makefile: build-openssl build-openldap \
+			  build-brotli build-jansson build-libxml2 \
+			  build-lua build-pcre build-zlib \
+			  build-apr build-aprutil \
+			  build-nghttp2 build-curl \
 			  $(SRCDIR)/$(httpd_srcdir)/CMakeLists.txt
 	-mkdir $(httpd_srcdir) 2>NUL
+	sed -e "s#\(.*/server\)#\1 \1/mpm/winnt#" \
+	    -e "s#\(SET(mod_md_requires *[^ ]*\) .*)#\1)#" \
+		< $(SRCDIR)\$(httpd_srcdir)\CMakeLists.txt \
+		> $(SRCDIR)\$(httpd_srcdir)\CMakeLists.txt.mdpatch && \
+	copy /y $(SRCDIR)\$(httpd_srcdir)\CMakeLists.txt.mdpatch \
+	          $(SRCDIR)\$(httpd_srcdir)\CMakeLists.txt
 	cd $(httpd_srcdir) && \
 	  cmake $(CMAKE_DEFAULTS) \
 		-D CMAKE_INSTALL_PREFIX=$(DESTDIR) \
 		$(SRCDIR)/$(httpd_srcdir) && \
 	cd ..
 !ELSE
-$(httpd_srcdir)/Makefile: build-apr build-aprutil build-openssl \
-			  build-pcre build-libxml2 build-zlib \
-			  build-brotli build-lua build-nghttp2 \
+$(httpd_srcdir)/Makefile: build-openssl build-openldap \
+			  build-brotli build-jansson build-libxml2 \
+			  build-lua build-pcre build-zlib \
+			  build-apr build-aprutil \
+			  build-nghttp2 build-curl \
 			  $(SRCDIR)/$(httpd_srcdir)/configure
-	-mkdir $(httpd_srcdir) 2>NUL
+	-mkdir $(httpd_srcdir) 2>/dev/null
 	cd $(httpd_srcdir) && \
 	  $(SRCDIR)/$(httpd_srcdir)/configure \
 		 --prefix=$(DESTDIR) \
-		 --with-apr=$(DESTDIR) $(with_aprutil) \
-		 --with-openssl=$(DESTDIR) \
-		 --with-nghttp2=$(DESTDIR) \
-		 --with-brotli=$(DESTDIR) \
+		 $(with_ssl) \
+		 $(with_apr) \
+		 $(with_aprutil) \
+		 $(with_brotli) \
+		 $(with_jansson) \
+		 $(with_libxml2) \
+		 $(with_lua) \
+		 $(with_pcre) \
+		 $(with_zlib) \
+		 $(with_nghttp2) \
+		 $(with_openldap) \
+		 $(with_curl) \
 		 --enable-mods-shared=all \
 		 --enable-mpms-shared=all \
 		 --enable-load-all-modules \
 		 --enable-unixd=static \
 		 --enable-version=static \
-		 --disable-authnz-ldap \
-		 --disable-ldap \
+		 $(enable_ldap) \
+		 --disable-dialup \
+		 --disable-echo \
+		 --disable-reflector \
 		 --enable-cgi=shared \
 		 --enable-authnz-fcgi=shared \
 		 --enable-proxy-http2=shared \
