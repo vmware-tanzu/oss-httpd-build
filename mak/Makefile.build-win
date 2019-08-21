@@ -116,6 +116,39 @@ build-openssl: $(openssl_srcdir)/Makefile
 !ENDIF
 
 
+!IFNDEF openldap_srcdir
+with_openldap=--without-ldap --without-lber
+enable_ldap=--disable-ldap --disable-authnz-ldap
+build-openldap:
+!ELSE
+# TODO: This is the linux build schema, needs refactoring
+with_openldap=--with-ldap-lib=$(DESTDIR)/lib --with-ldap-include=$(DESTDIR)/include --with-ldap=ldap --with-lber=lber
+enable_ldap=--enable-ldap --enable-authnz-ldap
+
+$(openldap_srcdir)/Makefile: build-openssl \
+			     $(SRCDIR)/$(openldap_srcdir)/configure
+	-mkdir $(openldap_srcdir) 2>/dev/null
+	cd $(openldap_srcdir) && \
+	  CPPFLAGS="-I$(DESTDIR)/include $(CPPFLAGS)" \
+	  LDFLAGS="-L$(DESTDIR)/lib $(LDFLAGS)" \
+	  $(SRCDIR)/$(openldap_srcdir)/configure \
+		 --with-tls=openssl \
+		 --without-cyrus-sasl \
+		 --disable-ldbm \
+		 --disable-sasl \
+		 --disable-slapd \
+		 --disable-slurpd \
+		 --prefix=$(DESTDIR) && \
+	cd ..
+
+build-openldap: $(openldap_srcdir)/Makefile
+	cd $(openldap_srcdir) && \
+	  make $(OPT) && \
+	  make $(OPT) install && \
+	cd ..
+!ENDIF
+
+
 !IF $(PREFER_CMAKE)
 $(apr_srcdir)/Makefile: build-openssl build-expat \
 			$(SRCDIR)/$(apr_srcdir)/CMakeLists.txt
@@ -332,6 +365,28 @@ $(brotli_srcdir)/Makefile: $(SRCDIR)/$(brotli_srcdir)
 
 build-brotli: $(brotli_srcdir)/Makefile
 	cd $(brotli_srcdir) && \
+	  $(MAKE) && \
+	  $(MAKE) install && \
+	cd ..
+
+!ENDIF
+
+
+!IFNDEF jansson_srcdir
+build-jansson:
+
+!ELSE
+$(jansson_srcdir)/Makefile: $(SRCDIR)/$(jansson_srcdir)
+	-mkdir $(jansson_srcdir) 2>NUL
+	cd $(jansson_srcdir) && \
+	  cmake $(CMAKE_DEFAULTS) \
+		-D CMAKE_INSTALL_LIBDIR=lib \
+		-D CMAKE_INSTALL_PREFIX=$(DESTDIR) \
+		$(SRCDIR)/$(jansson_srcdir) && \
+	cd ..
+
+build-jansson: $(jansson_srcdir)/Makefile
+	cd $(jansson_srcdir) && \
 	  $(MAKE) && \
 	  $(MAKE) install && \
 	cd ..
