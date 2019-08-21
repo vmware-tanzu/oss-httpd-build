@@ -582,8 +582,11 @@ build-lua: $(lua_srcdir)/src/Makefile.win
         for %a in (lua.h luaconf.h lualib.h lauxlib.h lua.hpp) do \
 	  copy %a "$(DESTDIR)\include\"
 	cd "..\doc"
+	-mkdir "$(DESTDIR)\man"
 	-mkdir "$(DESTDIR)\man\man1"
 	copy *.1 "$(DESTDIR)\man\man1\"
+	-mkdir "$(DESTDIR)\share"
+	-mkdir "$(DESTDIR)\share\doc"
 	-mkdir "$(DESTDIR)\share\doc\lua"
 	copy * "$(DESTDIR)\share\doc\lua\"
 	del "$(DESTDIR)\share\doc\lua\*.1"
