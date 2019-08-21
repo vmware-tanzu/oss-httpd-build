@@ -197,10 +197,10 @@ with_apriconv=--with-apr-iconv=$(DESTDIR)
 $(apriconv_srcdir)/Makefile.win: $(SRCDIR)\$(apriconv_srcdir)\build\modules.mk.win
 	-mkdir $(apriconv_srcdir) 2>NUL
 	xcopy /s/v/e/y $(SRCDIR)\$(apriconv_srcdir)\* $(apriconv_srcdir)\ 
-	sed "s# \([^= ]*\)\\\\\([lib]*apr-1\.lib\) # /libpath:\1 \2 #;" \
+	sed -e "s# \([^= ]*\)\\\\\([lib]*apr-1\.lib\) # /libpath:\1 \2 #;" \
 		< $(SRCDIR)\$(apriconv_srcdir)\build\modules.mk.win \
 		> $(apriconv_srcdir)\build\modules.mk.win
-	sed "s#"".*\\\\libapr-1.lib""# #;s#\(LINK32_FLAGS=\)\(.*\) /out#\1 libapr-1.lib \2 /libpath:..\\\\$(apr_srcdir)\\\\$$(OUTDIR) /out#;" \
+	sed -e "s#"".*\\\\libapr-1.lib""# #;s#\(LINK32_FLAGS=\)\(.*\) /out#\1 libapr-1.lib \2 /libpath:..\\\\$(apr_srcdir)\\\\$$(OUTDIR) /out#;" \
 		< $(SRCDIR)\$(apriconv_srcdir)\libapriconv.mak \
 		> $(apriconv_srcdir)\libapriconv.mak
 	copy << $(apriconv_srcdir)\Makefile.win
