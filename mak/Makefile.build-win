@@ -608,7 +608,13 @@ $(curl_srcdir)/Makefile:  $(SRCDIR)/$(curl_srcdir)/CMakeLists.txt
 	-mkdir $(curl_srcdir) 2>NUL
 	cd $(curl_srcdir) && \
 	  cmake $(CMAKE_DEFAULTS) \
-		-D BUILD_SHARED_LIBS=ON -D CMAKE_INSTALL_PREFIX=$(DESTDIR) \
+		-D BUILD_CURL_EXE=OFF \
+		-D BUILD_TESTING=OFF \
+		-D CURL_HIDDEN_SYMBOLS=OFF \
+	        -D CMAKE_USE_LIBSSH=OFF \
+        	-D BUILD_STATIC_LIBS=OFF \
+		-D BUILD_SHARED_LIBS=ON \
+		-D CMAKE_INSTALL_PREFIX=$(DESTDIR) \
 		$(SRCDIR)\$(curl_srcdir) && \
 	cd ..
 
@@ -663,7 +669,7 @@ $(httpd_srcdir)/Makefile: build-openssl build-openldap \
 			  build-nghttp2 build-curl \
 			  $(SRCDIR)/$(httpd_srcdir)/CMakeLists.txt
 	-mkdir $(httpd_srcdir) 2>NUL
-	sed -e "s#\(.*/server\)#\1 \1/mpm/winnt#" \
+	sed -e "s#\(.*/server\)$$#\1 \1/mpm/winnt#" \
 	    -e "s#\(SET(mod_md_requires *[^ ]*\) .*)#\1)#" \
 		< $(SRCDIR)\$(httpd_srcdir)\CMakeLists.txt \
 		> $(SRCDIR)\$(httpd_srcdir)\CMakeLists.txt.mdpatch && \
@@ -672,6 +678,7 @@ $(httpd_srcdir)/Makefile: build-openssl build-openldap \
 	cd $(httpd_srcdir) && \
 	  cmake $(CMAKE_DEFAULTS) \
 		-D CMAKE_INSTALL_PREFIX=$(DESTDIR) \
+		-D CURL_LIBRARIES=$(DESTDIR)/lib/libcurl_imp.lib \
 		$(SRCDIR)/$(httpd_srcdir) && \
 	cd ..
 !ELSE
