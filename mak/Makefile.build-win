@@ -419,8 +419,8 @@ $(libxml2_srcdir)/win32/Makefile: $(SRCDIR)/$(libxml2_srcdir)/win32/configure.js
 	xcopy /s/v/d/e "$(SRCDIR)\$(libxml2_srcdir)\*" "$(libxml2_srcdir)\"
 	cd $(libxml2_srcdir)\win32
 	patch -p1 < <<
---- win32/Makefile.msvc	2019-08-22 09:00:27.347824900 -0700
-+++ win32/Makefile.msvc	2019-08-22 10:16:00.849929700 -0700
+--- win32/Makefile.msvc	Tue Nov 13 06:45:27 2018
++++ win32/Makefile.msvc	Thu Aug 22 12:34:12 2019
 @@ -25,8 +25,11 @@
  XML_RES = $$(XML_BASENAME).res
  XML_IMP = $$(XML_BASENAME).lib
@@ -471,7 +471,7 @@ $(libxml2_srcdir)/win32/Makefile: $(SRCDIR)/$(libxml2_srcdir)/win32/configure.js
 +	      /Fo$$(XML_INTDIR_A)\ /Fd$$(XML_INTDIR_A)\$$(XML_A_PDB) /c $$<
  
  # An implicit rule for static for dll libxml compilation.
- {$$(XML_SRCDIR)}.c{$(XML_INTDIR_A_DLL)}.obj::
+ {$$(XML_SRCDIR)}.c{$$(XML_INTDIR_A_DLL)}.obj::
 -	$$(CC) $$(CFLAGS) /D "LIBXML_STATIC" /D "LIBXML_STATIC_FOR_DLL" /Fo$$(XML_INTDIR_A_DLL)\ /c $$<
 +	$$(CC) $$(CFLAGS) /D "LIBXML_STATIC" /D "LIBXML_STATIC_FOR_DLL" \
 +	      /Fo$$(XML_INTDIR_A_DLL)\ /Fd$$(XML_INTDIR_A_DLL)\$$(XML_A_DLL_PDB) /c $$<
@@ -488,21 +488,22 @@ $(libxml2_srcdir)/win32/Makefile: $(SRCDIR)/$(libxml2_srcdir)/win32/configure.js
  	@$$(_VC_MANIFEST_EMBED_DLL)
  
  #$$(BINDIR)\$$(XML_SO) : $$(BINDIR) $$(XML_OBJS) $$(XML_INTDIR)\$$(XML_DEF)
-@@ -409,13 +414,13 @@
+@@ -409,13 +414,14 @@
  # An implicit rule for xmllint and friends.
  !if "$$(STATIC)" == "1"
  {$$(UTILS_SRCDIR)}.c{$$(BINDIR)}.exe:
 -	$$(CC) /D "LIBXML_STATIC" $$(CFLAGS) /Fo$$(UTILS_INTDIR)\ /c $$< 
 -	$$(LD) $$(LDFLAGS) /OUT:$$@ $$(XML_A) $$(LIBS) $$(UTILS_INTDIR)\$$(<B).obj
-+	$$(CC) /D "LIBXML_STATIC" $$(CFLAGS) /Fo$$(UTILS_INTDIR)\ /Fd$$(UTILS_INTDIR)\ /c $$< 
++	$$(CC) /D "LIBXML_STATIC" $$(CFLAGS) /Fo$$(UTILS_INTDIR)\ /Fd$$(UTILS_INTDIR)\ /c $$<
 +	$$(LD) $$(LDFLAGS) /OUT:$$@ /PDB:$$*.pdb $$(XML_A) $$(LIBS) $$(UTILS_INTDIR)\$$(<B).obj
  	@$$(_VC_MANIFEST_EMBED_EXE)
  !else
- {$$(UTILS_SRCDIR)}.c{$(BINDIR)}.exe:
+ {$$(UTILS_SRCDIR)}.c{$$(BINDIR)}.exe:
 -	$$(CC) $$(CFLAGS) /Fo$$(UTILS_INTDIR)\ /c $$< 
 -	$$(LD) $$(LDFLAGS) /OUT:$$@ $$(XML_IMP) $$(LIBS) $$(UTILS_INTDIR)\$$(<B).obj
-+	$$(CC) $$(CFLAGS) /Fo$$(UTILS_INTDIR)\ /Fd$$(UTILS_INTDIR)\ /c $$< 
-+	$$(LD) $$(LDFLAGS) /OUT:$$@ /PDB:$*.pdb $$(XML_IMP) $$(LIBS) $$(UTILS_INTDIR)\$$(<B).obj
++	$$(CC) $$(CFLAGS) /Fo$$(UTILS_INTDIR)\ /Fd$$(UTILS_INTDIR)\ /c $$<
++	$$(LD) $$(LDFLAGS) /OUT:$$@ /PDB:$$*.pdb \
++	      $$(XML_IMP) $$(LIBS) $$(UTILS_INTDIR)\$$(<B).obj
  	@$$(_VC_MANIFEST_EMBED_EXE)
  !endif
  
@@ -726,7 +727,6 @@ build-curl: $(curl_srcdir)/Makefile
 	cd $(curl_srcdir) && \
 	  $(MAKE) && \
 	  $(MAKE) install && \
-	  copy /y src\curl.pdb "$(DESTDIR)\bin" && \
 	  copy /y lib\libcurl.pdb "$(DESTDIR)\bin" && \
 	cd ..
 !ELSE
