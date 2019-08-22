@@ -64,11 +64,11 @@ collect-httpd: pre-package
 !IFDEF VCRUNTIME
 	copy $(VCToolsRedistDir)\vcruntime*.dll $(PKGDIR)\bin\ 
 !ENDIF
-	del $(PKGDIR)\bin\pcre*.exe
-	del $(PKGDIR)\bin\runtest.exe
-	del $(PKGDIR)\bin\runsuite.exe
-	del $(PKGDIR)\bin\test*.exe
-	del $(PKGDIR)\bin\xml*.exe
+	del $(PKGDIR)\bin\pcre*.*
+	del $(PKGDIR)\bin\runtest.*
+	del $(PKGDIR)\bin\runsuite.*
+	del $(PKGDIR)\bin\test*.*
+	del $(PKGDIR)\bin\xml*.*
 
 prepare-instance: collect-httpd
 	echo a > .a

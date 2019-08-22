@@ -69,6 +69,7 @@ build-expat: $(expat_srcdir)/Makefile
 	cd $(expat_srcdir) && \
 	  $(MAKE) && \
 	  $(MAKE) install && \
+	  copy /y CMakeFiles\expat.dir\expat.pdb "$(DESTDIR)\lib" && \
 	cd ..
 !ENDIF
 
@@ -183,6 +184,9 @@ build-apr: $(apr_srcdir)/Makefile
 	  $(MAKE) install && \
 	  copy "$(SRCDIR)\$(apr_srcdir)\include\arch\*.h" "$(DESTDIR)\include\arch" && \
 	  copy "$(SRCDIR)\$(apr_srcdir)\include\arch\win32\*.h" "$(DESTDIR)\include\arch\win32" && \
+	  copy /y CMakeFiles\apr-1.dir\apr-1.pdb "$(DESTDIR)\lib" && \
+	  copy /y CMakeFiles\aprapp-1.dir\aprapp-1.pdb "$(DESTDIR)\lib" && \
+	  copy /y CMakeFiles\libaprapp-1.dir\libaprapp-1.pdb "$(DESTDIR)\lib" && \
 	cd ..
 
 
@@ -306,6 +310,7 @@ build-aprutil: $(aprutil_srcdir)/Makefile
 	cd $(aprutil_srcdir) && \
 	  $(MAKE) && \
 	  $(MAKE) install && \
+	  copy /y CMakeFiles\aprutil-1.dir\aprutil-1.pdb "$(DESTDIR)\lib" && \
 	cd ..
 !ENDIF
 
@@ -328,6 +333,7 @@ build-pcre: $(pcre_srcdir)/Makefile
 	cd $(pcre_srcdir) && \
 	  $(MAKE) && \
 	  $(MAKE) install && \
+	  copy /y *.pdb "$(DESTDIR)\bin" && \
 	cd ..
 !ENDIF
 
@@ -348,6 +354,8 @@ build-zlib: $(zlib_srcdir)/Makefile
 	cd $(zlib_srcdir) && \
 	  $(MAKE) && \
 	  $(MAKE) install && \
+	  copy /y zlib.pdb "$(DESTDIR)\bin" && \
+	  copy /y CMakeFiles\zlibstatic.dir\zlibstatic.pdb "$(DESTDIR)\lib" && \
 	cd ..
 
 !ENDIF
@@ -370,8 +378,11 @@ build-brotli: $(brotli_srcdir)/Makefile
 	cd $(brotli_srcdir) && \
 	  $(MAKE) && \
 	  $(MAKE) install && \
+	  copy /y brotli.pdb "$(DESTDIR)\bin" && \
+	  copy /y CMakeFiles\brotlicommon-static.dir\brotlicommon-static.pdb "$(DESTDIR)\lib" && \
+	  copy /y CMakeFiles\brotlidec-static.dir\brotlidec-static.pdb "$(DESTDIR)\lib" && \
+	  copy /y CMakeFiles\brotlienc-static.dir\brotlienc-static.pdb "$(DESTDIR)\lib" && \
 	cd ..
-
 !ENDIF
 
 
@@ -392,6 +403,7 @@ build-jansson: $(jansson_srcdir)/Makefile
 	cd $(jansson_srcdir) && \
 	  $(MAKE) && \
 	  $(MAKE) install && \
+	  copy /y CMakeFiles\jansson.dir\jansson.pdb "$(DESTDIR)\lib" && \
 	cd ..
 
 !ENDIF
@@ -402,18 +414,109 @@ build-libxml2:
 
 !ELSE
 !IF $(PREFER_CMAKE)
-$(libxml2_srcdir)/Makefile: $(SRCDIR)/$(libxml2_srcdir)/win32/configure.js
+$(libxml2_srcdir)/win32/Makefile: $(SRCDIR)/$(libxml2_srcdir)/win32/configure.js
 	-mkdir $(libxml2_srcdir) 2>NUL
 	xcopy /s/v/d/e "$(SRCDIR)\$(libxml2_srcdir)\*" "$(libxml2_srcdir)\"
+	cd $(libxml2_srcdir)\win32
+	patch -p1 < <<
+--- win32/Makefile.msvc	2019-08-22 09:00:27.347824900 -0700
++++ win32/Makefile.msvc	2019-08-22 10:16:00.849929700 -0700
+@@ -25,8 +25,11 @@
+ XML_RES = $$(XML_BASENAME).res
+ XML_IMP = $$(XML_BASENAME).lib
+ XML_DEF = $$(XML_BASENAME).def
++XML_PDB = $$(XML_BASENAME).pdb
+ XML_A = $$(XML_BASENAME)_a.lib
++XML_A_PDB = $$(XML_BASENAME)_a.pdb
+ XML_A_DLL = $$(XML_BASENAME)_a_dll.lib
++XML_A_DLL_PDB = $$(XML_BASENAME)_a_dll.pdb
+ 
+ # Place where we let the compiler put its output.
+ BINDIR = bin.msvc
+@@ -100,10 +103,8 @@
+ CFLAGS = $$(CFLAGS) /D "_DEBUG" /Od /Z7
+ LDFLAGS = $$(LDFLAGS) /DEBUG
+ !else
+-CFLAGS = $$(CFLAGS) /D "NDEBUG" /O2 
+-# commented out as this break VC10 c.f. 634846
+-# LDFLAGS = $$(LDFLAGS) /OPT:NOWIN98
+-LDFLAGS = $$(LDFLAGS)
++CFLAGS = $$(CFLAGS) /D "NDEBUG" /O2 /Zi
++LDFLAGS = $$(LDFLAGS) /DEBUG /INCREMENTAL:NO /OPT:REF
+ !endif
+ 
+ # Libxml object files.
+@@ -320,8 +321,9 @@
+ 	copy $$(XML_SRCDIR)\include\libxml\*.h $$(INCPREFIX)\libxml2\libxml
+ 	copy $$(BINDIR)\$$(XML_SO) $$(SOPREFIX)
+ 	copy $$(BINDIR)\$$(XML_A) $$(LIBPREFIX)
+-	copy $$(BINDIR)\$$(XML_A_DLL) $$(LIBPREFIX)
+ 	copy $$(BINDIR)\$$(XML_IMP) $$(LIBPREFIX)
++	-copy $$(BINDIR)\$$(XML_PDB) $$(SOPREFIX)
++	-copy $$(XML_INTDIR_A)\$$(XML_A_PDB) $$(LIBPREFIX)
+ 
+ install : install-libs 
+ 	copy $$(BINDIR)\*.exe $$(BINPREFIX)
+@@ -359,15 +361,17 @@
+ 
+ # An implicit rule for libxml compilation.
+ {$$(XML_SRCDIR)}.c{$$(XML_INTDIR)}.obj::
+-	$$(CC) $$(CFLAGS) /Fo$$(XML_INTDIR)\ /c $$<
++	$$(CC) $$(CFLAGS) /Fo$$(XML_INTDIR)\ /Fd$$(XML_INTDIR)\ /c $$<
+ 
+ # An implicit rule for static libxml compilation.
+ {$$(XML_SRCDIR)}.c{$$(XML_INTDIR_A)}.obj::
+-	$$(CC) $$(CFLAGS) /D "LIBXML_STATIC" /Fo$$(XML_INTDIR_A)\ /c $$<
++	$$(CC) $$(CFLAGS) /D "LIBXML_STATIC" \
++	      /Fo$$(XML_INTDIR_A)\ /Fd$$(XML_INTDIR_A)\$$(XML_A_PDB) /c $$<
+ 
+ # An implicit rule for static for dll libxml compilation.
+ {$$(XML_SRCDIR)}.c{$(XML_INTDIR_A_DLL)}.obj::
+-	$$(CC) $$(CFLAGS) /D "LIBXML_STATIC" /D "LIBXML_STATIC_FOR_DLL" /Fo$$(XML_INTDIR_A_DLL)\ /c $$<
++	$$(CC) $$(CFLAGS) /D "LIBXML_STATIC" /D "LIBXML_STATIC_FOR_DLL" \
++	      /Fo$$(XML_INTDIR_A_DLL)\ /Fd$$(XML_INTDIR_A_DLL)\$$(XML_A_DLL_PDB) /c $$<
+ 
+ # Compiles libxml source. Uses the implicit rule for commands.
+ $$(XML_OBJS) : $$(XML_INTDIR) 
+@@ -387,7 +391,8 @@
+ # Creates the libxml shared object.
+ $$(BINDIR)\$$(XML_SO) : $$(BINDIR) $$(XML_OBJS) $$(XML_INTDIR)\$$(XML_DEF) $$(XML_INTDIR)\$$(XML_RES)
+ 	$$(LD) $$(LDFLAGS) /DLL \
+-		/IMPLIB:$$(BINDIR)\$$(XML_IMP) /OUT:$$(BINDIR)\$$(XML_SO) $$(XML_OBJS) $$(XML_INTDIR)\$$(XML_RES) $$(LIBS)
++		/IMPLIB:$$(BINDIR)\$$(XML_IMP) /OUT:$$(BINDIR)\$$(XML_SO) /PDB:$$(BINDIR)\$$(XML_PDB) \
++		$$(XML_OBJS) $$(XML_INTDIR)\$$(XML_RES) $$(LIBS)
+ 	@$$(_VC_MANIFEST_EMBED_DLL)
+ 
+ #$$(BINDIR)\$$(XML_SO) : $$(BINDIR) $$(XML_OBJS) $$(XML_INTDIR)\$$(XML_DEF)
+@@ -409,13 +414,13 @@
+ # An implicit rule for xmllint and friends.
+ !if "$$(STATIC)" == "1"
+ {$$(UTILS_SRCDIR)}.c{$$(BINDIR)}.exe:
+-	$$(CC) /D "LIBXML_STATIC" $$(CFLAGS) /Fo$$(UTILS_INTDIR)\ /c $$< 
+-	$$(LD) $$(LDFLAGS) /OUT:$$@ $$(XML_A) $$(LIBS) $$(UTILS_INTDIR)\$$(<B).obj
++	$$(CC) /D "LIBXML_STATIC" $$(CFLAGS) /Fo$$(UTILS_INTDIR)\ /Fd$$(UTILS_INTDIR)\ /c $$< 
++	$$(LD) $$(LDFLAGS) /OUT:$$@ /PDB:$$*.pdb $$(XML_A) $$(LIBS) $$(UTILS_INTDIR)\$$(<B).obj
+ 	@$$(_VC_MANIFEST_EMBED_EXE)
+ !else
+ {$$(UTILS_SRCDIR)}.c{$(BINDIR)}.exe:
+-	$$(CC) $$(CFLAGS) /Fo$$(UTILS_INTDIR)\ /c $$< 
+-	$$(LD) $$(LDFLAGS) /OUT:$$@ $$(XML_IMP) $$(LIBS) $$(UTILS_INTDIR)\$$(<B).obj
++	$$(CC) $$(CFLAGS) /Fo$$(UTILS_INTDIR)\ /Fd$$(UTILS_INTDIR)\ /c $$< 
++	$$(LD) $$(LDFLAGS) /OUT:$$@ /PDB:$*.pdb $$(XML_IMP) $$(LIBS) $$(UTILS_INTDIR)\$$(<B).obj
+ 	@$$(_VC_MANIFEST_EMBED_EXE)
+ !endif
+ 
+<<
+	cd ..\..
 	cd $(libxml2_srcdir)\win32 && \
 	  cscript configure.js compiler=msvc prefix=$(DESTDIR) iconv=no \
 		  include=$(DESTDIR)\include lib=$(DESTDIR)\lib && \
 	cd ..\..
 
-build-libxml2: $(libxml2_srcdir)/Makefile
+build-libxml2: $(libxml2_srcdir)/win32/Makefile
 	cd $(libxml2_srcdir)\win32 && \
 	  $(MAKE) && \
-	  $(MAKE) install && \
+	  $(MAKE) install-libs && \
 	cd ..\..
 !ELSE
 $(libxml2_srcdir)/Makefile: $(SRCDIR)/$(libxml2_srcdir)
@@ -457,6 +560,7 @@ build-nghttp2: $(nghttp2_srcdir)/Makefile
 	cd $(nghttp2_srcdir) && \
 	  $(MAKE) && \
 	  $(MAKE) install && \
+	  copy /y lib\*.pdb "$(DESTDIR)\bin" && \
 	cd ..
 !ENDIF
 
@@ -576,7 +680,7 @@ build-lua: $(lua_srcdir)/src/Makefile.win
 	nmake -f Makefile.win all
 	copy *.exe "$(DESTDIR)\bin\"
 	copy *.dll "$(DESTDIR)\bin\"
-	copy lua?.pdb "$(DESTDIR)\bin\"
+	copy *lua?.pdb "$(DESTDIR)\bin\"
 	copy *.lib "$(DESTDIR)\lib\"
 	copy lua_src.pdb "$(DESTDIR)\lib\"
         for %a in (lua.h luaconf.h lualib.h lauxlib.h lua.hpp) do \
@@ -622,6 +726,8 @@ build-curl: $(curl_srcdir)/Makefile
 	cd $(curl_srcdir) && \
 	  $(MAKE) && \
 	  $(MAKE) install && \
+	  copy /y src\curl.pdb "$(DESTDIR)\bin" && \
+	  copy /y lib\libcurl.pdb "$(DESTDIR)\bin" && \
 	cd ..
 !ELSE
 with_curl=--with-curl=$(DESTDIR)
@@ -673,7 +779,7 @@ $(httpd_srcdir)/Makefile: build-openssl build-openldap \
 	    -e "s#\(SET(mod_md_requires *[^ ]*\) .*)#\1)#" \
 		< $(SRCDIR)\$(httpd_srcdir)\CMakeLists.txt \
 		> $(SRCDIR)\$(httpd_srcdir)\CMakeLists.txt.mdpatch && \
-	copy /y $(SRCDIR)\$(httpd_srcdir)\CMakeLists.txt.mdpatch \
+	  copy /y $(SRCDIR)\$(httpd_srcdir)\CMakeLists.txt.mdpatch \
 	          $(SRCDIR)\$(httpd_srcdir)\CMakeLists.txt
 	cd $(httpd_srcdir) && \
 	  cmake $(CMAKE_DEFAULTS) \
