@@ -87,6 +87,8 @@ Please note the addition of the libjansson4 package and corrected liblua5.3-0 an
 
 ## **Microsoft Windows Users**
 
+Note that Pivotal convenience packages prior to httpd 2.4.41 were built with Visual Studio 2017. This may cause issues for users who have compiled third-party modules. Users are advised to rebuild any such modules before combining them with these newer packages.
+
 This package is built using Visual C++ 19.21 and C Runtime version 14.21, components of Microsoft Visual Studio 2019. Windows Server 2019, Windows Server 2016 and Windows Server 2012 are all suitable for deployment. Windows 10 is suitable for developer evaluation but is not suitable for server deployment, as Microsoft restricts the Windows 10 desktop license, limiting aspects of the operating system behavior including the Windows Sockets API, and tunes the process scheduler to deliver a better desktop experience.
 
 Users must obtain and install the "Microsoft Visual C++ Redistributable for Visual Studio 2019", x64 edition; from [https://visualstudio.microsoft.com/downloads/](https://visualstudio.microsoft.com/downloads/) (currently this is listed under Other Tools and Frameworks, and provides support for Visual Studio 2015 and 2017 as well.) Install the x64 flavor, and observe the prerequisites noted for that package. Installing this package from Microsoft ensures that this runtime is updated by the Windows Update service for security vulnerabilities within the Universal C Runtime itself.
