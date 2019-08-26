@@ -81,7 +81,8 @@ Please note the addition of the jansson package to this list since the 2.4.29-17
 
 The Ubuntu 16.04 package requires several commonly installed packages to be available, these may be provisioned with the following command;
 ```
-$ apt-get -y install libexpat1 libjansson4 libpcre3 libxml2 liblua5.3-0 zlib1g
+$ apt-get install libexpat1 libjansson4 libpcre3 libxml2 \
+             libuuid1 liblua5.3-0 zlib1g
 ```
 Please note the addition of the libjansson4 package and corrected liblua5.3-0 and libxml2 package names to this list since the 2.4.29-171109 release. In order to use the provided apxs utility, additional packages are required as indicated at the [https://github.com/appsuite/oss-httpd-build](https://github.com/appsuite/oss-httpd-build) README page.
 
