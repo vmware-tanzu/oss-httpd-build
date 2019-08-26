@@ -154,7 +154,11 @@ These base packages are required for deployment (and are incidently installed
 with the -devel packages above; most are already present by default);
 
  $ apt-get install libexpat1 libjansson4 libpcre3 libxml2 \
+<<<<<<< HEAD
                liblua5.3-0 libuuid1 zlib1g 
+=======
+               liblua5.3-0 libuuid1 zlib1g
+>>>>>>> 1188c849c0899d29690a3da1a31cca7c6b9b191e
 
 === Microsoft Windows dependencies
 
