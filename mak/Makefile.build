@@ -467,7 +467,9 @@ $(curl_srcdir)/Makefile: build-openssl build-zlib build-brotli build-nghttp2 \
 		 --without-libidn2 \
 		 --without-librtmp \
 		 --without-zsh-functions-dir \
-                 $(with_openldap) \
+		 --disable-ldap \
+		 --disable-ldaps \
+		 --disable-rtsp \
 		 --prefix=$(DESTDIR) && \
 	cd ..
 
