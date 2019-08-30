@@ -624,7 +624,7 @@ gather-libxml2-master: pre-manifest
 	echo libxml2_ver=$$libxml2_ver >>$(BLD)-manifest-vars
 
 gather-lua-release: pre-manifest
-	lua_srcpath=http://www.lua.org/ftp && \
+	lua_srcpath=https://www.lua.org/ftp && \
 	lua_pkg=`wget -q -O - $$lua_srcpath/ | sed -n '/<A HREF="lua-[0-9]/{s#.*HREF="\(lua-[0-9.]*tar.gz\)".*#\1#;p;q}'` && \
 	lua_srcdir=`echo $$lua_pkg | sed 's#\(.*\)\.tar\.gz#\1#;'` && \
 	lua_ver=`echo $$lua_srcdir | sed 's#lua-\(.*\)#\1#;'` && \
