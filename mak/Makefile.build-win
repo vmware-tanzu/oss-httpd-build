@@ -775,12 +775,6 @@ $(httpd_srcdir)/Makefile: build-openssl build-openldap \
 			  build-nghttp2 build-curl \
 			  $(SRCDIR)/$(httpd_srcdir)/CMakeLists.txt
 	-mkdir $(httpd_srcdir) 2>NUL
-	sed -e "s#\(.*/server\)$$#\1 \1/mpm/winnt#" \
-	    -e "s#\(SET(mod_md_requires *[^ ]*\) .*)#\1)#" \
-		< $(SRCDIR)\$(httpd_srcdir)\CMakeLists.txt \
-		> $(SRCDIR)\$(httpd_srcdir)\CMakeLists.txt.mdpatch && \
-	  copy /y $(SRCDIR)\$(httpd_srcdir)\CMakeLists.txt.mdpatch \
-	          $(SRCDIR)\$(httpd_srcdir)\CMakeLists.txt
 	cd $(httpd_srcdir) && \
 	  cmake $(CMAKE_DEFAULTS) \
 		-D CMAKE_INSTALL_PREFIX=$(DESTDIR) \
