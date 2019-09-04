@@ -462,7 +462,7 @@ gather-openldap-master: pre-manifest
 
 gather-expat-release: pre-manifest
 	expat_srcpath=https://github.com/libexpat/libexpat/releases && \
-	expat_ver=`wget -q -O - $$expat_srcpath | sed -n 's#^.*<a href=".*\/archive\/R_\(.*\)\.tar\.gz".*$$#\1#;t once;$$!b;:once;p;q;'` && \
+	expat_ver=`wget -q -O - $$expat_srcpath | sed -n 's#^.*<a.* href=".*\/archive\/R_\(.*\)\.tar\.gz".*$$#\1#;t once;$$!b;:once;p;q;'` && \
 	expat_srcpath=https://github.com/libexpat/libexpat/archive/R_$$expat_ver.tar.gz && \
 	expat_srcdir=libexpat-R_$$expat_ver && \
 	expat_pkg=$$expat_srcdir.tar.gz && \
@@ -549,16 +549,17 @@ gather-pcre2-trunk: pre-manifest
 
 
 gather-jansson-release: pre-manifest
-	jansson_srcpath=http://www.digip.org/jansson/releases && \
-	jansson_pkg=`wget -q -O - $$jansson_srcpath/ | sed -n '/<a href="\(jansson-2\.[0-9]*\.tar\.bz2\)"/{s#.*href="\([^"]*\).*#\1#;h};$$!b;g;p'` && \
-	jansson_ver=`echo $$jansson_pkg | sed 's#jansson-\(.*\)\.tar\.bz2#\1#;'` && \
+	jansson_srcpath=https://github.com/akheron/jansson/releases && \
+	jansson_ver=`wget -q -O - $$jansson_srcpath | sed -n 's#^.*<a.* href=".*\/archive\/v\(.*\)\.tar\.gz".*$$#\1#;t once;$$!b;:once;p;q;'` && \
+	jansson_srcpath=https://github.com/akheron/jansson/archive/v$$jansson_ver.tar.gz && \
 	jansson_srcdir=jansson-$$jansson_ver && \
+	jansson_pkg=$$jansson_srcdir.tar.gz && \
+        jansson_ver=`echo $$jansson_ver | sed "s#_#.#g"` && \
 	if test ! -f pkgs/$$jansson_pkg; then \
 	  cd pkgs && \
-	  wget -nv $$jansson_srcpath/$$jansson_pkg && \
-	  wget -nv $$jansson_srcpath/$$jansson_pkg.asc && \
+	  wget -nv $$jansson_srcpath -O $$jansson_pkg && \
 	  cd .. && \
-          tar -xjf pkgs/$$jansson_pkg; \
+	  tar -xzf pkgs/$$jansson_pkg; \
 	fi && \
 	echo jansson_srcpath=$$jansson_srcpath >>$(BLD)-manifest-vars && \
 	echo jansson_srcdir=$$jansson_srcdir >>$(BLD)-manifest-vars && \
@@ -578,15 +579,18 @@ gather-jansson-master: pre-manifest
 	echo jansson_ver=$$jansson_ver >>$(BLD)-manifest-vars
 
 
+# Excludes revs with '-' characters, e.g. v2.9.9-rc1
 gather-libxml2-release: pre-manifest
 	libxml2_srcpath=http://xmlsoft.org/sources && \
-	libxml2_pkg=`wget -q -O - $$libxml2_srcpath/ | sed -n '/<a href="\(libxml2-[0-9.]*\.tar\.gz\)"/{s#.*href="\([^"]*\).*#\1#;h};$$!b;g;p'` && \
-	libxml2_srcdir=`echo $$libxml2_pkg | sed 's#\(libxml2-.*\)\.tar\.gz#\1#;'` && \
-	libxml2_ver=`echo $$libxml2_srcdir | sed 's#libxml2-\(.*\)#\1#;'` && \
+	libxml2_srcpath=https://github.com/GNOME/libxml2/releases && \
+	libxml2_ver=`wget -q -O - $$libxml2_srcpath | sed -n 's#^.*<a.* href=".*\/archive\/v\([^-]*\)\.tar\.gz".*$$#\1#;t once;$$!b;:once;p;q;'` && \
+	libxml2_srcpath=https://github.com/GNOME/libxml2/archive/v$$libxml2_ver.tar.gz && \
+	libxml2_srcdir=libxml2-$$libxml2_ver && \
+	libxml2_pkg=$$libxml2_srcdir.tar.gz && \
+        libxml2_ver=`echo $$libxml2_ver | sed "s#_#.#g"` && \
 	if test ! -f pkgs/$$libxml2_pkg; then \
 	  cd pkgs && \
-	  wget -nv $$libxml2_srcpath/$$libxml2_pkg && \
-	  wget -nv $$libxml2_srcpath/$$libxml2_pkg.asc && \
+	  wget -nv $$libxml2_srcpath -O $$libxml2_pkg && \
 	  cd .. && \
 	  tar -xzf pkgs/$$libxml2_pkg; \
 	fi && \
@@ -594,6 +598,7 @@ gather-libxml2-release: pre-manifest
 	echo libxml2_srcdir=$$libxml2_srcdir >>$(BLD)-manifest-vars && \
 	echo libxml2_ver=$$libxml2_ver >>$(BLD)-manifest-vars
 
+# Re-draft from -release above, with v###-rc#.tar.gz search pattern
 gather-libxml2-rc: pre-manifest
 	libxml2_srcpath=http://xmlsoft.org/sources && \
 	libxml2_ver=`wget -q -O - $$libxml2_srcpath/ | sed -n '/<a href="LATEST_LIBXML2_IS_/{s#.*href="LATEST_LIBXML2_IS_\([^"]*\)".*#\1#;p;q}'` && \
