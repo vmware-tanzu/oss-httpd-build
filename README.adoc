@@ -82,7 +82,9 @@ after first running the `Makefile.gather` phase. (An immediate goal of this
 toolchain is to automate the local provisioning of those dependencies if not
 already installed.)
 
-=== RedHat or Fedora Linux development package dependencies:
+=== RedHat/CentOS/Oracle/Fedora Linux development package dependencies:
+
+Tested With RHEL and CentOS version 7.0 and Fedora 29.
 
 For all steps the complete group of development tools is recommended, e.g.;
 
@@ -124,9 +126,10 @@ The package names have remained the same.
 
 === Ubuntu or Debian development package dependencies:
 
-Additional required tools which may not be included by default;
+Tested with Ubuntu 16.04 and 18.04, install the following
+required tools which may not be included by default;
 
- $ apt-get install build-essential cmake docbook2x git \
+ $ apt-get install build-essential autoconf cmake docbook2x git \
                libtool libtool-bin subversion wget xutils-dev
 
 For the actual `Makefile.build` phase, a number of system component -devel
