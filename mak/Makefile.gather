@@ -203,6 +203,52 @@ gather-apr-trunk: pre-manifest
 	echo apr_ver=$$apr_ver >>$(BLD)-manifest-vars
 
 
+gather-apriconv-release: pre-manifest
+	apriconv_srcpath=https://www.apache.org/dist/apr && \
+	apriconv_pkg=`wget -q -O - $$apriconv_srcpath/ | sed -n '/<a href="\(apr-iconv-1\.[0-9]\.[0-9]*\.tar\.bz2\)"/{s#.*href="\([^"]*\).*#\1#;h};$$!b;g;p'` && \
+	apriconv_ver=`echo $$apriconv_pkg | sed 's#apr-iconv-\(.*\)\.tar\.bz2#\1#;'` && \
+	if test ! -f pkgs/$$apriconv_pkg; then \
+	  cd pkgs && \
+	  wget -nv $$apriconv_srcpath/$$apriconv_pkg && \
+	  wget -nv $$apriconv_srcpath/$$apriconv_pkg.asc && \
+	  cd .. && \
+	  tar -xjf pkgs/$$apriconv_pkg; \
+	fi && \
+	echo apriconv_pkg=$$apriconv_pkg >>$(BLD)-manifest-vars && \
+	echo apriconv_srcdir=apr-iconv-$$apriconv_ver >>$(BLD)-manifest-vars && \
+	echo apriconv_srcpath=$$apriconv_srcpath >>$(BLD)-manifest-vars && \
+	echo apriconv_ver=$$apriconv_ver >>$(BLD)-manifest-vars
+
+gather-apriconv-rc: pre-manifest
+	apriconv_srcpath=https://apr.apache.org/dev/dist && \
+	apriconv_pkg=`wget -q -O - $$apriconv_srcpath/ | sed -n '/<a href="\(apr-iconv-1\.[0-9]\.[0-9]*\.tar\.bz2\)"/{s#.*href="\([^"]*\).*#\1#;h};$$!b;g;p'` && \
+	apriconv_ver=`echo $$apriconv_pkg | sed 's#apr-iconv-\(.*\)\.tar\.bz2#\1#;'` && \
+	if test ! -f pkgs/$$apriconv_pkg; then \
+	  cd pkgs && \
+	  wget -nv $$apriconv_srcpath/$$apriconv_pkg && \
+	  wget -nv $$apriconv_srcpath/$$apriconv_pkg.asc && \
+	  cd .. && \
+	  tar -xjf pkgs/$$apriconv_pkg; \
+	fi && \
+	echo apriconv_pkg=$$apriconv_pkg >>$(BLD)-manifest-vars && \
+	echo apriconv_srcdir=apr-iconv-$$apriconv_ver >>$(BLD)-manifest-vars && \
+	echo apriconv_srcpath=$$apriconv_srcpath >>$(BLD)-manifest-vars && \
+	echo apriconv_ver=$$apriconv_ver >>$(BLD)-manifest-vars
+
+gather-apriconv-1xbranch: pre-manifest
+	apriconv_srcpath=https://svn.apache.org/repos/asf/apr/apr-iconv/trunk && \
+	apriconv_rev=`svn info $$apriconv_srcpath | sed -n '/Last Changed Rev: \([0-9]\+\)/{s#.*: ##;p}'` && \
+	apriconv_ver=1.3.x-$$apriconv_rev && \
+	apriconv_srcdir=apr-iconv-$$apriconv_ver && \
+	if test ! -d $$apriconv_srcdir ; then \
+	  svn co -q -r $$apriconv_rev $$apriconv_srcpath $$apriconv_srcdir; \
+	fi && \
+	echo apriconv_rev=$$apriconv_rev >>$(BLD)-manifest-vars && \
+	echo apriconv_srcdir=$$apriconv_srcdir >>$(BLD)-manifest-vars && \
+	echo apriconv_srcpath=$$apriconv_srcpath >>$(BLD)-manifest-vars && \
+	echo apriconv_ver=$$apriconv_ver >>$(BLD)-manifest-vars
+
+
 gather-aprutil-release: pre-manifest
 	aprutil_srcpath=https://www.apache.org/dist/apr && \
 	aprutil_pkg=`wget -q -O - $$aprutil_srcpath/ | sed -n '/<a href="\(apr-util-1\.[0-9]\.[0-9]*\.tar\.bz2\)"/{s#.*href="\([^"]*\).*#\1#;h};$$!b;g;p'` && \
@@ -372,52 +418,6 @@ gather-brotli-master: pre-manifest
 	echo brotli_srcdir=$$brotli_srcdir >>$(BLD)-manifest-vars && \
 	echo brotli_srcpath=$$brotli_srcpath >>$(BLD)-manifest-vars && \
 	echo brotli_ver=$$brotli_ver >>$(BLD)-manifest-vars
-
-
-gather-apriconv-release: pre-manifest
-	apriconv_srcpath=https://www.apache.org/dist/apr && \
-	apriconv_pkg=`wget -q -O - $$apriconv_srcpath/ | sed -n '/<a href="\(apr-iconv-1\.[0-9]\.[0-9]*\.tar\.bz2\)"/{s#.*href="\([^"]*\).*#\1#;h};$$!b;g;p'` && \
-	apriconv_ver=`echo $$apriconv_pkg | sed 's#apr-iconv-\(.*\)\.tar\.bz2#\1#;'` && \
-	if test ! -f pkgs/$$apriconv_pkg; then \
-	  cd pkgs && \
-	  wget -nv $$apriconv_srcpath/$$apriconv_pkg && \
-	  wget -nv $$apriconv_srcpath/$$apriconv_pkg.asc && \
-	  cd .. && \
-	  tar -xjf pkgs/$$apriconv_pkg; \
-	fi && \
-	echo apriconv_pkg=$$apriconv_pkg >>$(BLD)-manifest-vars && \
-	echo apriconv_srcdir=apr-iconv-$$apriconv_ver >>$(BLD)-manifest-vars && \
-	echo apriconv_srcpath=$$apriconv_srcpath >>$(BLD)-manifest-vars && \
-	echo apriconv_ver=$$apriconv_ver >>$(BLD)-manifest-vars
-
-gather-apriconv-rc: pre-manifest
-	apriconv_srcpath=https://apr.apache.org/dev/dist && \
-	apriconv_pkg=`wget -q -O - $$apriconv_srcpath/ | sed -n '/<a href="\(apr-iconv-1\.[0-9]\.[0-9]*\.tar\.bz2\)"/{s#.*href="\([^"]*\).*#\1#;h};$$!b;g;p'` && \
-	apriconv_ver=`echo $$apriconv_pkg | sed 's#apr-iconv-\(.*\)\.tar\.bz2#\1#;'` && \
-	if test ! -f pkgs/$$apriconv_pkg; then \
-	  cd pkgs && \
-	  wget -nv $$apriconv_srcpath/$$apriconv_pkg && \
-	  wget -nv $$apriconv_srcpath/$$apriconv_pkg.asc && \
-	  cd .. && \
-	  tar -xjf pkgs/$$apriconv_pkg; \
-	fi && \
-	echo apriconv_pkg=$$apriconv_pkg >>$(BLD)-manifest-vars && \
-	echo apriconv_srcdir=apr-iconv-$$apriconv_ver >>$(BLD)-manifest-vars && \
-	echo apriconv_srcpath=$$apriconv_srcpath >>$(BLD)-manifest-vars && \
-	echo apriconv_ver=$$apriconv_ver >>$(BLD)-manifest-vars
-
-gather-apriconv-1xbranch: pre-manifest
-	apriconv_srcpath=https://svn.apache.org/repos/asf/apr/apr-iconv/trunk && \
-	apriconv_rev=`svn info $$apriconv_srcpath | sed -n '/Last Changed Rev: \([0-9]\+\)/{s#.*: ##;p}'` && \
-	apriconv_ver=1.3.x-$$apriconv_rev && \
-	apriconv_srcdir=apr-iconv-$$apriconv_ver && \
-	if test ! -d $$apriconv_srcdir ; then \
-	  svn co -q -r $$apriconv_rev $$apriconv_srcpath $$apriconv_srcdir; \
-	fi && \
-	echo apriconv_rev=$$apriconv_rev >>$(BLD)-manifest-vars && \
-	echo apriconv_srcdir=$$apriconv_srcdir >>$(BLD)-manifest-vars && \
-	echo apriconv_srcpath=$$apriconv_srcpath >>$(BLD)-manifest-vars && \
-	echo apriconv_ver=$$apriconv_ver >>$(BLD)-manifest-vars
 
 
 gather-curl-release: pre-manifest
