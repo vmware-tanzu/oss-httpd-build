@@ -61,8 +61,9 @@ gather-httpd-release: pre-manifest
 	  cd .. && \
           tar -xjf pkgs/$$httpd_pkg; \
 	fi && \
-	echo httpd_srcpath=$$httpd_srcpath >>$(BLD)-manifest-vars && \
+	echo httpd_pkg=$$httpd_pkg >>$(BLD)-manifest-vars && \
 	echo httpd_srcdir=$$httpd_srcdir >>$(BLD)-manifest-vars && \
+	echo httpd_srcpath=$$httpd_srcpath >>$(BLD)-manifest-vars && \
 	echo httpd_ver=$$httpd_ver >>$(BLD)-manifest-vars
 
 gather-httpd-rc: pre-manifest
@@ -77,8 +78,9 @@ gather-httpd-rc: pre-manifest
 	  cd .. && \
           tar -xjf pkgs/$$httpd_pkg; \
 	fi && \
-	echo httpd_srcpath=$$httpd_srcpath >>$(BLD)-manifest-vars && \
+	echo httpd_pkg=$$httpd_pkg >>$(BLD)-manifest-vars && \
 	echo httpd_srcdir=$$httpd_srcdir >>$(BLD)-manifest-vars && \
+	echo httpd_srcpath=$$httpd_srcpath >>$(BLD)-manifest-vars && \
 	echo httpd_ver=$$httpd_ver >>$(BLD)-manifest-vars
 
 gather-httpd-2xbranch: pre-manifest
@@ -89,8 +91,9 @@ gather-httpd-2xbranch: pre-manifest
 	if test ! -d $$httpd_srcdir; then \
 	  svn co -q -r $$httpd_rev $$httpd_srcpath $$httpd_srcdir; \
 	fi && \
-	echo httpd_srcpath=$$httpd_srcpath >>$(BLD)-manifest-vars && \
+	echo httpd_rev=$$httpd_rev >>$(BLD)-manifest-vars && \
 	echo httpd_srcdir=$$httpd_srcdir >>$(BLD)-manifest-vars && \
+	echo httpd_srcpath=$$httpd_srcpath >>$(BLD)-manifest-vars && \
 	echo httpd_ver=$$httpd_ver >>$(BLD)-manifest-vars
 
 gather-httpd-trunk: pre-manifest
@@ -101,8 +104,9 @@ gather-httpd-trunk: pre-manifest
 	if test ! -d $$httpd_srcdir; then \
 	  svn co -q -r $$httpd_rev $$httpd_srcpath $$httpd_srcdir; \
 	fi && \
-	echo httpd_srcpath=$$httpd_srcpath >>$(BLD)-manifest-vars && \
+	echo httpd_rev=$$httpd_rev >>$(BLD)-manifest-vars && \
 	echo httpd_srcdir=$$httpd_srcdir >>$(BLD)-manifest-vars && \
+	echo httpd_srcpath=$$httpd_srcpath >>$(BLD)-manifest-vars && \
 	echo httpd_ver=$$httpd_ver >>$(BLD)-manifest-vars
 
 
@@ -119,8 +123,9 @@ gather-tcnative-release: pre-manifest
 	  cd .. && \
 	  tar -xzf pkgs/$$tcnative_pkg; \
 	fi && \
-	echo tcnative_srcpath=$$tcnative_srcpath >>$(BLD)-manifest-vars && \
+	echo tcnative_pkg=$$tcnative_pkg >>$(BLD)-manifest-vars && \
 	echo tcnative_srcdir=$$tcnative_srcdir >>$(BLD)-manifest-vars && \
+	echo tcnative_srcpath=$$tcnative_srcpath >>$(BLD)-manifest-vars && \
 	echo tcnative_ver=$$tcnative_ver >>$(BLD)-manifest-vars
 
 gather-tcnative-trunk: pre-manifest
@@ -149,8 +154,9 @@ gather-apr-release: pre-manifest
 	  cd .. && \
 	  tar -xjf pkgs/$$apr_pkg; \
 	fi && \
-	echo apr_srcpath=$$apr_srcpath >>$(BLD)-manifest-vars && \
+	echo apr_pkg=$$apr_pkg >>$(BLD)-manifest-vars && \
 	echo apr_srcdir=$$apr_srcdir >>$(BLD)-manifest-vars && \
+	echo apr_srcpath=$$apr_srcpath >>$(BLD)-manifest-vars && \
 	echo apr_ver=$$apr_ver >>$(BLD)-manifest-vars
 
 gather-apr-rc: pre-manifest
@@ -165,8 +171,9 @@ gather-apr-rc: pre-manifest
 	  cd .. && \
 	  tar -xjf pkgs/$$apr_pkg; \
 	fi && \
-	echo apr_srcpath=$$apr_srcpath >>$(BLD)-manifest-vars && \
+	echo apr_pkg=$$apr_pkg >>$(BLD)-manifest-vars && \
 	echo apr_srcdir=$$apr_srcdir >>$(BLD)-manifest-vars && \
+	echo apr_srcpath=$$apr_srcpath >>$(BLD)-manifest-vars && \
 	echo apr_ver=$$apr_ver >>$(BLD)-manifest-vars
 
 gather-apr-1xbranch: pre-manifest
@@ -207,8 +214,9 @@ gather-aprutil-release: pre-manifest
 	  cd .. && \
 	  tar -xjf pkgs/$$aprutil_pkg; \
 	fi && \
-	echo aprutil_srcpath=$$aprutil_srcpath >>$(BLD)-manifest-vars && \
+	echo aprutil_pkg=$$aprutil_pkg >>$(BLD)-manifest-vars && \
 	echo aprutil_srcdir=apr-util-$$aprutil_ver >>$(BLD)-manifest-vars && \
+	echo aprutil_srcpath=$$aprutil_srcpath >>$(BLD)-manifest-vars && \
 	echo aprutil_ver=$$aprutil_ver >>$(BLD)-manifest-vars
 
 gather-aprutil-rc: pre-manifest
@@ -222,8 +230,9 @@ gather-aprutil-rc: pre-manifest
 	  cd .. && \
 	  tar -xjf pkgs/$$aprutil_pkg; \
 	fi && \
-	echo aprutil_srcpath=$$aprutil_srcpath >>$(BLD)-manifest-vars && \
+	echo aprutil_pkg=$$aprutil_pkg >>$(BLD)-manifest-vars && \
 	echo aprutil_srcdir=apr-util-$$aprutil_ver >>$(BLD)-manifest-vars && \
+	echo aprutil_srcpath=$$aprutil_srcpath >>$(BLD)-manifest-vars && \
 	echo aprutil_ver=$$aprutil_ver >>$(BLD)-manifest-vars
 
 gather-aprutil-1xbranch: pre-manifest
@@ -254,8 +263,9 @@ gather-openssl-release: pre-manifest
 	  cd .. && \
 	  tar -xzf pkgs/$$openssl_pkg; \
 	fi && \
-	echo openssl_srcpath=$$openssl_srcpath >>$(BLD)-manifest-vars && \
+	echo openssl_pkg=$$openssl_pkg >>$(BLD)-manifest-vars && \
 	echo openssl_srcdir=openssl-$$openssl_ver >>$(BLD)-manifest-vars && \
+	echo openssl_srcpath=$$openssl_srcpath >>$(BLD)-manifest-vars && \
 	echo openssl_ver=$$openssl_ver >>$(BLD)-manifest-vars
 
 gather-openssl-candidate: pre-manifest
@@ -269,8 +279,9 @@ gather-openssl-candidate: pre-manifest
 	  cd .. && \
 	  tar -xzf pkgs/$$openssl_pkg; \
 	fi && \
-	echo openssl_srcpath=$$openssl_srcpath >>$(BLD)-manifest-vars && \
+	echo openssl_pkg=$$openssl_pkg >>$(BLD)-manifest-vars && \
 	echo openssl_srcdir=openssl-$$openssl_ver >>$(BLD)-manifest-vars && \
+	echo openssl_srcpath=$$openssl_srcpath >>$(BLD)-manifest-vars && \
 	echo openssl_ver=$$openssl_ver >>$(BLD)-manifest-vars
 
 gather-openssl-111branch: pre-manifest
@@ -282,8 +293,8 @@ gather-openssl-111branch: pre-manifest
 	else \
 	  cd $$openssl_srcdir && git fetch -q && cd ..; \
 	fi && \
-	echo openssl_srcpath=$$openssl_srcpath >>$(BLD)-manifest-vars && \
 	echo openssl_srcdir=$$openssl_srcdir >>$(BLD)-manifest-vars && \
+	echo openssl_srcpath=$$openssl_srcpath >>$(BLD)-manifest-vars && \
 	echo openssl_ver=$$openssl_ver >>$(BLD)-manifest-vars
 
 gather-openssl-master: pre-manifest
@@ -295,8 +306,8 @@ gather-openssl-master: pre-manifest
 	else \
 	  cd $$openssl_srcdir && git fetch -q && cd ..; \
 	fi && \
-	echo openssl_srcpath=$$openssl_srcpath >>$(BLD)-manifest-vars && \
 	echo openssl_srcdir=$$openssl_srcdir >>$(BLD)-manifest-vars && \
+	echo openssl_srcpath=$$openssl_srcpath >>$(BLD)-manifest-vars && \
 	echo openssl_ver=$$openssl_ver >>$(BLD)-manifest-vars
 
 
@@ -313,8 +324,9 @@ gather-nghttp2-release: pre-manifest
 	  cd .. && \
 	  tar -xjf pkgs/$$nghttp2_pkg; \
 	fi && \
-	echo nghttp2_srcpath=$$nghttp2_srcpath >>$(BLD)-manifest-vars && \
+	echo nghttp2_pkg=$$nghttp2_pkg >>$(BLD)-manifest-vars && \
 	echo nghttp2_srcdir=$$nghttp2_srcdir >>$(BLD)-manifest-vars && \
+	echo nghttp2_srcpath=$$nghttp2_srcpath >>$(BLD)-manifest-vars && \
 	echo nghttp2_ver=$$nghttp2_ver >>$(BLD)-manifest-vars
 
 gather-nghttp2-master: pre-manifest
@@ -357,8 +369,8 @@ gather-brotli-master: pre-manifest
 	else \
 	  cd $$brotli_srcdir && git fetch -q && cd ..; \
 	fi && \
-	echo brotli_srcpath=$$brotli_srcpath >>$(BLD)-manifest-vars && \
 	echo brotli_srcdir=$$brotli_srcdir >>$(BLD)-manifest-vars && \
+	echo brotli_srcpath=$$brotli_srcpath >>$(BLD)-manifest-vars && \
 	echo brotli_ver=$$brotli_ver >>$(BLD)-manifest-vars
 
 
@@ -373,8 +385,9 @@ gather-apriconv-release: pre-manifest
 	  cd .. && \
 	  tar -xjf pkgs/$$apriconv_pkg; \
 	fi && \
-	echo apriconv_srcpath=$$apriconv_srcpath >>$(BLD)-manifest-vars && \
+	echo apriconv_pkg=$$apriconv_pkg >>$(BLD)-manifest-vars && \
 	echo apriconv_srcdir=apr-iconv-$$apriconv_ver >>$(BLD)-manifest-vars && \
+	echo apriconv_srcpath=$$apriconv_srcpath >>$(BLD)-manifest-vars && \
 	echo apriconv_ver=$$apriconv_ver >>$(BLD)-manifest-vars
 
 gather-apriconv-rc: pre-manifest
@@ -388,8 +401,9 @@ gather-apriconv-rc: pre-manifest
 	  cd .. && \
 	  tar -xjf pkgs/$$apriconv_pkg; \
 	fi && \
-	echo apriconv_srcpath=$$apriconv_srcpath >>$(BLD)-manifest-vars && \
+	echo apriconv_pkg=$$apriconv_pkg >>$(BLD)-manifest-vars && \
 	echo apriconv_srcdir=apr-iconv-$$apriconv_ver >>$(BLD)-manifest-vars && \
+	echo apriconv_srcpath=$$apriconv_srcpath >>$(BLD)-manifest-vars && \
 	echo apriconv_ver=$$apriconv_ver >>$(BLD)-manifest-vars
 
 gather-apriconv-1xbranch: pre-manifest
@@ -418,8 +432,9 @@ gather-curl-release: pre-manifest
 	  cd .. && \
           tar -xjf pkgs/$$curl_pkg; \
 	fi && \
-	echo curl_srcpath=$$curl_srcpath >>$(BLD)-manifest-vars && \
+	echo curl_pkg=$$curl_pkg >>$(BLD)-manifest-vars && \
 	echo curl_srcdir=$$curl_srcdir >>$(BLD)-manifest-vars && \
+	echo curl_srcpath=$$curl_srcpath >>$(BLD)-manifest-vars && \
 	echo curl_ver=$$curl_ver >>$(BLD)-manifest-vars
 
 gather-curl-master: pre-manifest
@@ -464,8 +479,8 @@ gather-openldap-master: pre-manifest
 	else \
 	  cd $$openldap_srcdir && git fetch -q && cd ..; \
 	fi && \
-	echo openldap_srcpath=$$openldap_srcpath >>$(BLD)-manifest-vars && \
 	echo openldap_srcdir=$$openldap_srcdir >>$(BLD)-manifest-vars && \
+	echo openldap_srcpath=$$openldap_srcpath >>$(BLD)-manifest-vars && \
 	echo openldap_ver=$$openldap_ver >>$(BLD)-manifest-vars
 
 
@@ -482,8 +497,9 @@ gather-expat-release: pre-manifest
 	  cd .. && \
 	  tar -xzf pkgs/$$expat_pkg; \
 	fi && \
-	echo expat_srcpath=$$expat_srcpath >>$(BLD)-manifest-vars && \
+	echo expat_pkg=$$expat_pkg >>$(BLD)-manifest-vars && \
 	echo expat_srcdir=$$expat_srcdir >>$(BLD)-manifest-vars && \
+	echo expat_srcpath=$$expat_srcpath >>$(BLD)-manifest-vars && \
 	echo expat_ver=$$expat_ver >>$(BLD)-manifest-vars
 
 gather-expat-master: pre-manifest
@@ -495,8 +511,8 @@ gather-expat-master: pre-manifest
 	else \
 	  cd $$expat_srcdir && git fetch -q && cd ..; \
 	fi && \
-	echo expat_srcpath=$$expat_srcpath >>$(BLD)-manifest-vars && \
 	echo expat_srcdir=$$expat_srcdir >>$(BLD)-manifest-vars && \
+	echo expat_srcpath=$$expat_srcpath >>$(BLD)-manifest-vars && \
 	echo expat_ver=$$expat_ver >>$(BLD)-manifest-vars
 
 
@@ -512,8 +528,9 @@ gather-pcre-release: pre-manifest
 	  cd .. && \
 	  tar -xjf pkgs/$$pcre_pkg; \
 	fi && \
-	echo pcre_srcpath=$$pcre_srcpath >>$(BLD)-manifest-vars && \
+	echo pcre_pkg=$$pcre_pkg >>$(BLD)-manifest-vars && \
 	echo pcre_srcdir=$$pcre_srcdir >>$(BLD)-manifest-vars && \
+	echo pcre_srcpath=$$pcre_srcpath >>$(BLD)-manifest-vars && \
 	echo pcre_ver=$$pcre_ver >>$(BLD)-manifest-vars
 
 gather-pcre-candidate: pre-manifest
@@ -528,8 +545,9 @@ gather-pcre-candidate: pre-manifest
 	  cd .. && \
 	  tar -xjf pkgs/$$pcre_pkg; \
 	fi && \
-	echo pcre_srcpath=$$pcre_srcpath >>$(BLD)-manifest-vars && \
+	echo pcre_pkg=$$pcre_pkg >>$(BLD)-manifest-vars && \
 	echo pcre_srcdir=$$pcre_srcdir >>$(BLD)-manifest-vars && \
+	echo pcre_srcpath=$$pcre_srcpath >>$(BLD)-manifest-vars && \
 	echo pcre_ver=$$pcre_ver >>$(BLD)-manifest-vars
 
 gather-pcre-trunk: pre-manifest
@@ -540,8 +558,9 @@ gather-pcre-trunk: pre-manifest
 	if test ! -d $$pcre_srcdir; then \
 	  svn co -q -r $$pcre_rev $$pcre_srcpath $$pcre_srcdir; \
 	fi && \
-	echo pcre_srcpath=$$pcre_srcpath >>$(BLD)-manifest-vars && \
+	echo pcre_rev=$$pcre_rev >>$(BLD)-manifest-vars && \
 	echo pcre_srcdir=$$pcre_srcdir >>$(BLD)-manifest-vars && \
+	echo pcre_srcpath=$$pcre_srcpath >>$(BLD)-manifest-vars && \
 	echo pcre_ver=$$pcre_ver >>$(BLD)-manifest-vars
 
 gather-pcre2-trunk: pre-manifest
@@ -552,8 +571,9 @@ gather-pcre2-trunk: pre-manifest
 	if test ! -d $$pcre_srcdir; then \
 	  svn co -q -r $$pcre_rev $$pcre_srcpath $$pcre_srcdir; \
 	fi && \
-	echo pcre_srcpath=$$pcre_srcpath >>$(BLD)-manifest-vars && \
+	echo pcre_rev=$$pcre_rev >>$(BLD)-manifest-vars && \
 	echo pcre_srcdir=$$pcre_srcdir >>$(BLD)-manifest-vars && \
+	echo pcre_srcpath=$$pcre_srcpath >>$(BLD)-manifest-vars && \
 	echo pcre_ver=$$pcre_ver >>$(BLD)-manifest-vars
 
 
@@ -570,8 +590,9 @@ gather-jansson-release: pre-manifest
 	  cd .. && \
 	  tar -xzf pkgs/$$jansson_pkg; \
 	fi && \
-	echo jansson_srcpath=$$jansson_srcpath >>$(BLD)-manifest-vars && \
+	echo jansson_pkg=$$jansson_pkg >>$(BLD)-manifest-vars && \
 	echo jansson_srcdir=$$jansson_srcdir >>$(BLD)-manifest-vars && \
+	echo jansson_srcpath=$$jansson_srcpath >>$(BLD)-manifest-vars && \
 	echo jansson_ver=$$jansson_ver >>$(BLD)-manifest-vars
 
 gather-jansson-master: pre-manifest
@@ -633,8 +654,8 @@ gather-libxml2-master: pre-manifest
 	else \
 	  cd $$libxml2_srcdir && git fetch -q && cd ..; \
 	fi && \
-	echo libxml2_srcpath=$$libxml2_srcpath >>$(BLD)-manifest-vars && \
 	echo libxml2_srcdir=$$libxml2_srcdir >>$(BLD)-manifest-vars && \
+	echo libxml2_srcpath=$$libxml2_srcpath >>$(BLD)-manifest-vars && \
 	echo libxml2_ver=$$libxml2_ver >>$(BLD)-manifest-vars
 
 gather-lua-release: pre-manifest
@@ -648,8 +669,9 @@ gather-lua-release: pre-manifest
 	  cd .. && \
 	  tar -xzf pkgs/$$lua_pkg; \
 	fi && \
-	echo lua_srcpath=$$lua_srcpath >>$(BLD)-manifest-vars && \
+	echo lua_pkg=$$lua_pkg >>$(BLD)-manifest-vars && \
 	echo lua_srcdir=$$lua_srcdir >>$(BLD)-manifest-vars && \
+	echo lua_srcpath=$$lua_srcpath >>$(BLD)-manifest-vars && \
 	echo lua_ver=$$lua_ver >>$(BLD)-manifest-vars
 
 
@@ -665,8 +687,9 @@ gather-zlib-release: pre-manifest
 	  cd .. && \
 	  tar -xzf pkgs/$$zlib_pkg; \
 	fi && \
-	echo zlib_srcpath=$$zlib_srcpath >>$(BLD)-manifest-vars && \
+	echo zlib_pkg=$$zlib_pkg >>$(BLD)-manifest-vars && \
 	echo zlib_srcdir=$$zlib_srcdir >>$(BLD)-manifest-vars && \
+	echo zlib_srcpath=$$zlib_srcpath >>$(BLD)-manifest-vars && \
 	echo zlib_ver=$$zlib_ver >>$(BLD)-manifest-vars
 
 gather-zlib-master: pre-manifest
@@ -678,8 +701,8 @@ gather-zlib-master: pre-manifest
 	else \
 	  cd $$zlib_srcdir && git fetch -q && cd ..; \
 	fi && \
-	echo zlib_srcpath=$$zlib_srcpath >>$(BLD)-manifest-vars && \
 	echo zlib_srcdir=$$zlib_srcdir >>$(BLD)-manifest-vars && \
+	echo zlib_srcpath=$$zlib_srcpath >>$(BLD)-manifest-vars && \
 	echo zlib_ver=$$zlib_ver >>$(BLD)-manifest-vars
 
 
