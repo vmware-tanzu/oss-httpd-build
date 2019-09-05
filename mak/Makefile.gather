@@ -36,16 +36,17 @@ pre-manifest:
 	truncate -s0 $(BLD)-manifest-vars
 
 
+# Not reversioned, so we won't rebuild frequently on test changes
 gather-httpdtest-trunk: pre-manifest
 	httpdtest_srcpath=https://svn.apache.org/repos/asf/httpd/test/framework/trunk && \
-	if test ! -d httpdtest-trunk ; then \
-	  svn co -q $$httpdtest_srcpath httpdtest-trunk; \
+	httpdtest_srcdir=httpdtest-trunk && \
+	if test ! -d $$httpdtest_srcdir ; then \
+	  svn co -q $$httpdtest_srcpath $$httpdtest_srcdir; \
 	else \
-	  svn up -q httpdtest-trunk; \
+	  svn up -q $$httpdtest_srcdir; \
 	fi && \
-	echo httpdtest_srcpath=$$httpdtest_srcpath >>$(BLD)-manifest-vars && \
-	echo httpdtest_srcdir=httpdtest-trunk >>$(BLD)-manifest-vars && \
-	echo httpdtest_ver=httpdtest-trunk >>$(BLD)-manifest-vars
+	echo httpdtest_srcdir=$$httpdtest_srcdir >>$(BLD)-manifest-vars && \
+	echo httpdtest_srcpath=$$httpdtest_srcpath >>$(BLD)-manifest-vars
 
 
 gather-httpd-release: pre-manifest
@@ -128,10 +129,11 @@ gather-tcnative-trunk: pre-manifest
 	tcnative_ver=1.2.x-$$tcnative_rev && \
 	tcnative_srcdir=tomcat-native-$$tcnative_ver && \
 	if test ! -d $$tcnative_srcdir ; then \
-	  svn co -q $$tcnative_srcpath $$tcnative_srcdir; \
+	  svn co -q -r $$tcnative_rev $$tcnative_srcpath $$tcnative_srcdir; \
 	fi && \
-	echo tcnative_srcpath=$$tcnative_srcpath >>$(BLD)-manifest-vars && \
+	echo tcnative_rev=$$tcnative_rev >>$(BLD)-manifest-vars && \
 	echo tcnative_srcdir=$$tcnative_srcdir >>$(BLD)-manifest-vars && \
+	echo tcnative_srcpath=$$tcnative_srcpath >>$(BLD)-manifest-vars && \
 	echo tcnative_ver=$$tcnative_ver >>$(BLD)-manifest-vars
 
 
@@ -173,10 +175,11 @@ gather-apr-1xbranch: pre-manifest
 	apr_ver=1.7.x-$$apr_rev && \
 	apr_srcdir=apr-$$apr_ver && \
 	if test ! -d $$apr_srcdir ; then \
-	  svn co -q $$apr_srcpath $$apr_srcdir; \
+	  svn co -q -r $$apr_rev $$apr_srcpath $$apr_srcdir; \
 	fi && \
-	echo apr_srcpath=$$apr_srcpath >>$(BLD)-manifest-vars && \
+	echo apr_rev=$$tcnative_rev >>$(BLD)-manifest-vars && \
 	echo apr_srcdir=$$apr_srcdir >>$(BLD)-manifest-vars && \
+	echo apr_srcpath=$$apr_srcpath >>$(BLD)-manifest-vars && \
 	echo apr_ver=$$apr_ver >>$(BLD)-manifest-vars
 
 gather-apr-trunk: pre-manifest
@@ -185,10 +188,11 @@ gather-apr-trunk: pre-manifest
 	apr_ver=2.0.x-$$apr_rev && \
 	apr_srcdir=apr-$$apr_ver && \
 	if test ! -d $$apr_srcdir ; then \
-	  svn co -q $$apr_srcpath $$apr_srcdir; \
+	  svn co -q -r $$apr_rev $$apr_srcpath $$apr_srcdir; \
 	fi && \
-	echo apr_srcpath=$$apr_srcpath >>$(BLD)-manifest-vars && \
+	echo apr_rev=$$tcnative_rev >>$(BLD)-manifest-vars && \
 	echo apr_srcdir=$$apr_srcdir >>$(BLD)-manifest-vars && \
+	echo apr_srcpath=$$apr_srcpath >>$(BLD)-manifest-vars && \
 	echo apr_ver=$$apr_ver >>$(BLD)-manifest-vars
 
 
@@ -228,10 +232,11 @@ gather-aprutil-1xbranch: pre-manifest
 	aprutil_ver=1.7.x-$$aprutil_rev && \
 	aprutil_srcdir=apr-util-$$aprutil_ver && \
 	if test ! -d $$aprutil_srcdir ; then \
-	  svn co -q $$aprutil_srcpath $$aprutil_srcdir; \
+	  svn co -q -r $$aprutil_rev $$aprutil_srcpath $$aprutil_srcdir; \
 	fi && \
-	echo aprutil_srcpath=$$aprutil_srcpath >>$(BLD)-manifest-vars && \
+	echo aprutil_rev=$$aprutil_rev >>$(BLD)-manifest-vars && \
 	echo aprutil_srcdir=$$aprutil_srcdir >>$(BLD)-manifest-vars && \
+	echo aprutil_srcpath=$$aprutil_srcpath >>$(BLD)-manifest-vars && \
 	echo aprutil_ver=$$aprutil_ver >>$(BLD)-manifest-vars
 
 gather-aprutil-trunk: pre-manifest
@@ -321,25 +326,26 @@ gather-nghttp2-master: pre-manifest
 	else \
 	  cd $$nghttp2_srcdir && git fetch -q && cd ..; \
 	fi && \
-	echo nghttp2_srcpath=$$nghttp2_srcpath >>$(BLD)-manifest-vars && \
 	echo nghttp2_srcdir=$$nghttp2_srcdir >>$(BLD)-manifest-vars && \
+	echo nghttp2_srcpath=$$nghttp2_srcpath >>$(BLD)-manifest-vars && \
 	echo nghttp2_ver=$$nghttp2_ver >>$(BLD)-manifest-vars
 
 
 gather-brotli-release: pre-manifest
 	brotli_srcpath=https://github.com/google/brotli/releases && \
 	brotli_ver=`wget --max-redirect=0 $$brotli_srcpath/latest/ 2>&1 | sed 's#Location: .*/tag/v\([^/]*\) \[following\]#\1#p;d;'` && \
-	brotli_srcpath=https://github.com/google/brotli/archive && \
+	brotli_srcpath=https://github.com/google/brotli/archive/v$$brotli_ver.tar.gz && \
 	brotli_srcdir=brotli-$$brotli_ver && \
 	brotli_pkg=$$brotli_srcdir.tar.gz && \
 	if test ! -f pkgs/$$brotli_pkg; then \
 	  cd pkgs && \
-	  wget -nv $$brotli_srcpath/v$$brotli_ver.tar.gz -O $$brotli_pkg && \
+	  wget -nv $$brotli_srcpath -O $$brotli_pkg && \
 	  cd .. && \
 	  tar -xzf pkgs/$$brotli_pkg; \
 	fi && \
-	echo brotli_srcpath=$$brotli_srcpath >>$(BLD)-manifest-vars && \
+	echo brotli_pkg=$$brotli_pkg >>$(BLD)-manifest-vars && \
 	echo brotli_srcdir=$$brotli_srcdir >>$(BLD)-manifest-vars && \
+	echo brotli_srcpath=$$brotli_srcpath >>$(BLD)-manifest-vars && \
 	echo brotli_ver=$$brotli_ver >>$(BLD)-manifest-vars
 
 gather-brotli-master: pre-manifest
@@ -392,10 +398,11 @@ gather-apriconv-1xbranch: pre-manifest
 	apriconv_ver=1.3.x-$$apriconv_rev && \
 	apriconv_srcdir=apr-iconv-$$apriconv_ver && \
 	if test ! -d $$apriconv_srcdir ; then \
-	  svn co -q $$apriconv_srcpath $$apriconv_srcdir; \
+	  svn co -q -r $$apriconv_rev $$apriconv_srcpath $$apriconv_srcdir; \
 	fi && \
-	echo apriconv_srcpath=$$apriconv_srcpath >>$(BLD)-manifest-vars && \
+	echo apriconv_rev=$$apriconv_rev >>$(BLD)-manifest-vars && \
 	echo apriconv_srcdir=$$apriconv_srcdir >>$(BLD)-manifest-vars && \
+	echo apriconv_srcpath=$$apriconv_srcpath >>$(BLD)-manifest-vars && \
 	echo apriconv_ver=$$apriconv_ver >>$(BLD)-manifest-vars
 
 
@@ -424,25 +431,27 @@ gather-curl-master: pre-manifest
 	else \
 	  cd $$curl_srcdir && git fetch -q && cd ..; \
 	fi && \
-	echo curl_srcpath=$$curl_srcpath >>$(BLD)-manifest-vars && \
 	echo curl_srcdir=$$curl_srcdir >>$(BLD)-manifest-vars && \
+	echo curl_srcpath=$$curl_srcpath >>$(BLD)-manifest-vars && \
 	echo curl_ver=$$curl_ver >>$(BLD)-manifest-vars
 
 
 gather-openldap-release: pre-manifest
 	openldap_srcpath=https://gpl.savoirfairelinux.net/pub/mirrors/openldap/openldap-release && \
-	openldap_pkg=`wget -q -O - $$openldap_srcpath/ | sed -n '/<a href="\(openldap-2\.4\.[0-9]*\.tgz\)"/{s#.*href="\(.*\)\.tgz".*#\1#;h};$$!b;g;p'` && \
-	openldap_ver=`echo $$openldap_pkg | sed 's#openldap-\(.*\)#\1#;'` && \
+	openldap_pkg=`wget -q -O - $$openldap_srcpath/ | sed -n '/<a href="\(openldap-2\.4\.[0-9]*\.tgz\)"/{s#.*href="\(.*\.tgz\)".*#\1#;h};$$!b;g;p'` && \
+	openldap_ver=`echo $$openldap_pkg | sed 's#openldap-\(.*\)\.tgz#\1#;'` && \
 	openldap_srcdir=openldap-$$openldap_ver && \
 	if test ! -f pkgs/$$openldap_pkg.tgz; then \
 	  cd pkgs && \
-	  wget -nv $$openldap_srcpath/$$openldap_pkg.tgz && \
-	  wget -nv $$openldap_srcpath/$$openldap_pkg.sha1 && \
+	  wget -nv $$openldap_srcpath/$$openldap_pkg && \
+	  openldap_sig=`echo $$openldap_pkg | sed 's#\.tgz#.sha1#'` && \
+	  wget -nv $$openldap_srcpath/$$openldap_sig && \
 	  cd .. && \
-          tar -xzf pkgs/$$openldap_pkg.tgz; \
+          tar -xzf pkgs/$$openldap_pkg; \
 	fi && \
-	echo openldap_srcpath=$$openldap_srcpath.tgz >>$(BLD)-manifest-vars && \
+	echo openldap_pkg=$$openldap_pkg >>$(BLD)-manifest-vars && \
 	echo openldap_srcdir=$$openldap_srcdir >>$(BLD)-manifest-vars && \
+	echo openldap_srcpath=$$openldap_srcpath.tgz >>$(BLD)-manifest-vars && \
 	echo openldap_ver=$$openldap_ver >>$(BLD)-manifest-vars
 
 gather-openldap-master: pre-manifest
@@ -579,11 +588,9 @@ gather-jansson-master: pre-manifest
 	echo jansson_ver=$$jansson_ver >>$(BLD)-manifest-vars
 
 
-# Excludes revs with '-' characters, e.g. v2.9.9-rc1
 gather-libxml2-release: pre-manifest
-	libxml2_srcpath=http://xmlsoft.org/sources && \
 	libxml2_srcpath=https://github.com/GNOME/libxml2/releases && \
-	libxml2_ver=`wget -q -O - $$libxml2_srcpath | sed -n 's#^.*<a.* href=".*\/archive\/v\([^-]*\)\.tar\.gz".*$$#\1#;t once;$$!b;:once;p;q;'` && \
+	libxml2_ver=`wget -q -O - $$libxml2_srcpath | sed -n 's#^.*<a.* href=".*\/archive\/v\([^"-]*\)\.tar\.gz".*$$#\1#;t once;$$!b;:once;p;q;'` && \
 	libxml2_srcpath=https://github.com/GNOME/libxml2/archive/v$$libxml2_ver.tar.gz && \
 	libxml2_srcdir=libxml2-$$libxml2_ver && \
 	libxml2_pkg=$$libxml2_srcdir.tar.gz && \
@@ -594,25 +601,27 @@ gather-libxml2-release: pre-manifest
 	  cd .. && \
 	  tar -xzf pkgs/$$libxml2_pkg; \
 	fi && \
-	echo libxml2_srcpath=$$libxml2_srcpath >>$(BLD)-manifest-vars && \
+	echo libxml2_pkg=$$libxml2_pkg >>$(BLD)-manifest-vars && \
 	echo libxml2_srcdir=$$libxml2_srcdir >>$(BLD)-manifest-vars && \
+	echo libxml2_srcpath=$$libxml2_srcpath >>$(BLD)-manifest-vars && \
 	echo libxml2_ver=$$libxml2_ver >>$(BLD)-manifest-vars
 
-# Re-draft from -release above, with v###-rc#.tar.gz search pattern
 gather-libxml2-rc: pre-manifest
-	libxml2_srcpath=http://xmlsoft.org/sources && \
-	libxml2_ver=`wget -q -O - $$libxml2_srcpath/ | sed -n '/<a href="LATEST_LIBXML2_IS_/{s#.*href="LATEST_LIBXML2_IS_\([^"]*\)".*#\1#;p;q}'` && \
+	libxml2_srcpath=https://github.com/GNOME/libxml2/releases && \
+	libxml2_ver=`wget -q -O - $$libxml2_srcpath | sed -n 's#^.*<a.* href=".*\/archive\/v\([^"]*-rc[0-9]*\)\.tar\.gz".*$$#\1#;t once;$$!b;:once;p;q;'` && \
+	libxml2_srcpath=https://github.com/GNOME/libxml2/archive/v$$libxml2_ver.tar.gz && \
 	libxml2_srcdir=libxml2-$$libxml2_ver && \
 	libxml2_pkg=$$libxml2_srcdir.tar.gz && \
+        libxml2_ver=`echo $$libxml2_ver | sed "s#_#.#g"` && \
 	if test ! -f pkgs/$$libxml2_pkg; then \
 	  cd pkgs && \
-	  wget -nv $$libxml2_srcpath/$$libxml2_pkg && \
-	  wget -nv $$libxml2_srcpath/$$libxml2_pkg.asc && \
+	  wget -nv $$libxml2_srcpath -O $$libxml2_pkg && \
 	  cd .. && \
 	  tar -xzf pkgs/$$libxml2_pkg; \
 	fi && \
-	echo libxml2_srcpath=$$libxml2_srcpath >>$(BLD)-manifest-vars && \
+	echo libxml2_pkg=$$libxml2_pkg >>$(BLD)-manifest-vars && \
 	echo libxml2_srcdir=$$libxml2_srcdir >>$(BLD)-manifest-vars && \
+	echo libxml2_srcpath=$$libxml2_srcpath >>$(BLD)-manifest-vars && \
 	echo libxml2_ver=$$libxml2_ver >>$(BLD)-manifest-vars
 
 gather-libxml2-master: pre-manifest
