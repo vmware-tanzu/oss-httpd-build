@@ -74,13 +74,14 @@ is required to build this package. In addition, a number of stable,
 well-maintained components are leveraged from the OS distribution, rather than
 building and installing potentially conflicting versions.
 
-On all platforms, pre-install the `Text::Template` package from CPAN to assure
-you are building OpenSSL with the latest tools. In order to run `Makefile.test`
-there is a list of CPAN dependencies required to invoke the perl-based
-`Apache::Test` framework. These can be found under `src/httpdtest-trunk/README`
-after first running the `Makefile.gather` phase. (An immediate goal of this
-toolchain is to automate the local provisioning of those dependencies if not
-already installed.)
+On all platforms, pre-install the `Text::Template` package from CPAN to
+assure you are building OpenSSL with the latest tools. In order to run 
+`Makefile.test` there is a list of CPAN dependencies required to invoke
+the perl-based `Apache::Test` framework. These can be found under
+`src/httpdtest-trunk/README` after first running the `Makefile.gather`
+and `Makefile.download` phases. (An immediate goal of this toolchain is
+to automate the local provisioning of those dependencies if not already
+installed.)
 
 === RedHat/CentOS/Oracle/Fedora Linux development package dependencies:
 
@@ -169,35 +170,38 @@ with the -devel packages above; most are already present by default);
  . curl and awk (or name gawk from unxutils as awk)
  . Subversion and GIT command line tools
 
-== Phase 1: Gather Sources
+== Phase 1: Gather and Download Sources
 
  $ cd src/
  $ make -f ../mak/Makefile.gather [BLD={type}] [GRP=complete] [targets]
+ $ make -f ../mak/Makefile.download [BLD={type}]
 
-BLD defines the build type: release - candidate - snapshot - bleed
+BLD defines the build type, one of : release - candidate - snapshot - bleed
 (case sensitive) where release is the default.
 
-Gathers source code packages or (source checkouts) for all packages
-into the source tree, and generates a version and directory name manifest.
+Gathers the manifest of source code packages or source checkouts for all
+packages into a {type}-manifest-vars file into the source tree, providing
+the package origins, version identifiers and directory names. Then download
+the list provided by that manifest file. If that manifest file from the
+`Makefile.gather` step has not changed, there would be no need to repeat
+the remaining steps in this process.
 
 This will gather all components if GRP=complete is specified, otherwise
 the linux system package sources of expat, lua, pcre, jansson, libxml2
-and zlib will not be gathered or compiled. Two packages not included in
-the GRP=complete all target are the "openldap" library for the httpd ldap
-modules and the Tomcat "tcnative" connector. Add these explicitly to the
-targets list followed by the explicit "all" target, as desired. 
+and zlib will not be gathered, downloaded or compiled. Two packages not
+included in the GRP=complete all target are the "openldap" library for
+the httpd ldap modules and the Tomcat "tcnative" connector. Add these
+explicitly to the targets list followed by the explicit "all" target,
+as desired. 
 
-Each component is designed for persistence, if from git or svn it performs
-a fetch / update, if from a most recent release package, it fetches and
-unpacks the package. The source directory tree is designed for parallelism,
-the different build types may coexist in the same source tree.
+These makefiles are run from the source directory root (e.g. `src/`),
+and must be performed as updates to the source packages are released
+or committed. The resulting manifest from Makefile.gather can be
+compared to the previously created manifest to determine whether any
+sources have been updated.
 
-This makefile is run first from the source directory root (e.g. `src/`),
-and must be performed only upon updates to the source packages.
-The resulting manifest can be compared to the previously created manifest
-to determine if the sources have been updated.
-
-`Makefile.preconfig` should follow immediately when the manifest changes.
+`Makefile.preconfig` must immediately follow when the manifest has
+changeed, owing to newly downloaded directories to be preconfigured.
 
 == Phase 2: Preconfigure Sources
 
@@ -208,13 +212,13 @@ Prepare configuration scripts of packages, particularly from source control
 where autoconf etc have not been invoked yet. Release and candidate source
 packages are already distributed with this step completed.
 
-This makefile is run after `Makefile.gather` from the source directory root,
-and must be performed following updates to the source packages as indicated
-by manifest changes. Only source code packages corresponding to the specific
-BLD target are updated.
+This makefile is run after `Makefile.gather`+`Makefile.download` from the
+source directory root, and must be performed following updates to the
+source packages as indicated by manifest changes. Only source code packages
+corresponding to the specific BLD target are updated.
 
 The result of this step is suitable for archive, or escrow and distribution
-to multiple build systems, beginning at the `Makefile.build` step.
+to multiple build systems, resuming from the following `Makefile.build` step.
 
 == Phase 3: Build Sources
 

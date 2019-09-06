@@ -15,794 +15,220 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Makefile.gather : Gather source code packages or (source checkouts)
-#                   for all packages into the source tree, and generate
-#                   a version and directory name manifest
+# Makefile.download : Gather source code packages or (source checkouts)
+#                     for all packages into the source tree based on
+#                     the manifest file
 #
 # BLD defines the build type: release - candidate - snapshot - bleed
 #
 # This makefile is run first from the source directory root, and must be
-# performed following updates to the source packages. Makefile.preconfig
-# in the same directory should follow immediately if the manifest changes.
+# performed following updates to the manifest (list of source packages.)
+# Makefile.preconfig in the same directory should follow immediately.
 
 BLD=release
-GRP=linux
 
-all: gather-$(GRP)-$(BLD)
+include $(BLD)-manifest-vars
 
-pre-manifest:
+all: download-all
+
+pre-download:
 	mkdir pkgs 2>/dev/null || true
-	echo Gathering $(BLD) Source Trees
-	truncate -s0 $(BLD)-manifest-vars
+	echo Downloading $(BLD) Source Trees
 
 
-# Not reversioned, so we won't rebuild frequently on test changes
-gather-httpdtest-trunk: pre-manifest
-	httpdtest_srcpath=https://svn.apache.org/repos/asf/httpd/test/framework/trunk && \
-	httpdtest_srcdir=httpdtest-trunk && \
-	if test ! -d $$httpdtest_srcdir ; then \
-	  svn co -q $$httpdtest_srcpath $$httpdtest_srcdir; \
-	else \
-	  svn up -q $$httpdtest_srcdir; \
-	fi && \
-	echo httpdtest_srcdir=$$httpdtest_srcdir >>$(BLD)-manifest-vars && \
-	echo httpdtest_srcpath=$$httpdtest_srcpath >>$(BLD)-manifest-vars
+$(httpdtest_srcdir): pre-download
+	svn co -q $(httpdtest_srcpath) $(httpdtest_srcdir)
 
 
-gather-httpd-release: pre-manifest
-	httpd_srcpath=https://www.apache.org/dist/httpd && \
-	httpd_pkg=`wget -q -O - $$httpd_srcpath/ | sed -n '/<a href="\(httpd-2\.4\.[0-9]*\.tar\.bz2\)"/{s#.*href="\([^"]*\).*#\1#;h};$$!b;g;p'` && \
-	httpd_ver=`echo $$httpd_pkg | sed 's#httpd-\(.*\)\.tar\.bz2#\1#;'` && \
-	httpd_srcdir=httpd-$$httpd_ver && \
-	if test ! -f pkgs/$$httpd_pkg; then \
+$(httpd_srcdir): pre-download
+ifdef httpd_pkg
 	  cd pkgs && \
-	  wget -nv $$httpd_srcpath/$$httpd_pkg && \
-	  wget -nv $$httpd_srcpath/$$httpd_pkg.asc && \
+	  wget -nv $(httpd_srcpath)/$(httpd_pkg) && \
+	  wget -nv $(httpd_srcpath)/$(httpd_pkg).asc && \
 	  cd .. && \
-          tar -xjf pkgs/$$httpd_pkg; \
-	fi && \
-	echo httpd_pkg=$$httpd_pkg >>$(BLD)-manifest-vars && \
-	echo httpd_srcdir=$$httpd_srcdir >>$(BLD)-manifest-vars && \
-	echo httpd_srcpath=$$httpd_srcpath >>$(BLD)-manifest-vars && \
-	echo httpd_ver=$$httpd_ver >>$(BLD)-manifest-vars
-
-gather-httpd-rc: pre-manifest
-	httpd_srcpath=https://httpd.apache.org/dev/dist && \
-	httpd_pkg=`wget -q -O - $$httpd_srcpath/ | sed -n '/<a href="\(httpd-2\.4\.[0-9]*\.tar\.bz2\)"/{s#.*href="\([^"]*\).*#\1#;h};$$!b;g;p'` && \
-	httpd_ver=`echo $$httpd_pkg | sed 's#httpd-\(.*\)\.tar\.bz2#\1#;'` && \
-	httpd_srcdir=httpd-$$httpd_ver && \
-	if test ! -f pkgs/$$httpd_pkg; then \
-	  cd pkgs && \
-	  wget -nv $$httpd_srcpath/$$httpd_pkg && \
-	  wget -nv $$httpd_srcpath/$$httpd_pkg.asc && \
-	  cd .. && \
-          tar -xjf pkgs/$$httpd_pkg; \
-	fi && \
-	echo httpd_pkg=$$httpd_pkg >>$(BLD)-manifest-vars && \
-	echo httpd_srcdir=$$httpd_srcdir >>$(BLD)-manifest-vars && \
-	echo httpd_srcpath=$$httpd_srcpath >>$(BLD)-manifest-vars && \
-	echo httpd_ver=$$httpd_ver >>$(BLD)-manifest-vars
-
-gather-httpd-2xbranch: pre-manifest
-	httpd_srcpath=https://svn.apache.org/repos/asf/httpd/httpd/branches/2.4.x && \
-	httpd_rev=`svn info $$httpd_srcpath | sed -n '/Last Changed Rev: \([0-9]\+\)/{s#.*: ##;p}'` && \
-	httpd_ver=2.4.x-$$httpd_rev && \
-	httpd_srcdir=httpd-$$httpd_ver && \
-	if test ! -d $$httpd_srcdir; then \
-	  svn co -q -r $$httpd_rev $$httpd_srcpath $$httpd_srcdir; \
-	fi && \
-	echo httpd_rev=$$httpd_rev >>$(BLD)-manifest-vars && \
-	echo httpd_srcdir=$$httpd_srcdir >>$(BLD)-manifest-vars && \
-	echo httpd_srcpath=$$httpd_srcpath >>$(BLD)-manifest-vars && \
-	echo httpd_ver=$$httpd_ver >>$(BLD)-manifest-vars
-
-gather-httpd-trunk: pre-manifest
-	httpd_srcpath=https://svn.apache.org/repos/asf/httpd/httpd/trunk && \
-	httpd_rev=`svn info $$httpd_srcpath | sed -n '/Last Changed Rev: \([0-9]\+\)/{s#.*: ##;p}'` && \
-	httpd_ver=2.5.x-$$httpd_rev && \
-	httpd_srcdir=httpd-$$httpd_ver && \
-	if test ! -d $$httpd_srcdir; then \
-	  svn co -q -r $$httpd_rev $$httpd_srcpath $$httpd_srcdir; \
-	fi && \
-	echo httpd_rev=$$httpd_rev >>$(BLD)-manifest-vars && \
-	echo httpd_srcdir=$$httpd_srcdir >>$(BLD)-manifest-vars && \
-	echo httpd_srcpath=$$httpd_srcpath >>$(BLD)-manifest-vars && \
-	echo httpd_ver=$$httpd_ver >>$(BLD)-manifest-vars
-
-
-gather-tcnative-release: pre-manifest
-	tcnative_srcpath=https://www.apache.org/dist/tomcat/tomcat-connectors/native && \
-	tcnative_ver=`wget -q -O - $$tcnative_srcpath/ | sed -n '/<a href="\(1\.2\.[0-9]*\/\)"/{s#.*href="\([^"/]*\)\/.*#\1#;h};$$!b;g;p'` && \
-	tcnative_srcpath=$$tcnative_srcpath/$$tcnative_ver/source && \
-	tcnative_srcdir=tomcat-native-$$tcnative_ver-src && \
-	tcnative_pkg=$$tcnative_srcdir.tar.gz && \
-	if test ! -f pkgs/$$tcnative_pkg; then \
-	  cd pkgs && \
-	  wget -nv $$tcnative_srcpath/$$tcnative_pkg && \
-	  wget -nv $$tcnative_srcpath/$$tcnative_pkg.asc && \
-	  cd .. && \
-	  tar -xzf pkgs/$$tcnative_pkg; \
-	fi && \
-	echo tcnative_pkg=$$tcnative_pkg >>$(BLD)-manifest-vars && \
-	echo tcnative_srcdir=$$tcnative_srcdir >>$(BLD)-manifest-vars && \
-	echo tcnative_srcpath=$$tcnative_srcpath >>$(BLD)-manifest-vars && \
-	echo tcnative_ver=$$tcnative_ver >>$(BLD)-manifest-vars
-
-gather-tcnative-trunk: pre-manifest
-	tcnative_srcpath=https://svn.apache.org/repos/asf/tomcat/native/trunk && \
-	tcnative_rev=`svn info $$tcnative_srcpath | sed -n '/Last Changed Rev: \([0-9]\+\)/{s#.*: ##;p}'` && \
-	tcnative_ver=1.2.x-$$tcnative_rev && \
-	tcnative_srcdir=tomcat-native-$$tcnative_ver && \
-	if test ! -d $$tcnative_srcdir ; then \
-	  svn co -q -r $$tcnative_rev $$tcnative_srcpath $$tcnative_srcdir; \
-	fi && \
-	echo tcnative_rev=$$tcnative_rev >>$(BLD)-manifest-vars && \
-	echo tcnative_srcdir=$$tcnative_srcdir >>$(BLD)-manifest-vars && \
-	echo tcnative_srcpath=$$tcnative_srcpath >>$(BLD)-manifest-vars && \
-	echo tcnative_ver=$$tcnative_ver >>$(BLD)-manifest-vars
-
-
-gather-apr-release: pre-manifest
-	apr_srcpath=https://www.apache.org/dist/apr && \
-	apr_pkg=`wget -q -O - $$apr_srcpath/ | sed -n '/<a href="\(apr-1\.[0-9]\.[0-9]*\.tar\.bz2\)"/{s#.*href="\([^"]*\).*#\1#;h};$$!b;g;p'` && \
-	apr_ver=`echo $$apr_pkg | sed 's#apr-\(.*\)\.tar\.bz2#\1#;'` && \
-	apr_srcdir=apr-$$apr_ver && \
-	if test ! -f pkgs/$$apr_pkg; then \
-	  cd pkgs && \
-	  wget -nv $$apr_srcpath/$$apr_pkg && \
-	  wget -nv $$apr_srcpath/$$apr_pkg.asc && \
-	  cd .. && \
-	  tar -xjf pkgs/$$apr_pkg; \
-	fi && \
-	echo apr_pkg=$$apr_pkg >>$(BLD)-manifest-vars && \
-	echo apr_srcdir=$$apr_srcdir >>$(BLD)-manifest-vars && \
-	echo apr_srcpath=$$apr_srcpath >>$(BLD)-manifest-vars && \
-	echo apr_ver=$$apr_ver >>$(BLD)-manifest-vars
-
-gather-apr-rc: pre-manifest
-	apr_srcpath=https://apr.apache.org/dev/dist && \
-	apr_pkg=`wget -q -O - $$apr_srcpath/ | sed -n '/<a href="\(apr-1\.[0-9]\.[0-9]*\.tar\.bz2\)"/{s#.*href="\([^"]*\).*#\1#;h};$$!b;g;p'` && \
-	apr_ver=`echo $$apr_pkg | sed 's#apr-\(.*\)\.tar\.bz2#\1#;'` && \
-	apr_srcdir=apr-$$apr_ver && \
-	if test ! -f pkgs/$$apr_pkg; then \
-	  cd pkgs && \
-	  wget -nv $$apr_srcpath/$$apr_pkg && \
-	  wget -nv $$apr_srcpath/$$apr_pkg.asc && \
-	  cd .. && \
-	  tar -xjf pkgs/$$apr_pkg; \
-	fi && \
-	echo apr_pkg=$$apr_pkg >>$(BLD)-manifest-vars && \
-	echo apr_srcdir=$$apr_srcdir >>$(BLD)-manifest-vars && \
-	echo apr_srcpath=$$apr_srcpath >>$(BLD)-manifest-vars && \
-	echo apr_ver=$$apr_ver >>$(BLD)-manifest-vars
-
-gather-apr-1xbranch: pre-manifest
-	apr_srcpath=https://svn.apache.org/repos/asf/apr/apr/branches/1.7.x && \
-	apr_rev=`svn info $$apr_srcpath | sed -n '/Last Changed Rev: \([0-9]\+\)/{s#.*: ##;p}'` && \
-	apr_ver=1.7.x-$$apr_rev && \
-	apr_srcdir=apr-$$apr_ver && \
-	if test ! -d $$apr_srcdir ; then \
-	  svn co -q -r $$apr_rev $$apr_srcpath $$apr_srcdir; \
-	fi && \
-	echo apr_rev=$$tcnative_rev >>$(BLD)-manifest-vars && \
-	echo apr_srcdir=$$apr_srcdir >>$(BLD)-manifest-vars && \
-	echo apr_srcpath=$$apr_srcpath >>$(BLD)-manifest-vars && \
-	echo apr_ver=$$apr_ver >>$(BLD)-manifest-vars
-
-gather-apr-trunk: pre-manifest
-	apr_srcpath=https://svn.apache.org/repos/asf/apr/apr/trunk && \
-	apr_rev=`svn info $$apr_srcpath | sed -n '/Last Changed Rev: \([0-9]\+\)/{s#.*: ##;p}'` && \
-	apr_ver=2.0.x-$$apr_rev && \
-	apr_srcdir=apr-$$apr_ver && \
-	if test ! -d $$apr_srcdir ; then \
-	  svn co -q -r $$apr_rev $$apr_srcpath $$apr_srcdir; \
-	fi && \
-	echo apr_rev=$$tcnative_rev >>$(BLD)-manifest-vars && \
-	echo apr_srcdir=$$apr_srcdir >>$(BLD)-manifest-vars && \
-	echo apr_srcpath=$$apr_srcpath >>$(BLD)-manifest-vars && \
-	echo apr_ver=$$apr_ver >>$(BLD)-manifest-vars
-
-
-gather-apriconv-release: pre-manifest
-	apriconv_srcpath=https://www.apache.org/dist/apr && \
-	apriconv_pkg=`wget -q -O - $$apriconv_srcpath/ | sed -n '/<a href="\(apr-iconv-1\.[0-9]\.[0-9]*\.tar\.bz2\)"/{s#.*href="\([^"]*\).*#\1#;h};$$!b;g;p'` && \
-	apriconv_ver=`echo $$apriconv_pkg | sed 's#apr-iconv-\(.*\)\.tar\.bz2#\1#;'` && \
-	if test ! -f pkgs/$$apriconv_pkg; then \
-	  cd pkgs && \
-	  wget -nv $$apriconv_srcpath/$$apriconv_pkg && \
-	  wget -nv $$apriconv_srcpath/$$apriconv_pkg.asc && \
-	  cd .. && \
-	  tar -xjf pkgs/$$apriconv_pkg; \
-	fi && \
-	echo apriconv_pkg=$$apriconv_pkg >>$(BLD)-manifest-vars && \
-	echo apriconv_srcdir=apr-iconv-$$apriconv_ver >>$(BLD)-manifest-vars && \
-	echo apriconv_srcpath=$$apriconv_srcpath >>$(BLD)-manifest-vars && \
-	echo apriconv_ver=$$apriconv_ver >>$(BLD)-manifest-vars
-
-gather-apriconv-rc: pre-manifest
-	apriconv_srcpath=https://apr.apache.org/dev/dist && \
-	apriconv_pkg=`wget -q -O - $$apriconv_srcpath/ | sed -n '/<a href="\(apr-iconv-1\.[0-9]\.[0-9]*\.tar\.bz2\)"/{s#.*href="\([^"]*\).*#\1#;h};$$!b;g;p'` && \
-	apriconv_ver=`echo $$apriconv_pkg | sed 's#apr-iconv-\(.*\)\.tar\.bz2#\1#;'` && \
-	if test ! -f pkgs/$$apriconv_pkg; then \
-	  cd pkgs && \
-	  wget -nv $$apriconv_srcpath/$$apriconv_pkg && \
-	  wget -nv $$apriconv_srcpath/$$apriconv_pkg.asc && \
-	  cd .. && \
-	  tar -xjf pkgs/$$apriconv_pkg; \
-	fi && \
-	echo apriconv_pkg=$$apriconv_pkg >>$(BLD)-manifest-vars && \
-	echo apriconv_srcdir=apr-iconv-$$apriconv_ver >>$(BLD)-manifest-vars && \
-	echo apriconv_srcpath=$$apriconv_srcpath >>$(BLD)-manifest-vars && \
-	echo apriconv_ver=$$apriconv_ver >>$(BLD)-manifest-vars
-
-gather-apriconv-1xbranch: pre-manifest
-	apriconv_srcpath=https://svn.apache.org/repos/asf/apr/apr-iconv/trunk && \
-	apriconv_rev=`svn info $$apriconv_srcpath | sed -n '/Last Changed Rev: \([0-9]\+\)/{s#.*: ##;p}'` && \
-	apriconv_ver=1.3.x-$$apriconv_rev && \
-	apriconv_srcdir=apr-iconv-$$apriconv_ver && \
-	if test ! -d $$apriconv_srcdir ; then \
-	  svn co -q -r $$apriconv_rev $$apriconv_srcpath $$apriconv_srcdir; \
-	fi && \
-	echo apriconv_rev=$$apriconv_rev >>$(BLD)-manifest-vars && \
-	echo apriconv_srcdir=$$apriconv_srcdir >>$(BLD)-manifest-vars && \
-	echo apriconv_srcpath=$$apriconv_srcpath >>$(BLD)-manifest-vars && \
-	echo apriconv_ver=$$apriconv_ver >>$(BLD)-manifest-vars
-
-
-gather-aprutil-release: pre-manifest
-	aprutil_srcpath=https://www.apache.org/dist/apr && \
-	aprutil_pkg=`wget -q -O - $$aprutil_srcpath/ | sed -n '/<a href="\(apr-util-1\.[0-9]\.[0-9]*\.tar\.bz2\)"/{s#.*href="\([^"]*\).*#\1#;h};$$!b;g;p'` && \
-	aprutil_ver=`echo $$aprutil_pkg | sed 's#apr-util-\(.*\)\.tar\.bz2#\1#;'` && \
-	if test ! -f pkgs/$$aprutil_pkg; then \
-	  cd pkgs && \
-	  wget -nv $$aprutil_srcpath/$$aprutil_pkg && \
-	  wget -nv $$aprutil_srcpath/$$aprutil_pkg.asc && \
-	  cd .. && \
-	  tar -xjf pkgs/$$aprutil_pkg; \
-	fi && \
-	echo aprutil_pkg=$$aprutil_pkg >>$(BLD)-manifest-vars && \
-	echo aprutil_srcdir=apr-util-$$aprutil_ver >>$(BLD)-manifest-vars && \
-	echo aprutil_srcpath=$$aprutil_srcpath >>$(BLD)-manifest-vars && \
-	echo aprutil_ver=$$aprutil_ver >>$(BLD)-manifest-vars
-
-gather-aprutil-rc: pre-manifest
-	aprutil_srcpath=https://apr.apache.org/dev/dist && \
-	aprutil_pkg=`wget -q -O - $$aprutil_srcpath/ | sed -n '/<a href="\(apr-util-1\.[0-9]\.[0-9]*\.tar\.bz2\)"/{s#.*href="\([^"]*\).*#\1#;h};$$!b;g;p'` && \
-	aprutil_ver=`echo $$aprutil_pkg | sed 's#apr-util-\(.*\)\.tar\.bz2#\1#;'` && \
-	if test ! -f pkgs/$$aprutil_pkg; then \
-	  cd pkgs && \
-	  wget -nv $$aprutil_srcpath/$$aprutil_pkg && \
-	  wget -nv $$aprutil_srcpath/$$aprutil_pkg.asc && \
-	  cd .. && \
-	  tar -xjf pkgs/$$aprutil_pkg; \
-	fi && \
-	echo aprutil_pkg=$$aprutil_pkg >>$(BLD)-manifest-vars && \
-	echo aprutil_srcdir=apr-util-$$aprutil_ver >>$(BLD)-manifest-vars && \
-	echo aprutil_srcpath=$$aprutil_srcpath >>$(BLD)-manifest-vars && \
-	echo aprutil_ver=$$aprutil_ver >>$(BLD)-manifest-vars
-
-gather-aprutil-1xbranch: pre-manifest
-	aprutil_srcpath=https://svn.apache.org/repos/asf/apr/apr-util/branches/1.7.x && \
-	aprutil_rev=`svn info $$aprutil_srcpath | sed -n '/Last Changed Rev: \([0-9]\+\)/{s#.*: ##;p}'` && \
-	aprutil_ver=1.7.x-$$aprutil_rev && \
-	aprutil_srcdir=apr-util-$$aprutil_ver && \
-	if test ! -d $$aprutil_srcdir ; then \
-	  svn co -q -r $$aprutil_rev $$aprutil_srcpath $$aprutil_srcdir; \
-	fi && \
-	echo aprutil_rev=$$aprutil_rev >>$(BLD)-manifest-vars && \
-	echo aprutil_srcdir=$$aprutil_srcdir >>$(BLD)-manifest-vars && \
-	echo aprutil_srcpath=$$aprutil_srcpath >>$(BLD)-manifest-vars && \
-	echo aprutil_ver=$$aprutil_ver >>$(BLD)-manifest-vars
-
-gather-aprutil-trunk: pre-manifest
-#	NOOP - aprutil merges into apr
-
-
-gather-openssl-release: pre-manifest
-	openssl_srcpath=https://www.openssl.org/source && \
-	openssl_pkg=`wget -q -O - $$openssl_srcpath/ | sed 's#.*<a href="\(openssl-1\.1\.1[a-z]*\.tar\.gz\)".*#\1#p;d;'` && \
-	openssl_ver=`echo $$openssl_pkg | sed 's#openssl-\(.*\)\.tar\.gz#\1#;'` && \
-	if test ! -f pkgs/$$openssl_pkg; then \
-	  cd pkgs && \
-	  wget -nv $$openssl_srcpath/$$openssl_pkg && \
-	  wget -nv $$openssl_srcpath/$$openssl_pkg.asc && \
-	  cd .. && \
-	  tar -xzf pkgs/$$openssl_pkg; \
-	fi && \
-	echo openssl_pkg=$$openssl_pkg >>$(BLD)-manifest-vars && \
-	echo openssl_srcdir=openssl-$$openssl_ver >>$(BLD)-manifest-vars && \
-	echo openssl_srcpath=$$openssl_srcpath >>$(BLD)-manifest-vars && \
-	echo openssl_ver=$$openssl_ver >>$(BLD)-manifest-vars
-
-gather-openssl-candidate: pre-manifest
-	openssl_srcpath=https://www.openssl.org/source && \
-	openssl_pkg=`wget -q -O - $$openssl_srcpath/ | sed 's#.*<a href="\(openssl-1\.1\.1[a-z0-9-]*\.tar\.gz\)".*#\1#p;d;'` && \
-	openssl_ver=`echo $$openssl_pkg | sed 's#openssl-\(.*\)\.tar\.gz#\1#;'` && \
-	if test ! -f pkgs/$$openssl_pkg; then \
-	  cd pkgs && \
-	  wget -nv $$openssl_srcpath/$$openssl_pkg && \
-	  wget -nv $$openssl_srcpath/$$openssl_pkg.asc && \
-	  cd .. && \
-	  tar -xzf pkgs/$$openssl_pkg; \
-	fi && \
-	echo openssl_pkg=$$openssl_pkg >>$(BLD)-manifest-vars && \
-	echo openssl_srcdir=openssl-$$openssl_ver >>$(BLD)-manifest-vars && \
-	echo openssl_srcpath=$$openssl_srcpath >>$(BLD)-manifest-vars && \
-	echo openssl_ver=$$openssl_ver >>$(BLD)-manifest-vars
-
-gather-openssl-111branch: pre-manifest
-	openssl_srcpath=https://github.com/openssl/openssl && \
-	openssl_ver=1.1.1-git && \
-	openssl_srcdir=openssl-$$openssl_ver && \
-	if test ! -d $$openssl_srcdir ; then \
-	  git clone -q $$openssl_srcpath.git -b OpenSSL_1_1_1-stable $$openssl_srcdir; \
-	else \
-	  cd $$openssl_srcdir && git fetch -q && cd ..; \
-	fi && \
-	echo openssl_srcdir=$$openssl_srcdir >>$(BLD)-manifest-vars && \
-	echo openssl_srcpath=$$openssl_srcpath >>$(BLD)-manifest-vars && \
-	echo openssl_ver=$$openssl_ver >>$(BLD)-manifest-vars
-
-gather-openssl-master: pre-manifest
-	openssl_srcpath=https://github.com/openssl/openssl && \
-	openssl_ver=1.x-git && \
-	openssl_srcdir=openssl-$$openssl_ver && \
-	if test ! -d $$openssl_srcdir ; then \
-	  git clone -q $$openssl_srcpath.git $$openssl_srcdir; \
-	else \
-	  cd $$openssl_srcdir && git fetch -q && cd ..; \
-	fi && \
-	echo openssl_srcdir=$$openssl_srcdir >>$(BLD)-manifest-vars && \
-	echo openssl_srcpath=$$openssl_srcpath >>$(BLD)-manifest-vars && \
-	echo openssl_ver=$$openssl_ver >>$(BLD)-manifest-vars
-
-
-gather-nghttp2-release: pre-manifest
-	nghttp2_srcpath=https://github.com/nghttp2/nghttp2/releases && \
-	nghttp2_pkg=`wget --max-redirect=0 $$nghttp2_srcpath/latest/ 2>&1 | sed 's#Location: \(.*\)/tag/v\([^/]*\) \[following\]#\1/download/v\2/nghttp2-\2.tar.bz2#p;d;'` && \
-	nghttp2_srcpath=`echo $$nghttp2_pkg | sed 's#/[^/]*$$##;'` && \
-	nghttp2_pkg=`echo $$nghttp2_pkg | sed 's#.*/##;'` && \
-	nghttp2_ver=`echo $$nghttp2_pkg | sed 's#nghttp2-\(.*\)\.tar\.bz2#\1#;'`&& \
-	nghttp2_srcdir=nghttp2-$$nghttp2_ver && \
-	if test ! -f pkgs/$$nghttp2_pkg; then \
-	  cd pkgs && \
-	  wget -nv $$nghttp2_srcpath/$$nghttp2_pkg && \
-	  cd .. && \
-	  tar -xjf pkgs/$$nghttp2_pkg; \
-	fi && \
-	echo nghttp2_pkg=$$nghttp2_pkg >>$(BLD)-manifest-vars && \
-	echo nghttp2_srcdir=$$nghttp2_srcdir >>$(BLD)-manifest-vars && \
-	echo nghttp2_srcpath=$$nghttp2_srcpath >>$(BLD)-manifest-vars && \
-	echo nghttp2_ver=$$nghttp2_ver >>$(BLD)-manifest-vars
-
-gather-nghttp2-master: pre-manifest
-	nghttp2_srcpath=https://github.com/tatsuhiro-t/nghttp2 && \
-	nghttp2_ver=1.x-git && \
-	nghttp2_srcdir=nghttp2-$$nghttp2_ver && \
-	if test ! -d $$nghttp2_srcdir ; then \
-	  git clone -q $$nghttp2_srcpath.git $$nghttp2_srcdir; \
-	else \
-	  cd $$nghttp2_srcdir && git fetch -q && cd ..; \
-	fi && \
-	echo nghttp2_srcdir=$$nghttp2_srcdir >>$(BLD)-manifest-vars && \
-	echo nghttp2_srcpath=$$nghttp2_srcpath >>$(BLD)-manifest-vars && \
-	echo nghttp2_ver=$$nghttp2_ver >>$(BLD)-manifest-vars
-
-
-gather-brotli-release: pre-manifest
-	brotli_srcpath=https://github.com/google/brotli/releases && \
-	brotli_ver=`wget --max-redirect=0 $$brotli_srcpath/latest/ 2>&1 | sed 's#Location: .*/tag/v\([^/]*\) \[following\]#\1#p;d;'` && \
-	brotli_srcpath=https://github.com/google/brotli/archive/v$$brotli_ver.tar.gz && \
-	brotli_srcdir=brotli-$$brotli_ver && \
-	brotli_pkg=$$brotli_srcdir.tar.gz && \
-	if test ! -f pkgs/$$brotli_pkg; then \
-	  cd pkgs && \
-	  wget -nv $$brotli_srcpath -O $$brotli_pkg && \
-	  cd .. && \
-	  tar -xzf pkgs/$$brotli_pkg; \
-	fi && \
-	echo brotli_pkg=$$brotli_pkg >>$(BLD)-manifest-vars && \
-	echo brotli_srcdir=$$brotli_srcdir >>$(BLD)-manifest-vars && \
-	echo brotli_srcpath=$$brotli_srcpath >>$(BLD)-manifest-vars && \
-	echo brotli_ver=$$brotli_ver >>$(BLD)-manifest-vars
-
-gather-brotli-master: pre-manifest
-	brotli_srcpath=https://github.com/google/brotli && \
-	brotli_ver=1.x-git && \
-	brotli_srcdir=brotli-$$brotli_ver && \
-	if test ! -d $$brotli_srcdir ; then \
-	  git clone -q $$brotli_srcpath.git $$brotli_srcdir; \
-	else \
-	  cd $$brotli_srcdir && git fetch -q && cd ..; \
-	fi && \
-	echo brotli_srcdir=$$brotli_srcdir >>$(BLD)-manifest-vars && \
-	echo brotli_srcpath=$$brotli_srcpath >>$(BLD)-manifest-vars && \
-	echo brotli_ver=$$brotli_ver >>$(BLD)-manifest-vars
-
-
-gather-curl-release: pre-manifest
-	curl_srcpath=https://curl.haxx.se/download && \
-	curl_pkg=`wget -q -O - $$curl_srcpath/ | sed -n '/<a href="\(curl-7\.[0-9.]*\.tar\.bz2\)"/{s#.*href="\([^"]*\).*#\1#;h};$$!b;g;p'` && \
-	curl_ver=`echo $$curl_pkg | sed 's#curl-\(.*\)\.tar\.bz2#\1#;'` && \
-	curl_srcdir=curl-$$curl_ver && \
-	if test ! -f pkgs/$$curl_pkg; then \
-	  cd pkgs && \
-	  wget -nv $$curl_srcpath/$$curl_pkg && \
-	  wget -nv $$curl_srcpath/$$curl_pkg.asc && \
-	  cd .. && \
-          tar -xjf pkgs/$$curl_pkg; \
-	fi && \
-	echo curl_pkg=$$curl_pkg >>$(BLD)-manifest-vars && \
-	echo curl_srcdir=$$curl_srcdir >>$(BLD)-manifest-vars && \
-	echo curl_srcpath=$$curl_srcpath >>$(BLD)-manifest-vars && \
-	echo curl_ver=$$curl_ver >>$(BLD)-manifest-vars
-
-gather-curl-master: pre-manifest
-	curl_srcpath=https://github.com/curl/curl && \
-	curl_ver=7.x-git && \
-	curl_srcdir=curl-$$curl_ver && \
-	if test ! -d $$curl_srcdir ; then \
-	  git clone -q $$curl_srcpath.git $$curl_srcdir; \
-	else \
-	  cd $$curl_srcdir && git fetch -q && cd ..; \
-	fi && \
-	echo curl_srcdir=$$curl_srcdir >>$(BLD)-manifest-vars && \
-	echo curl_srcpath=$$curl_srcpath >>$(BLD)-manifest-vars && \
-	echo curl_ver=$$curl_ver >>$(BLD)-manifest-vars
-
-
-gather-openldap-release: pre-manifest
-	openldap_srcpath=https://gpl.savoirfairelinux.net/pub/mirrors/openldap/openldap-release && \
-	openldap_pkg=`wget -q -O - $$openldap_srcpath/ | sed -n '/<a href="\(openldap-2\.4\.[0-9]*\.tgz\)"/{s#.*href="\(.*\.tgz\)".*#\1#;h};$$!b;g;p'` && \
-	openldap_ver=`echo $$openldap_pkg | sed 's#openldap-\(.*\)\.tgz#\1#;'` && \
-	openldap_srcdir=openldap-$$openldap_ver && \
-	if test ! -f pkgs/$$openldap_pkg.tgz; then \
-	  cd pkgs && \
-	  wget -nv $$openldap_srcpath/$$openldap_pkg && \
-	  openldap_sig=`echo $$openldap_pkg | sed 's#\.tgz#.sha1#'` && \
-	  wget -nv $$openldap_srcpath/$$openldap_sig && \
-	  cd .. && \
-          tar -xzf pkgs/$$openldap_pkg; \
-	fi && \
-	echo openldap_pkg=$$openldap_pkg >>$(BLD)-manifest-vars && \
-	echo openldap_srcdir=$$openldap_srcdir >>$(BLD)-manifest-vars && \
-	echo openldap_srcpath=$$openldap_srcpath.tgz >>$(BLD)-manifest-vars && \
-	echo openldap_ver=$$openldap_ver >>$(BLD)-manifest-vars
-
-gather-openldap-master: pre-manifest
-	openldap_srcpath=git://git.openldap.org/openldap.git && \
-	openldap_ver=2_4 && \
-	openldap_srcdir=openldap_$$openldap_ver && \
-	if test ! -d $$openldap_srcdir ; then \
-	  git clone -q -b OPENLDAP_REL_ENG_$$openldap_ver \
-		    $$openldap_srcpath $$openldap_srcdir; \
-	else \
-	  cd $$openldap_srcdir && git fetch -q && cd ..; \
-	fi && \
-	echo openldap_srcdir=$$openldap_srcdir >>$(BLD)-manifest-vars && \
-	echo openldap_srcpath=$$openldap_srcpath >>$(BLD)-manifest-vars && \
-	echo openldap_ver=$$openldap_ver >>$(BLD)-manifest-vars
-
-
-gather-expat-release: pre-manifest
-	expat_srcpath=https://github.com/libexpat/libexpat/releases && \
-	expat_ver=`wget -q -O - $$expat_srcpath | sed -n 's#^.*<a.* href=".*\/archive\/R_\(.*\)\.tar\.gz".*$$#\1#;t once;$$!b;:once;p;q;'` && \
-	expat_srcpath=https://github.com/libexpat/libexpat/archive/R_$$expat_ver.tar.gz && \
-	expat_srcdir=libexpat-R_$$expat_ver && \
-	expat_pkg=$$expat_srcdir.tar.gz && \
-        expat_ver=`echo $$expat_ver | sed "s#_#.#g"` && \
-	if test ! -f pkgs/$$expat_pkg; then \
-	  cd pkgs && \
-	  wget -nv $$expat_srcpath -O $$expat_pkg && \
-	  cd .. && \
-	  tar -xzf pkgs/$$expat_pkg; \
-	fi && \
-	echo expat_pkg=$$expat_pkg >>$(BLD)-manifest-vars && \
-	echo expat_srcdir=$$expat_srcdir >>$(BLD)-manifest-vars && \
-	echo expat_srcpath=$$expat_srcpath >>$(BLD)-manifest-vars && \
-	echo expat_ver=$$expat_ver >>$(BLD)-manifest-vars
-
-gather-expat-master: pre-manifest
-	expat_srcpath=https://github.com/libexpat/libexpat && \
-	expat_ver=2.x-git && \
-	expat_srcdir=libexpat-$$expat_ver && \
-	if test ! -d $$expat_srcdir ; then \
-	  git clone -q $$expat_srcpath.git $$expat_srcdir; \
-	else \
-	  cd $$expat_srcdir && git fetch -q && cd ..; \
-	fi && \
-	echo expat_srcdir=$$expat_srcdir >>$(BLD)-manifest-vars && \
-	echo expat_srcpath=$$expat_srcpath >>$(BLD)-manifest-vars && \
-	echo expat_ver=$$expat_ver >>$(BLD)-manifest-vars
-
-
-gather-pcre-release: pre-manifest
-	pcre_srcpath=https://ftp.pcre.org/pub/pcre/ && \
-	pcre_pkg=`wget -q -O - $$pcre_srcpath/ | sed -n '/<a href="\(pcre-8\.[0-9]*\.tar\.bz2\)"/{s#.*href="\([^"]*\).*#\1#;h};$$!b;g;p'` && \
-	pcre_srcdir=`echo $$pcre_pkg | sed 's#\(pcre-.*\)\.tar\.bz2#\1#;'` && \
-	pcre_ver=`echo $$pcre_srcdir | sed 's#pcre-\(.*\)#\1#;'` && \
-	if test ! -f pkgs/$$pcre_pkg; then \
-	  cd pkgs && \
-	  wget -nv $$pcre_srcpath/$$pcre_pkg && \
-	  wget -nv $$pcre_srcpath/$$pcre_pkg.sig && \
-	  cd .. && \
-	  tar -xjf pkgs/$$pcre_pkg; \
-	fi && \
-	echo pcre_pkg=$$pcre_pkg >>$(BLD)-manifest-vars && \
-	echo pcre_srcdir=$$pcre_srcdir >>$(BLD)-manifest-vars && \
-	echo pcre_srcpath=$$pcre_srcpath >>$(BLD)-manifest-vars && \
-	echo pcre_ver=$$pcre_ver >>$(BLD)-manifest-vars
-
-gather-pcre-candidate: pre-manifest
-	pcre_srcpath=https://ftp.pcre.org/pub/pcre/Testing/ && \
-	pcre_pkg=`wget -q -O - $$pcre_srcpath/ | sed -n '/<a href="\(pcre-8\.[0-9]*-RC[0-9]*\.tar\.bz2\)"/{s#.*href="\([^"]*\).*#\1#;h};$$!b;g;p'` && \
-	pcre_srcdir=`echo $$pcre_pkg | sed 's#\(pcre-.*\)\.tar\.bz2#\1#;'` && \
-	pcre_ver=`echo $$pcre_srcdir | sed 's#pcre-\(.*\)#\1#;'` && \
-	if test ! -f pkgs/$$pcre_pkg; then \
-	  cd pkgs && \
-	  wget -nv $$pcre_srcpath/$$pcre_pkg && \
-	  wget -nv $$pcre_srcpath/$$pcre_pkg.sig && \
-	  cd .. && \
-	  tar -xjf pkgs/$$pcre_pkg; \
-	fi && \
-	echo pcre_pkg=$$pcre_pkg >>$(BLD)-manifest-vars && \
-	echo pcre_srcdir=$$pcre_srcdir >>$(BLD)-manifest-vars && \
-	echo pcre_srcpath=$$pcre_srcpath >>$(BLD)-manifest-vars && \
-	echo pcre_ver=$$pcre_ver >>$(BLD)-manifest-vars
-
-gather-pcre-trunk: pre-manifest
-	pcre_srcpath=svn://vcs.exim.org/pcre/code/trunk && \
-	pcre_rev=`svn info $$pcre_srcpath | sed -n '/Last Changed Rev: \([0-9]\+\)/{s#.*: ##;p}'` && \
-	pcre_ver=8.x-$$pcre_rev && \
-	pcre_srcdir=pcre-$$pcre_ver && \
-	if test ! -d $$pcre_srcdir; then \
-	  svn co -q -r $$pcre_rev $$pcre_srcpath $$pcre_srcdir; \
-	fi && \
-	echo pcre_rev=$$pcre_rev >>$(BLD)-manifest-vars && \
-	echo pcre_srcdir=$$pcre_srcdir >>$(BLD)-manifest-vars && \
-	echo pcre_srcpath=$$pcre_srcpath >>$(BLD)-manifest-vars && \
-	echo pcre_ver=$$pcre_ver >>$(BLD)-manifest-vars
-
-gather-pcre2-trunk: pre-manifest
-	pcre_srcpath=svn://vcs.exim.org/pcre2/code/trunk && \
-	pcre_rev=`svn info $$pcre_srcpath | sed -n '/Last Changed Rev: \([0-9]\+\)/{s#.*: ##;p}'` && \
-	pcre_ver=10.x-$$pcre_rev && \
-	pcre_srcdir=pcre2-$$pcre_ver && \
-	if test ! -d $$pcre_srcdir; then \
-	  svn co -q -r $$pcre_rev $$pcre_srcpath $$pcre_srcdir; \
-	fi && \
-	echo pcre_rev=$$pcre_rev >>$(BLD)-manifest-vars && \
-	echo pcre_srcdir=$$pcre_srcdir >>$(BLD)-manifest-vars && \
-	echo pcre_srcpath=$$pcre_srcpath >>$(BLD)-manifest-vars && \
-	echo pcre_ver=$$pcre_ver >>$(BLD)-manifest-vars
-
-
-gather-jansson-release: pre-manifest
-	jansson_srcpath=https://github.com/akheron/jansson/releases && \
-	jansson_ver=`wget -q -O - $$jansson_srcpath | sed -n 's#^.*<a.* href=".*\/archive\/v\(.*\)\.tar\.gz".*$$#\1#;t once;$$!b;:once;p;q;'` && \
-	jansson_srcpath=https://github.com/akheron/jansson/archive/v$$jansson_ver.tar.gz && \
-	jansson_srcdir=jansson-$$jansson_ver && \
-	jansson_pkg=$$jansson_srcdir.tar.gz && \
-        jansson_ver=`echo $$jansson_ver | sed "s#_#.#g"` && \
-	if test ! -f pkgs/$$jansson_pkg; then \
-	  cd pkgs && \
-	  wget -nv $$jansson_srcpath -O $$jansson_pkg && \
-	  cd .. && \
-	  tar -xzf pkgs/$$jansson_pkg; \
-	fi && \
-	echo jansson_pkg=$$jansson_pkg >>$(BLD)-manifest-vars && \
-	echo jansson_srcdir=$$jansson_srcdir >>$(BLD)-manifest-vars && \
-	echo jansson_srcpath=$$jansson_srcpath >>$(BLD)-manifest-vars && \
-	echo jansson_ver=$$jansson_ver >>$(BLD)-manifest-vars
-
-gather-jansson-master: pre-manifest
-	jansson_srcpath=https://github.com/akheron/jansson && \
-	jansson_ver=2.x-git && \
-	jansson_srcdir=jansson-$$jansson_ver && \
-	if test ! -d $$jansson_srcdir ; then \
-	  git clone -q $$jansson_srcpath.git $$jansson_srcdir; \
-	else \
-	  cd $$jansson_srcdir && git fetch -q && cd ..; \
-	fi && \
-	echo jansson_srcpath=$$jansson_srcpath >>$(BLD)-manifest-vars && \
-	echo jansson_srcdir=$$jansson_srcdir >>$(BLD)-manifest-vars && \
-	echo jansson_ver=$$jansson_ver >>$(BLD)-manifest-vars
-
-
-gather-libxml2-release: pre-manifest
-	libxml2_srcpath=https://github.com/GNOME/libxml2/releases && \
-	libxml2_ver=`wget -q -O - $$libxml2_srcpath | sed -n 's#^.*<a.* href=".*\/archive\/v\([^"-]*\)\.tar\.gz".*$$#\1#;t once;$$!b;:once;p;q;'` && \
-	libxml2_srcpath=https://github.com/GNOME/libxml2/archive/v$$libxml2_ver.tar.gz && \
-	libxml2_srcdir=libxml2-$$libxml2_ver && \
-	libxml2_pkg=$$libxml2_srcdir.tar.gz && \
-        libxml2_ver=`echo $$libxml2_ver | sed "s#_#.#g"` && \
-	if test ! -f pkgs/$$libxml2_pkg; then \
-	  cd pkgs && \
-	  wget -nv $$libxml2_srcpath -O $$libxml2_pkg && \
-	  cd .. && \
-	  tar -xzf pkgs/$$libxml2_pkg; \
-	fi && \
-	echo libxml2_pkg=$$libxml2_pkg >>$(BLD)-manifest-vars && \
-	echo libxml2_srcdir=$$libxml2_srcdir >>$(BLD)-manifest-vars && \
-	echo libxml2_srcpath=$$libxml2_srcpath >>$(BLD)-manifest-vars && \
-	echo libxml2_ver=$$libxml2_ver >>$(BLD)-manifest-vars
-
-gather-libxml2-rc: pre-manifest
-	libxml2_srcpath=https://github.com/GNOME/libxml2/releases && \
-	libxml2_ver=`wget -q -O - $$libxml2_srcpath | sed -n 's#^.*<a.* href=".*\/archive\/v\([^"]*-rc[0-9]*\)\.tar\.gz".*$$#\1#;t once;$$!b;:once;p;q;'` && \
-	libxml2_srcpath=https://github.com/GNOME/libxml2/archive/v$$libxml2_ver.tar.gz && \
-	libxml2_srcdir=libxml2-$$libxml2_ver && \
-	libxml2_pkg=$$libxml2_srcdir.tar.gz && \
-        libxml2_ver=`echo $$libxml2_ver | sed "s#_#.#g"` && \
-	if test ! -f pkgs/$$libxml2_pkg; then \
-	  cd pkgs && \
-	  wget -nv $$libxml2_srcpath -O $$libxml2_pkg && \
-	  cd .. && \
-	  tar -xzf pkgs/$$libxml2_pkg; \
-	fi && \
-	echo libxml2_pkg=$$libxml2_pkg >>$(BLD)-manifest-vars && \
-	echo libxml2_srcdir=$$libxml2_srcdir >>$(BLD)-manifest-vars && \
-	echo libxml2_srcpath=$$libxml2_srcpath >>$(BLD)-manifest-vars && \
-	echo libxml2_ver=$$libxml2_ver >>$(BLD)-manifest-vars
-
-gather-libxml2-master: pre-manifest
-	libxml2_srcpath=https://github.com/gnome/libxml2 && \
-	libxml2_ver=2.x-git && \
-	libxml2_srcdir=libxml2-$$libxml2_ver && \
-	if test ! -d $$libxml2_srcdir ; then \
-	  git clone -q $$libxml2_srcpath.git $$libxml2_srcdir; \
-	else \
-	  cd $$libxml2_srcdir && git fetch -q && cd ..; \
-	fi && \
-	echo libxml2_srcdir=$$libxml2_srcdir >>$(BLD)-manifest-vars && \
-	echo libxml2_srcpath=$$libxml2_srcpath >>$(BLD)-manifest-vars && \
-	echo libxml2_ver=$$libxml2_ver >>$(BLD)-manifest-vars
-
-gather-lua-release: pre-manifest
-	lua_srcpath=https://www.lua.org/ftp && \
-	lua_pkg=`wget -q -O - $$lua_srcpath/ | sed -n '/<A HREF="lua-[0-9]/{s#.*HREF="\(lua-[0-9.]*tar.gz\)".*#\1#;p;q}'` && \
-	lua_srcdir=`echo $$lua_pkg | sed 's#\(.*\)\.tar\.gz#\1#;'` && \
-	lua_ver=`echo $$lua_srcdir | sed 's#lua-\(.*\)#\1#;'` && \
-	if test ! -f pkgs/$$lua_pkg; then \
-	  cd pkgs && \
-	  wget -nv $$lua_srcpath/$$lua_pkg && \
-	  cd .. && \
-	  tar -xzf pkgs/$$lua_pkg; \
-	fi && \
-	echo lua_pkg=$$lua_pkg >>$(BLD)-manifest-vars && \
-	echo lua_srcdir=$$lua_srcdir >>$(BLD)-manifest-vars && \
-	echo lua_srcpath=$$lua_srcpath >>$(BLD)-manifest-vars && \
-	echo lua_ver=$$lua_ver >>$(BLD)-manifest-vars
-
-
-gather-zlib-release: pre-manifest
-	zlib_srcpath=https://zlib.net && \
-	zlib_pkg=`wget -q -O - $$zlib_srcpath/ | sed -n '/<a href="\(zlib-1\.[0-9.]*\.tar\.gz\).asc"/{s#.*href="\(.*\)\.asc".*#\1#;p;q}'` && \
-	zlib_srcdir=`echo $$zlib_pkg | sed 's#\(.*\)\.tar\.gz#\1#;'` && \
-	zlib_ver=`echo $$zlib_srcdir | sed 's#zlib-\(.*\)#\1#;'` && \
-	if test ! -f pkgs/$$zlib_pkg; then \
-	  cd pkgs && \
-	  wget -nv $$zlib_srcpath/$$zlib_pkg && \
-	  wget -nv $$zlib_srcpath/$$zlib_pkg.asc && \
-	  cd .. && \
-	  tar -xzf pkgs/$$zlib_pkg; \
-	fi && \
-	echo zlib_pkg=$$zlib_pkg >>$(BLD)-manifest-vars && \
-	echo zlib_srcdir=$$zlib_srcdir >>$(BLD)-manifest-vars && \
-	echo zlib_srcpath=$$zlib_srcpath >>$(BLD)-manifest-vars && \
-	echo zlib_ver=$$zlib_ver >>$(BLD)-manifest-vars
-
-gather-zlib-master: pre-manifest
-	zlib_srcpath=https://github.com/madler/zlib && \
-	zlib_ver=1.2.x-git && \
-	zlib_srcdir=zlib-$$zlib_ver && \
-	if test ! -d $$zlib_srcdir ; then \
-	  git clone -q $$zlib_srcpath.git $$zlib_srcdir; \
-	else \
-	  cd $$zlib_srcdir && git fetch -q && cd ..; \
-	fi && \
-	echo zlib_srcdir=$$zlib_srcdir >>$(BLD)-manifest-vars && \
-	echo zlib_srcpath=$$zlib_srcpath >>$(BLD)-manifest-vars && \
-	echo zlib_ver=$$zlib_ver >>$(BLD)-manifest-vars
-
-
-gather-core-release:  gather-apr-release gather-aprutil-release \
-		      gather-httpd-release gather-openssl-release \
-		      gather-nghttp2-release gather-brotli-release \
-		      gather-curl-release gather-httpdtest-trunk
-
-gather-complete-release: gather-core-release \
-		      gather-expat-release gather-pcre-release \
-		      gather-apriconv-release gather-libxml2-release \
-		      gather-lua-release gather-zlib-release \
-		      gather-jansson-release
-	mv $(BLD)-manifest-vars $(BLD)-manifest-vars.sav
-	LC_COLLATE=C sort < $(BLD)-manifest-vars.sav > $(BLD)-manifest-vars
-	rm $(BLD)-manifest-vars.sav
-
-gather-linux-release: gather-core-release
-	mv $(BLD)-manifest-vars $(BLD)-manifest-vars.sav
-	LC_COLLATE=C sort < $(BLD)-manifest-vars.sav > $(BLD)-manifest-vars
-	rm $(BLD)-manifest-vars.sav
-
-
-gather-core-candidate: gather-apr-rc gather-aprutil-rc \
-		      gather-httpd-rc gather-openssl-candidate \
-		      gather-nghttp2-release gather-brotli-release \
-		      gather-curl-release gather-httpdtest-trunk
-
-gather-linux-candidate: gather-core-candidate
-	mv $(BLD)-manifest-vars $(BLD)-manifest-vars.sav
-	LC_COLLATE=C sort < $(BLD)-manifest-vars.sav > $(BLD)-manifest-vars
-	rm $(BLD)-manifest-vars.sav
-
-gather-complete-candidate: gather-core-candidate \
-		      gather-expat-release gather-pcre-candidate \
-		      gather-apriconv-rc gather-libxml2-release \
-		      gather-lua-release gather-zlib-release \
-		      gather-jansson-release
-	mv $(BLD)-manifest-vars $(BLD)-manifest-vars.sav
-	LC_COLLATE=C sort < $(BLD)-manifest-vars.sav > $(BLD)-manifest-vars
-	rm $(BLD)-manifest-vars.sav
-
-
-gather-core-snapshot: gather-apr-1xbranch gather-aprutil-1xbranch \
-		      gather-expat-master gather-pcre-trunk \
-		      gather-apriconv-1xbranch gather-libxml2-master \
-		      gather-httpd-2xbranch gather-openssl-111branch \
-		      gather-nghttp2-master gather-brotli-master \
-		      gather-curl-master gather-httpdtest-trunk \
-		      gather-zlib-master gather-jansson-master
-
-gather-complete-snapshot: gather-core-snapshot \
-		      gather-lua-release
-	mv $(BLD)-manifest-vars $(BLD)-manifest-vars.sav
-	LC_COLLATE=C sort < $(BLD)-manifest-vars.sav > $(BLD)-manifest-vars
-	rm $(BLD)-manifest-vars.sav
-
-gather-linux-snapshot: gather-core-snapshot
-	mv $(BLD)-manifest-vars $(BLD)-manifest-vars.sav
-	LC_COLLATE=C sort < $(BLD)-manifest-vars.sav > $(BLD)-manifest-vars
-	rm $(BLD)-manifest-vars.sav
-
-
-gather-core-bleed:    gather-apr-trunk gather-pcre2-trunk \
-		      gather-httpd-trunk gather-openssl-master \
-		      gather-nghttp2-master gather-brotli-master \
-		      gather-expat-master gather-libxml2-master \
-		      gather-curl-master gather-jansson-master \
-		      gather-zlib-master gather-httpdtest-trunk
-
-gather-complete-bleed: gather-core-bleed \
-		      gather-lua-release
-	mv $(BLD)-manifest-vars $(BLD)-manifest-vars.sav
-	LC_COLLATE=C sort < $(BLD)-manifest-vars.sav > $(BLD)-manifest-vars
-	rm $(BLD)-manifest-vars.sav
-
-gather-linux-bleed:   gather-core-bleed
-	mv $(BLD)-manifest-vars $(BLD)-manifest-vars.sav
-	LC_COLLATE=C sort < $(BLD)-manifest-vars.sav > $(BLD)-manifest-vars
-	rm $(BLD)-manifest-vars.sav
-
-ifeq "$(BLD)" "release"
-tcnative: gather-tcnative-release
-
-openldap: gather-openldap-release
-
-else ifeq "$(BLD)" "candidate"
-tcnative: gather-tcnative-release
-
-openldap: gather-openldap-release
-
-else ifeq "$(BLD)" "snapshot"
-tcnative: gather-tcnative-trunk
-
-openldap: gather-openldap-master
-
+          tar -xjf pkgs/$(httpd_pkg)
 else
-tcnative: gather-tcnative-trunk
-
-openldap:
-
+	  svn co -q -r $(httpd_rev) $(httpd_srcpath) $(httpd_srcdir)
 endif
+
+
+$(tcnative_srcdir): pre-download
+ifdef tcnative_pkg
+	  cd pkgs && \
+	  wget -nv $(tcnative_srcpath)/$(tcnative_pkg) && \
+	  wget -nv $(tcnative_srcpath)/$(tcnative_pkg).asc && \
+	  cd .. && \
+	  tar -xzf pkgs/$(tcnative_pkg)
+else
+	  svn co -q -r $(tcnative_rev) $(tcnative_srcpath) $(tcnative_srcdir)
+endif
+
+
+$(apr_srcdir): pre-download
+ifdef apr_pkg
+	  cd pkgs && \
+	  wget -nv $(apr_srcpath)/$(apr_pkg) && \
+	  wget -nv $(apr_srcpath)/$(apr_pkg).asc && \
+	  cd .. && \
+	  tar -xjf pkgs/$(apr_pkg)
+else
+	  svn co -q -r $(apr_rev) $(apr_srcpath) $(apr_srcdir)
+endif
+
+
+$(apriconv_srcdir): pre-download
+ifdef apriconv_pkg
+	  cd pkgs && \
+	  wget -nv $(apriconv_srcpath)/$(apriconv_pkg) && \
+	  wget -nv $(apriconv_srcpath)/$(apriconv_pkg.asc) && \
+	  cd .. && \
+	  tar -xjf pkgs/$(apriconv_pkg)
+else
+	  svn co -q -r $(apriconv_rev) $(apriconv_srcpath) $(apriconv_srcdir)
+endif
+
+
+$(aprutil_srcdir): pre-download
+ifdef aprutil_pkg
+	  cd pkgs && \
+	  wget -nv $(aprutil_srcpath)/$(aprutil_pkg) && \
+	  wget -nv $(aprutil_srcpath)/$(aprutil_pkg).asc && \
+	  cd .. && \
+	  tar -xjf pkgs/$(aprutil_pkg)
+else
+	  svn co -q -r $(aprutil_rev) $(aprutil_srcpath) $(aprutil_srcdir)
+endif
+
+
+$(openssl_srcdir): pre-download
+ifdef openssl_pkg
+	  cd pkgs && \
+	  wget -nv $(openssl_srcpath)/$(openssl_pkg) && \
+	  wget -nv $(openssl_srcpath)/$(openssl_pkg).asc && \
+	  cd .. && \
+	  tar -xzf pkgs/$(openssl_pkg)
+else
+	  git clone -q $(openssl_srcpath).git -b $(openssl_rev) $(openssl_srcdir)
+endif
+
+
+$(nghttp2_srcdir): pre-download
+ifdef nghttp2_pkg
+	  cd pkgs && \
+	  wget -nv $(nghttp2_srcpath)/$(nghttp2_pkg) && \
+	  cd .. && \
+	  tar -xjf pkgs/$(nghttp2_pkg)
+else
+	  git clone -q $(nghttp2_srcpath).git $(nghttp2_srcdir)
+endif
+
+
+$(brotli_srcdir): pre-download
+ifdef brotli_pkg
+	  cd pkgs && \
+	  wget -nv $(brotli_srcpath) -O $(brotli_pkg) && \
+	  cd .. && \
+	  tar -xzf pkgs/$(brotli_pkg)
+else
+	  git clone -q $(brotli_srcpath).git $(brotli_srcdir)
+endif
+
+
+$(curl_srcdir): pre-download
+ifdef curl_pkg
+	  cd pkgs && \
+	  wget -nv $(curl_srcpath)/$(curl_pkg) && \
+	  wget -nv $(curl_srcpath)/$(curl_pkg).asc && \
+	  cd .. && \
+          tar -xjf pkgs/$(curl_pkg)
+else
+	  git clone -q $(curl_srcpath.git) $(curl_srcdir)
+endif
+
+
+$(openldap_srcdir): pre-download
+ifdef openldap_pkg
+	  cd pkgs && \
+	  wget -nv $(openldap_srcpath)/$(openldap_pkg) && \
+	  openldap_sig=`echo $(openldap_pkg) | sed 's#\.tgz#.sha1#'` && \
+	  wget -nv $(openldap_srcpath)/$$openldap_sig && \
+	  cd .. && \
+          tar -xzf pkgs/$(openldap_pkg)
+else
+	  git clone -q -b OPENLDAP_REL_ENG_$(openldap_ver) $(openldap_srcpath) $(openldap_srcdir)
+endif
+
+
+$(expat_srcdir): pre-download
+ifdef expat_pkg
+	  cd pkgs && \
+	  wget -nv $(expat_srcpath) -O $(expat_pkg) && \
+	  cd .. && \
+	  tar -xzf pkgs/$(expat_pkg)
+else
+	  git clone -q $(expat_srcpath).git $(expat_srcdir)
+endif
+
+
+$(pcre_srcdir): pre-download
+ifdef pcre_pkg
+	  cd pkgs && \
+	  wget -nv $(pcre_srcpath)/$(pcre_pkg) && \
+	  wget -nv $(pcre_srcpath)/$(pcre_pkg).sig && \
+	  cd .. && \
+	  tar -xjf pkgs/$(pcre_pkg)
+else
+	  svn co -q -r $(pcre_rev) $(pcre_srcpath) $(pcre_srcdir)
+endif
+
+
+$(jansson_srcdir): pre-download
+ifdef jansson_pkg
+	  cd pkgs && \
+	  wget -nv $(jansson_srcpath) -O $(jansson_pkg) && \
+	  cd .. && \
+	  tar -xzf pkgs/$(jansson_pkg)
+else
+	  git clone -q $(jansson_srcpath).git $(jansson_srcdir)
+endif
+
+
+$(libxml2_srcdir): pre-download
+ifdef libxml2_pkg
+	  cd pkgs && \
+	  wget -nv $(libxml2_srcpath) -O $(libxml2_pkg) && \
+	  cd .. && \
+	  tar -xzf pkgs/$(libxml2_pkg)
+else
+	  git clone -q $(libxml2_srcpath).git $(libxml2_srcdir)
+endif
+
+
+$(lua_srcdir): pre-download
+ifdef lua_pkg
+	  cd pkgs && \
+	  wget -nv $(lua_srcpath)/$(lua_pkg) && \
+	  cd ..
+	  tar -xzf pkgs/$(lua_pkg)
+endif
+
+
+$(zlib_srcdir): pre-download
+ifdef zlib_pkg
+	cd pkgs && \
+	wget -nv $(zlib_srcpath)/$(zlib_pkg) && \
+	wget -nv $(zlib_srcpath)/$(zlib_pkg).asc && \
+	cd .. && \
+	tar -xzf pkgs/$(zlib_pkg)
+else
+	git clone -q $(zlib_srcpath).git $(zlib_srcdir)
+endif
+
+
+download-all:	$(httpdtest_srcdir) $(httpd_srcdir) $(tcnative_srcdir) \
+		$(apr_srcdir) $(apriconv_srcdir) $(aprutil_srcdir) \
+		$(openssl_srcdir) $(nghttp2_srcdir) $(brotli_srcdir) \
+		$(curl_srcdir) $(openldap_srcdir) $(expat_srcdir) \
+		$(pcre_srcdir) $(jansson_srcdir) $(libxml2_srcdir) \
+		$(lua_srcdir) $(zlib_srcdir)
 
