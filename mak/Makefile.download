@@ -31,17 +31,14 @@ include $(BLD)-manifest-vars
 
 all: download-all
 
-pre-download:
-	mkdir pkgs 2>/dev/null || true
-	echo Downloading $(BLD) Source Trees
+
+$(httpdtest_srcdir):
+	svn co -q -r $(httpdtest_rev) $(httpdtest_srcpath) $(httpdtest_srcdir)
 
 
-$(httpdtest_srcdir): pre-download
-	svn co -q $(httpdtest_srcpath) $(httpdtest_srcdir)
-
-
-$(httpd_srcdir): pre-download
+$(httpd_srcdir):
 ifdef httpd_pkg
+	  if test ! -d pkgs; then mkdir pkgs; fi
 	  cd pkgs && \
 	  wget -nv $(httpd_srcpath)/$(httpd_pkg) && \
 	  wget -nv $(httpd_srcpath)/$(httpd_pkg).asc && \
@@ -52,20 +49,23 @@ else
 endif
 
 
-$(tcnative_srcdir): pre-download
+$(tcnative_srcdir):
 ifdef tcnative_pkg
+	  if test ! -d pkgs; then mkdir pkgs; fi
 	  cd pkgs && \
 	  wget -nv $(tcnative_srcpath)/$(tcnative_pkg) && \
 	  wget -nv $(tcnative_srcpath)/$(tcnative_pkg).asc && \
 	  cd .. && \
 	  tar -xzf pkgs/$(tcnative_pkg)
 else
-	  svn co -q -r $(tcnative_rev) $(tcnative_srcpath) $(tcnative_srcdir)
+	  git clone -q $(tcnative_srcpath).git -n -b $(tcnative_ver) $(tcnative_srcdir) && \
+	  cd $(tcnative_srcdir) && git checkout -q $(tcnative_rev) && cd ..
 endif
 
 
-$(apr_srcdir): pre-download
+$(apr_srcdir):
 ifdef apr_pkg
+	  if test ! -d pkgs; then mkdir pkgs; fi
 	  cd pkgs && \
 	  wget -nv $(apr_srcpath)/$(apr_pkg) && \
 	  wget -nv $(apr_srcpath)/$(apr_pkg).asc && \
@@ -76,8 +76,9 @@ else
 endif
 
 
-$(apriconv_srcdir): pre-download
+$(apriconv_srcdir):
 ifdef apriconv_pkg
+	  if test ! -d pkgs; then mkdir pkgs; fi
 	  cd pkgs && \
 	  wget -nv $(apriconv_srcpath)/$(apriconv_pkg) && \
 	  wget -nv $(apriconv_srcpath)/$(apriconv_pkg.asc) && \
@@ -88,8 +89,9 @@ else
 endif
 
 
-$(aprutil_srcdir): pre-download
+$(aprutil_srcdir):
 ifdef aprutil_pkg
+	  if test ! -d pkgs; then mkdir pkgs; fi
 	  cd pkgs && \
 	  wget -nv $(aprutil_srcpath)/$(aprutil_pkg) && \
 	  wget -nv $(aprutil_srcpath)/$(aprutil_pkg).asc && \
@@ -100,54 +102,63 @@ else
 endif
 
 
-$(openssl_srcdir): pre-download
+$(openssl_srcdir):
 ifdef openssl_pkg
+	  if test ! -d pkgs; then mkdir pkgs; fi
 	  cd pkgs && \
 	  wget -nv $(openssl_srcpath)/$(openssl_pkg) && \
 	  wget -nv $(openssl_srcpath)/$(openssl_pkg).asc && \
 	  cd .. && \
 	  tar -xzf pkgs/$(openssl_pkg)
 else
-	  git clone -q $(openssl_srcpath).git -b $(openssl_rev) $(openssl_srcdir)
+	  git clone -q $(openssl_srcpath).git -n -b $(openssl_ver) $(openssl_srcdir) && \
+	  cd $(openssl_srcdir) && git checkout -q $(openssl_rev) && cd ..
 endif
 
 
-$(nghttp2_srcdir): pre-download
+$(nghttp2_srcdir):
 ifdef nghttp2_pkg
+	  if test ! -d pkgs; then mkdir pkgs; fi
 	  cd pkgs && \
 	  wget -nv $(nghttp2_srcpath)/$(nghttp2_pkg) && \
 	  cd .. && \
 	  tar -xjf pkgs/$(nghttp2_pkg)
 else
-	  git clone -q $(nghttp2_srcpath).git $(nghttp2_srcdir)
+	  git clone -q $(nghttp2_srcpath).git -n -b $(nghttp2_ver) $(nghttp2_srcdir) && \
+	  cd $(nghttp2_srcdir) && git checkout -q $(nghttp2_rev) && cd ..
 endif
 
 
-$(brotli_srcdir): pre-download
+$(brotli_srcdir):
 ifdef brotli_pkg
+	  if test ! -d pkgs; then mkdir pkgs; fi
 	  cd pkgs && \
 	  wget -nv $(brotli_srcpath) -O $(brotli_pkg) && \
 	  cd .. && \
 	  tar -xzf pkgs/$(brotli_pkg)
 else
-	  git clone -q $(brotli_srcpath).git $(brotli_srcdir)
+	  git clone -q $(brotli_srcpath).git -n -b $(brotli_ver) $(brotli_srcdir) && \
+	  cd $(brotli_srcdir) && git checkout -q $(brotli_rev) && cd ..
 endif
 
 
-$(curl_srcdir): pre-download
+$(curl_srcdir):
 ifdef curl_pkg
+	  if test ! -d pkgs; then mkdir pkgs; fi
 	  cd pkgs && \
 	  wget -nv $(curl_srcpath)/$(curl_pkg) && \
 	  wget -nv $(curl_srcpath)/$(curl_pkg).asc && \
 	  cd .. && \
           tar -xjf pkgs/$(curl_pkg)
 else
-	  git clone -q $(curl_srcpath.git) $(curl_srcdir)
+	  git clone -q $(curl_srcpath).git -n -b $(curl_ver) $(curl_srcdir) && \
+	  cd $(curl_srcdir) && git checkout -q $(curl_rev) && cd ..
 endif
 
 
-$(openldap_srcdir): pre-download
+$(openldap_srcdir):
 ifdef openldap_pkg
+	  if test ! -d pkgs; then mkdir pkgs; fi
 	  cd pkgs && \
 	  wget -nv $(openldap_srcpath)/$(openldap_pkg) && \
 	  openldap_sig=`echo $(openldap_pkg) | sed 's#\.tgz#.sha1#'` && \
@@ -155,23 +166,28 @@ ifdef openldap_pkg
 	  cd .. && \
           tar -xzf pkgs/$(openldap_pkg)
 else
-	  git clone -q -b OPENLDAP_REL_ENG_$(openldap_ver) $(openldap_srcpath) $(openldap_srcdir)
+	  # git clone -q -b OPENLDAP_REL_ENG_$(openldap_ver)
+	  git clone -q $(openldap_srcpath) -n -b $(openldap_ver) $(openldap_srcdir) && \
+	  cd $(openldap_srcdir) && git checkout -q $(openldap_rev) && cd ..
 endif
 
 
-$(expat_srcdir): pre-download
+$(expat_srcdir):
 ifdef expat_pkg
+	  if test ! -d pkgs; then mkdir pkgs; fi
 	  cd pkgs && \
 	  wget -nv $(expat_srcpath) -O $(expat_pkg) && \
 	  cd .. && \
 	  tar -xzf pkgs/$(expat_pkg)
 else
-	  git clone -q $(expat_srcpath).git $(expat_srcdir)
+	  git clone -q $(expat_srcpath).git -n -b $(expat_ver) $(expat_srcdir) && \
+	  cd $(expat_srcdir) && git checkout -q $(expat_rev) && cd ..
 endif
 
 
-$(pcre_srcdir): pre-download
+$(pcre_srcdir):
 ifdef pcre_pkg
+	  if test ! -d pkgs; then mkdir pkgs; fi
 	  cd pkgs && \
 	  wget -nv $(pcre_srcpath)/$(pcre_pkg) && \
 	  wget -nv $(pcre_srcpath)/$(pcre_pkg).sig && \
@@ -182,30 +198,35 @@ else
 endif
 
 
-$(jansson_srcdir): pre-download
+$(jansson_srcdir):
 ifdef jansson_pkg
+	  if test ! -d pkgs; then mkdir pkgs; fi
 	  cd pkgs && \
 	  wget -nv $(jansson_srcpath) -O $(jansson_pkg) && \
 	  cd .. && \
 	  tar -xzf pkgs/$(jansson_pkg)
 else
-	  git clone -q $(jansson_srcpath).git $(jansson_srcdir)
+	  git clone -q $(jansson_srcpath).git -n -b $(jansson_ver) $(jansson_srcdir) && \
+	  cd $(jansson_srcdir) && git checkout -q $(jansson_rev) && cd ..
 endif
 
 
-$(libxml2_srcdir): pre-download
+$(libxml2_srcdir):
 ifdef libxml2_pkg
+	  if test ! -d pkgs; then mkdir pkgs; fi
 	  cd pkgs && \
 	  wget -nv $(libxml2_srcpath) -O $(libxml2_pkg) && \
 	  cd .. && \
 	  tar -xzf pkgs/$(libxml2_pkg)
 else
-	  git clone -q $(libxml2_srcpath).git $(libxml2_srcdir)
+	  git clone -q $(libxml2_srcpath).git -n -b $(libxml2_ver) $(libxml2_srcdir) && \
+	  cd $(libxml2_srcdir) && git checkout -q $(libxml2_rev) && cd ..
 endif
 
 
-$(lua_srcdir): pre-download
+$(lua_srcdir):
 ifdef lua_pkg
+	  if test ! -d pkgs; then mkdir pkgs; fi
 	  cd pkgs && \
 	  wget -nv $(lua_srcpath)/$(lua_pkg) && \
 	  cd ..
@@ -213,15 +234,17 @@ ifdef lua_pkg
 endif
 
 
-$(zlib_srcdir): pre-download
+$(zlib_srcdir):
 ifdef zlib_pkg
-	cd pkgs && \
-	wget -nv $(zlib_srcpath)/$(zlib_pkg) && \
-	wget -nv $(zlib_srcpath)/$(zlib_pkg).asc && \
-	cd .. && \
-	tar -xzf pkgs/$(zlib_pkg)
+	  if test ! -d pkgs; then mkdir pkgs; fi
+	  cd pkgs && \
+	  wget -nv $(zlib_srcpath)/$(zlib_pkg) && \
+	  wget -nv $(zlib_srcpath)/$(zlib_pkg).asc && \
+	  cd .. && \
+	  tar -xzf pkgs/$(zlib_pkg)
 else
-	git clone -q $(zlib_srcpath).git $(zlib_srcdir)
+	  git clone -q $(zlib_srcpath).git -n -b $(zlib_ver) $(zlib_srcdir) && \
+	  cd $(zlib_srcdir) && git checkout -q $(zlib_rev) && cd ..
 endif
 
 

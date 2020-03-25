@@ -36,12 +36,15 @@ pre-manifest:
 	truncate -s0 $(BLD)-manifest-vars
 
 
-# Not reversioned, so we won't rebuild frequently on test changes
 gather-httpdtest-trunk: pre-manifest
 	httpdtest_srcpath=https://svn.apache.org/repos/asf/httpd/test/framework/trunk && \
-	httpdtest_srcdir=httpdtest-trunk && \
+	httpdtest_rev=`svn info $$httpdtest_srcpath | sed -n '/Last Changed Rev: \([0-9]\+\)/{s#.*: ##;p}'` && \
+	httpdtest_ver=$$httpdtest_rev && \
+	httpdtest_srcdir=httpdtest-$$httpdtest_ver && \
+	echo httpdtest_rev=$$httpdtest_rev >>$(BLD)-manifest-vars && \
 	echo httpdtest_srcdir=$$httpdtest_srcdir >>$(BLD)-manifest-vars && \
-	echo httpdtest_srcpath=$$httpdtest_srcpath >>$(BLD)-manifest-vars
+	echo httpdtest_srcpath=$$httpdtest_srcpath >>$(BLD)-manifest-vars && \
+	echo httpdtest_ver=$$httpdtest_ver >>$(BLD)-manifest-vars
 
 
 gather-httpd-release: pre-manifest
@@ -97,10 +100,11 @@ gather-tcnative-release: pre-manifest
 	echo tcnative_ver=$$tcnative_ver >>$(BLD)-manifest-vars
 
 gather-tcnative-trunk: pre-manifest
-	tcnative_srcpath=https://svn.apache.org/repos/asf/tomcat/native/trunk && \
-	tcnative_rev=`svn info $$tcnative_srcpath | sed -n '/Last Changed Rev: \([0-9]\+\)/{s#.*: ##;p}'` && \
-	tcnative_ver=1.2.x-$$tcnative_rev && \
-	tcnative_srcdir=tomcat-native-$$tcnative_ver && \
+	tcnative_srcpath=https://github.com/apache/tomcat-native && \
+	tcnative_ver=master && \
+	if test -d tcnative-git; then ( cd tcnative-git; git fetch --all ); else ( git clone $$tcnative_srcpath --bare tcnative-git ); fi && \
+	tcnative_rev=`cd tcnative-git; git show -b $$tcnative_ver --format="format:%h" --name-only | awk "//{print $$1; exit;}"` && \
+	tcnative_srcdir=tcnative-3.0.x-$$tcnative_rev && \
 	echo tcnative_rev=$$tcnative_rev >>$(BLD)-manifest-vars && \
 	echo tcnative_srcdir=$$tcnative_srcdir >>$(BLD)-manifest-vars && \
 	echo tcnative_srcpath=$$tcnative_srcpath >>$(BLD)-manifest-vars && \
@@ -132,7 +136,7 @@ gather-apr-1xbranch: pre-manifest
 	apr_rev=`svn info $$apr_srcpath | sed -n '/Last Changed Rev: \([0-9]\+\)/{s#.*: ##;p}'` && \
 	apr_ver=1.7.x-$$apr_rev && \
 	apr_srcdir=apr-$$apr_ver && \
-	echo apr_rev=$$tcnative_rev >>$(BLD)-manifest-vars && \
+	echo apr_rev=$$apr_rev >>$(BLD)-manifest-vars && \
 	echo apr_srcdir=$$apr_srcdir >>$(BLD)-manifest-vars && \
 	echo apr_srcpath=$$apr_srcpath >>$(BLD)-manifest-vars && \
 	echo apr_ver=$$apr_ver >>$(BLD)-manifest-vars
@@ -142,7 +146,7 @@ gather-apr-trunk: pre-manifest
 	apr_rev=`svn info $$apr_srcpath | sed -n '/Last Changed Rev: \([0-9]\+\)/{s#.*: ##;p}'` && \
 	apr_ver=2.0.x-$$apr_rev && \
 	apr_srcdir=apr-$$apr_ver && \
-	echo apr_rev=$$tcnative_rev >>$(BLD)-manifest-vars && \
+	echo apr_rev=$$apr_rev >>$(BLD)-manifest-vars && \
 	echo apr_srcdir=$$apr_srcdir >>$(BLD)-manifest-vars && \
 	echo apr_srcpath=$$apr_srcpath >>$(BLD)-manifest-vars && \
 	echo apr_ver=$$apr_ver >>$(BLD)-manifest-vars
@@ -227,18 +231,24 @@ gather-openssl-candidate: pre-manifest
 	echo openssl_srcpath=$$openssl_srcpath >>$(BLD)-manifest-vars && \
 	echo openssl_ver=$$openssl_ver >>$(BLD)-manifest-vars
 
-gather-openssl-111branch: pre-manifest
+gather-openssl-111branch: # pre-manifest
 	openssl_srcpath=https://github.com/openssl/openssl && \
-	openssl_ver=1.1.1-git && \
-	openssl_srcdir=openssl-$$openssl_ver && \
+	openssl_ver=OpenSSL_1_1_1-stable && \
+	if test -d openssl-git; then ( cd openssl-git; git fetch --all ); else ( git clone $$openssl_srcpath --bare openssl-git ); fi && \
+	openssl_rev=`cd openssl-git; git show -b $$openssl_ver --format="format:%h" --name-only | awk "//{print $$1; exit;}"` && \
+	openssl_srcdir=openssl-1.1.1-$$openssl_rev && \
+	echo openssl_rev=$$openssl_rev >>$(BLD)-manifest-vars && \
 	echo openssl_srcdir=$$openssl_srcdir >>$(BLD)-manifest-vars && \
 	echo openssl_srcpath=$$openssl_srcpath >>$(BLD)-manifest-vars && \
 	echo openssl_ver=$$openssl_ver >>$(BLD)-manifest-vars
 
 gather-openssl-master: pre-manifest
 	openssl_srcpath=https://github.com/openssl/openssl && \
-	openssl_ver=1.x-git && \
-	openssl_srcdir=openssl-$$openssl_ver && \
+	openssl_ver=master && \
+	if test -d openssl-git; then ( cd openssl-git; git fetch --all ); else ( git clone $$openssl_srcpath --bare openssl-git ); fi && \
+	openssl_rev=`cd openssl-git; git show -b $$openssl_ver --format="format:%h" --name-only | awk "//{print $$1; exit;}"` && \
+	openssl_srcdir=openssl-3.0.x-$$openssl_rev && \
+	echo openssl_rev=$$openssl_rev >>$(BLD)-manifest-vars && \
 	echo openssl_srcdir=$$openssl_srcdir >>$(BLD)-manifest-vars && \
 	echo openssl_srcpath=$$openssl_srcpath >>$(BLD)-manifest-vars && \
 	echo openssl_ver=$$openssl_ver >>$(BLD)-manifest-vars
@@ -257,9 +267,12 @@ gather-nghttp2-release: pre-manifest
 	echo nghttp2_ver=$$nghttp2_ver >>$(BLD)-manifest-vars
 
 gather-nghttp2-master: pre-manifest
-	nghttp2_srcpath=https://github.com/tatsuhiro-t/nghttp2 && \
-	nghttp2_ver=1.x-git && \
-	nghttp2_srcdir=nghttp2-$$nghttp2_ver && \
+	nghttp2_srcpath=https://github.com/nghttp2/nghttp2 && \
+	nghttp2_ver=master && \
+	if test -d nghttp2-git; then ( cd nghttp2-git; git fetch --all ); else ( git clone $$nghttp2_srcpath --bare nghttp2-git ); fi && \
+	nghttp2_rev=`cd nghttp2-git; git show -b $$nghttp2_ver --format="format:%h" --name-only | awk "//{print $$1; exit;}"` && \
+	nghttp2_srcdir=nghttp2-1.x-$$nghttp2_rev && \
+	echo nghttp2_rev=$$nghttp2_rev >>$(BLD)-manifest-vars && \
 	echo nghttp2_srcdir=$$nghttp2_srcdir >>$(BLD)-manifest-vars && \
 	echo nghttp2_srcpath=$$nghttp2_srcpath >>$(BLD)-manifest-vars && \
 	echo nghttp2_ver=$$nghttp2_ver >>$(BLD)-manifest-vars
@@ -278,8 +291,11 @@ gather-brotli-release: pre-manifest
 
 gather-brotli-master: pre-manifest
 	brotli_srcpath=https://github.com/google/brotli && \
-	brotli_ver=1.x-git && \
-	brotli_srcdir=brotli-$$brotli_ver && \
+	brotli_ver=master && \
+	if test -d brotli-git; then ( cd brotli-git; git fetch --all ); else ( git clone $$brotli_srcpath --bare brotli-git ); fi && \
+	brotli_rev=`cd brotli-git; git show -b $$brotli_ver --format="format:%h" --name-only | awk "//{print $$1; exit;}"` && \
+	brotli_srcdir=brotli-1.0.x-$$brotli_rev && \
+	echo brotli_rev=$$brotli_rev >>$(BLD)-manifest-vars && \
 	echo brotli_srcdir=$$brotli_srcdir >>$(BLD)-manifest-vars && \
 	echo brotli_srcpath=$$brotli_srcpath >>$(BLD)-manifest-vars && \
 	echo brotli_ver=$$brotli_ver >>$(BLD)-manifest-vars
@@ -297,8 +313,11 @@ gather-curl-release: pre-manifest
 
 gather-curl-master: pre-manifest
 	curl_srcpath=https://github.com/curl/curl && \
-	curl_ver=7.x-git && \
-	curl_srcdir=curl-$$curl_ver && \
+	curl_ver=master && \
+	if test -d curl-git; then ( cd curl-git; git fetch --all ); else ( git clone $$curl_srcpath --bare curl-git ); fi && \
+	curl_rev=`cd curl-git; git show -b $$curl_ver --format="format:%h" --name-only | awk "//{print $$1; exit;}"` && \
+	curl_srcdir=curl-7.x-$$curl_rev && \
+	echo curl_rev=$$curl_rev >>$(BLD)-manifest-vars && \
 	echo curl_srcdir=$$curl_srcdir >>$(BLD)-manifest-vars && \
 	echo curl_srcpath=$$curl_srcpath >>$(BLD)-manifest-vars && \
 	echo curl_ver=$$curl_ver >>$(BLD)-manifest-vars
@@ -311,13 +330,16 @@ gather-openldap-release: pre-manifest
 	openldap_srcdir=openldap-$$openldap_ver && \
 	echo openldap_pkg=$$openldap_pkg >>$(BLD)-manifest-vars && \
 	echo openldap_srcdir=$$openldap_srcdir >>$(BLD)-manifest-vars && \
-	echo openldap_srcpath=$$openldap_srcpath.tgz >>$(BLD)-manifest-vars && \
+	echo openldap_srcpath=$$openldap_srcpath >>$(BLD)-manifest-vars && \
 	echo openldap_ver=$$openldap_ver >>$(BLD)-manifest-vars
 
 gather-openldap-master: pre-manifest
-	openldap_srcpath=git://git.openldap.org/openldap.git && \
-	openldap_ver=2_4 && \
-	openldap_srcdir=openldap_$$openldap_ver && \
+	openldap_srcpath=https://git.openldap.org/openldap/openldap.git && \
+	openldap_ver=master && \
+	if test -d openldap-git; then ( cd openldap-git; git fetch --all ); else ( git clone $$openldap_srcpath --bare openldap-git ); fi && \
+	openldap_rev=`cd openldap-git; git show -b $$openldap_ver --format="format:%h" --name-only | awk "//{print $$1; exit;}"` && \
+	openldap_srcdir=openldap-2.x-$$openldap_rev && \
+	echo openldap_rev=$$openldap_rev >>$(BLD)-manifest-vars && \
 	echo openldap_srcdir=$$openldap_srcdir >>$(BLD)-manifest-vars && \
 	echo openldap_srcpath=$$openldap_srcpath >>$(BLD)-manifest-vars && \
 	echo openldap_ver=$$openldap_ver >>$(BLD)-manifest-vars
@@ -337,8 +359,11 @@ gather-expat-release: pre-manifest
 
 gather-expat-master: pre-manifest
 	expat_srcpath=https://github.com/libexpat/libexpat && \
-	expat_ver=2.x-git && \
-	expat_srcdir=libexpat-$$expat_ver && \
+	expat_ver=master && \
+	if test -d expat-git; then ( cd expat-git; git fetch --all ); else ( git clone $$expat_srcpath --bare expat-git ); fi && \
+	expat_rev=`cd expat-git; git show -b $$expat_ver --format="format:%h" --name-only | awk "//{print $$1; exit;}"` && \
+	expat_srcdir=expat-2.x-$$expat_rev && \
+	echo expat_rev=$$expat_rev >>$(BLD)-manifest-vars && \
 	echo expat_srcdir=$$expat_srcdir >>$(BLD)-manifest-vars && \
 	echo expat_srcpath=$$expat_srcpath >>$(BLD)-manifest-vars && \
 	echo expat_ver=$$expat_ver >>$(BLD)-manifest-vars
@@ -399,8 +424,11 @@ gather-jansson-release: pre-manifest
 
 gather-jansson-master: pre-manifest
 	jansson_srcpath=https://github.com/akheron/jansson && \
-	jansson_ver=2.x-git && \
-	jansson_srcdir=jansson-$$jansson_ver && \
+	jansson_ver=master && \
+	if test -d jansson-git; then ( cd jansson-git; git fetch --all ); else ( git clone $$jansson_srcpath --bare jansson-git ); fi && \
+	jansson_rev=`cd jansson-git; git show -b $$jansson_ver --format="format:%h" --name-only | awk "//{print $$1; exit;}"` && \
+	jansson_srcdir=jansson-2.x-$$jansson_rev && \
+	echo jansson_rev=$$jansson_rev >>$(BLD)-manifest-vars && \
 	echo jansson_srcpath=$$jansson_srcpath >>$(BLD)-manifest-vars && \
 	echo jansson_srcdir=$$jansson_srcdir >>$(BLD)-manifest-vars && \
 	echo jansson_ver=$$jansson_ver >>$(BLD)-manifest-vars
@@ -432,8 +460,11 @@ gather-libxml2-rc: pre-manifest
 
 gather-libxml2-master: pre-manifest
 	libxml2_srcpath=https://github.com/gnome/libxml2 && \
-	libxml2_ver=2.x-git && \
-	libxml2_srcdir=libxml2-$$libxml2_ver && \
+	libxml2_ver=mainline && \
+	if test -d libxml2-git; then ( cd libxml2-git; git fetch --all ); else ( git clone $$libxml2_srcpath --bare libxml2-git ); fi && \
+	libxml2_rev=`cd libxml2-git; git show -b $$libxml2_ver --format="format:%h" --name-only | awk "//{print $$1; exit;}"` && \
+	libxml2_srcdir=libxml2-2.x-$$libxml2_rev && \
+	echo libxml2_rev=$$libxml2_rev >>$(BLD)-manifest-vars && \
 	echo libxml2_srcdir=$$libxml2_srcdir >>$(BLD)-manifest-vars && \
 	echo libxml2_srcpath=$$libxml2_srcpath >>$(BLD)-manifest-vars && \
 	echo libxml2_ver=$$libxml2_ver >>$(BLD)-manifest-vars
@@ -461,8 +492,11 @@ gather-zlib-release: pre-manifest
 
 gather-zlib-master: pre-manifest
 	zlib_srcpath=https://github.com/madler/zlib && \
-	zlib_ver=1.2.x-git && \
-	zlib_srcdir=zlib-$$zlib_ver && \
+	zlib_ver=master && \
+	if test -d zlib-git; then ( cd zlib-git; git fetch --all ); else ( git clone $$zlib_srcpath --bare zlib-git ); fi && \
+	zlib_rev=`cd zlib-git; git show -b $$zlib_ver --format="format:%h" --name-only | awk "//{print $$1; exit;}"` && \
+	zlib_srcdir=zlib-1.2.x-$$zlib_rev && \
+	echo zlib_rev=$$zlib_rev >>$(BLD)-manifest-vars && \
 	echo zlib_srcdir=$$zlib_srcdir >>$(BLD)-manifest-vars && \
 	echo zlib_srcpath=$$zlib_srcpath >>$(BLD)-manifest-vars && \
 	echo zlib_ver=$$zlib_ver >>$(BLD)-manifest-vars
@@ -564,7 +598,7 @@ openldap: gather-openldap-master
 else
 tcnative: gather-tcnative-trunk
 
-openldap:
+openldap: gather-openldap-master
 
 endif
 
