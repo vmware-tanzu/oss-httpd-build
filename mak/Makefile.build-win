@@ -121,6 +121,7 @@ build-openssl: $(openssl_srcdir)/Makefile
 with_openldap=--without-ldap --without-lber
 enable_ldap=--disable-ldap --disable-authnz-ldap
 build-openldap:
+	echo OpenLDAP can no longer be built on Windows
 !ELSE
 # TODO: This is the linux build schema, needs refactoring
 with_openldap=--with-ldap-lib=$(DESTDIR)/lib --with-ldap-include=$(DESTDIR)/include --with-ldap=ldap --with-lber=lber
@@ -847,9 +848,9 @@ build-httpd: $(httpd_srcdir)/Makefile
 	cd ..
 
 
-!IFNDEF tcnative_srcdir
+!IFNDEF tcnative_ready
 build-tcnative:
-
+	echo Further work is required at oss-httpd-build to build tcnative on Windows
 !ELSE
 $(tcnative_srcdir)/Makefile: build-apr build-openssl
 			     $(SRCDIR)/$(tcnative_srcdir)/native/configure
@@ -866,7 +867,7 @@ build-tcnative: $(tcnative_srcdir)/Makefile
 	  make -j && \
 	  make -j install && \
 	cd ..
-
 !ENDIF
+
 
 all: build-httpd
