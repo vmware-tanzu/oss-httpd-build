@@ -69,8 +69,8 @@ build-expat: $(expat_srcdir)/Makefile
 	cd $(expat_srcdir) && \
 	  $(MAKE) && \
 	  $(MAKE) install && \
-	  copy /y CMakeFiles\expat.dir\expat.pdb "$(DESTDIR)\lib" && \
 	cd ..
+	-copy /y "$(expat_srcdir)\CMakeFiles\expat.dir\expat.pdb" "$(DESTDIR)\lib"
 !ENDIF
 
 
@@ -94,7 +94,7 @@ $(openssl_srcdir)/Makefile: $(SRCDIR)/$(openssl_srcdir)
 #			    $(firstword $(MAKEFILE_LIST))
 			    
 	-mkdir $(openssl_srcdir) 2>NUL
-	xcopy /s/v/e $(SRCDIR)\$(openssl_srcdir)\* $(openssl_srcdir)\ 
+	xcopy /s/e/d/y "$(SRCDIR)\$(openssl_srcdir)\*" "$(openssl_srcdir)\"
 	cd $(openssl_srcdir) && \
 	  perl ./Configure --prefix=$(DESTDIR) shared \
 		   -I$(DESTDIR)/include -L$(DESTDIR)/lib $(OPENSSL_ARCH) && \
@@ -200,7 +200,7 @@ with_apriconv=--with-apr-iconv=$(DESTDIR)
 # 1.2.x does not support vpath builds, and does not yet have a Makefile.win
 $(apriconv_srcdir)/Makefile.win: $(SRCDIR)\$(apriconv_srcdir)\build\modules.mk.win
 	-mkdir $(apriconv_srcdir) 2>NUL
-	xcopy /s/v/e/y $(SRCDIR)\$(apriconv_srcdir)\* $(apriconv_srcdir)\ 
+	xcopy /s/e/d/y "$(SRCDIR)\$(apriconv_srcdir)\*" "$(apriconv_srcdir)\"
 	sed -e "s# \([^= ]*\)\\\\\([lib]*apr-1\.lib\) # /libpath:\1 \2 #;" \
 		< $(SRCDIR)\$(apriconv_srcdir)\build\modules.mk.win \
 		> $(apriconv_srcdir)\build\modules.mk.win
@@ -416,7 +416,7 @@ build-libxml2:
 !IF $(PREFER_CMAKE)
 $(libxml2_srcdir)/win32/Makefile: $(SRCDIR)/$(libxml2_srcdir)/win32/configure.js
 	-mkdir $(libxml2_srcdir) 2>NUL
-	xcopy /s/v/d/e "$(SRCDIR)\$(libxml2_srcdir)\*" "$(libxml2_srcdir)\"
+	xcopy /s/e/d/y "$(SRCDIR)\$(libxml2_srcdir)\*" "$(libxml2_srcdir)\"
 	cd $(libxml2_srcdir)\win32
 	patch -p1 < <<
 --- win32/Makefile.msvc	Tue Nov 13 06:45:27 2018
@@ -545,6 +545,8 @@ $(nghttp2_srcdir)/Makefile: $(SRCDIR)/$(nghttp2_srcdir)/CMakeLists.txt
 	  cmake $(CMAKE_DEFAULTS) \
 		-D CMAKE_INSTALL_PREFIX=$(DESTDIR) \
 		-D ENABLE_LIB_ONLY=1 \
+		-D ENABLE_SHARED_LIB=1 \
+		-D ENABLE_STATIC_LIB=0 \
 		$(SRCDIR)/$(nghttp2_srcdir) && \
 	cd ..
 !ELSE
@@ -571,7 +573,7 @@ build-lua:
 !ELSE
 !IF $(PREFER_CMAKE)
 $(lua_srcdir)/src/Makefile.win: $(SRCDIR)/$(lua_srcdir)/src/Makefile
-	xcopy /s/v/e/i "$(SRCDIR)\$(lua_srcdir)" $(lua_srcdir)
+	xcopy /s/e/d/y "$(SRCDIR)\$(lua_srcdir)" "$(lua_srcdir)\"
 	awk > $(lua_srcdir)/src/liblua.rc < $(lua_srcdir)/src/lua.h -f <<
 BEGIN{
 print "#include <winver.h>"
@@ -719,6 +721,8 @@ $(curl_srcdir)/Makefile:  $(SRCDIR)/$(curl_srcdir)/CMakeLists.txt
 	        -D CMAKE_USE_LIBSSH=OFF \
         	-D BUILD_STATIC_LIBS=OFF \
 		-D BUILD_SHARED_LIBS=ON \
+		-D USE_NGHTTP2=ON \
+		-D NGHTTP2_STATICLIB=ON \
 		-D CMAKE_INSTALL_PREFIX=$(DESTDIR) \
 		$(SRCDIR)\$(curl_srcdir) && \
 	cd ..
@@ -775,6 +779,14 @@ $(httpd_srcdir)/Makefile: build-openssl build-openldap \
 			  build-nghttp2 build-curl \
 			  $(SRCDIR)/$(httpd_srcdir)/CMakeLists.txt
 	-mkdir $(httpd_srcdir) 2>NUL
+!IF "$(httpd_ver)" == "2.4.41"
+	sed -e "s#\(.*/server\)$$#\1 \1/mpm/winnt#" \
+	    -e "s#\(SET(mod_md_requires *[^ ]*\) .*)#\1)#" \
+		< $(SRCDIR)\$(httpd_srcdir)\CMakeLists.txt \
+		> $(SRCDIR)\$(httpd_srcdir)\CMakeLists.txt.mdpatch && \
+	  copy /y $(SRCDIR)\$(httpd_srcdir)\CMakeLists.txt.mdpatch \
+	          $(SRCDIR)\$(httpd_srcdir)\CMakeLists.txt
+!ENDIF
 	cd $(httpd_srcdir) && \
 	  cmake $(CMAKE_DEFAULTS) \
 		-D CMAKE_INSTALL_PREFIX=$(DESTDIR) \
@@ -839,7 +851,7 @@ build-httpd: $(httpd_srcdir)/Makefile
 build-tcnative:
 
 !ELSE
-$(tcnative_srcdir)/Makefile: build-apr build-openssl \
+$(tcnative_srcdir)/Makefile: build-apr build-openssl
 			     $(SRCDIR)/$(tcnative_srcdir)/native/configure
 	-mkdir $(tcnative_srcdir) 2>NUL
 	cd $(tcnative_srcdir) && \
@@ -857,3 +869,4 @@ build-tcnative: $(tcnative_srcdir)/Makefile
 
 !ENDIF
 
+all: build-httpd
