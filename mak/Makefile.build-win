@@ -117,7 +117,7 @@ build-openssl: $(openssl_srcdir)/Makefile
 !ENDIF
 
 
-!IFNDEF openldap_srcdir
+!IFNDEF openldap_ready
 with_openldap=--without-ldap --without-lber
 enable_ldap=--disable-ldap --disable-authnz-ldap
 build-openldap:
