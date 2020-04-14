@@ -77,6 +77,12 @@ $ yum install libuuid expat jansson libxml2 lua pcre zlib
 ```
 Please note the addition of the jansson package to this list since the 2.4.29-171109 release. In order to use the provided apxs utility, additional packages are required as indicated at the [https://github.com/appsuite/oss-httpd-build](https://github.com/appsuite/oss-httpd-build) README page.
 
+## **RHEL 8 Users**
+
+The RHEL 7 package is compatible with RHEL 8 and Fedora 30+, and requires some less commonly installed packages to be available. These may all be provisioned with the following command;
+
+$ dnf install libuuid expat jansson libxcrypt-compat libxml2 lua pcre zlib
+
 ## **Ubuntu 16.04 and 18.04 Users**
 
 The Ubuntu 16.04 package (compatible with 18.04) requires several commonly installed packages to be available, these may be provisioned with the following command;
