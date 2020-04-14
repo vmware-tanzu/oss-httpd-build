@@ -115,15 +115,38 @@ And use CPAN for the packages not distributed with the OS as listed above
 
  $ cpan install Text::Template Protocol::HTTP2::Client
 
+In RHEL 8 and Fedora 30 and later, the libxcrypt package is required
+(although it may often be installed by default), while the Text::Template
+and Protocol::HTTP2 perl packages become available;
+
+ $ dnf groupinstall 'Development Tools'
+
+ $ dnf install cmake imake
+
+ $ dnf install libuuid-devel expat-devel jansson-devel libxml2-devel \
+           libxcrypt-devel lua-devel pcre-devel zlib-devel docbook2X
+
+ $ dnf install perl-core perl-Module-Load-Conditional \
+           perl-HTTP-DAV perl-LWP-Protocol-https perl-AnyEvent-HTTP \
+           perl-Crypt-SSLeay perl-Net-SSLGlue perl-DateTime \
+           perl-Module-Build-Tiny perl-Test-LeakTrace perl-Test-TCP \
+           perl-Text-Template Protocol-HTTP2
+
 === RedHat or Fedora Linux deployment package dependencies:
+
+Tested With RHEL and CentOS version 7.0 and Fedora 29.
 
 These base packages are required for deployment (and are incidently installed
 with the -devel packages above; most are already present by default);
 
- $ yum install libuuid expat jansson libxml2 lua pcre zlib 
+ $ yum install libuuid expat jansson libxml2 lua pcre zlib
 
-* Note that following RHEL 7 / Fedora 21, `yum` becomes the `dnf` utility.
-The package names have remained the same.
+Note that following RHEL 7 / Fedora 21, `yum` becomes the `dnf` utility.
+
+In RHEL 8 and Fedora 30 and later, the libxcrypt package is required
+(although it may often be installed by default);
+
+ $ dnf install libuuid expat jansson libxcrypt libxml2 lua pcre zlib
 
 === Ubuntu or Debian development package dependencies:
 
