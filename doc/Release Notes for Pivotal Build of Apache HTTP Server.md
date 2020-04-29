@@ -1,6 +1,6 @@
-# **Release Notes for Pivotal Build of Apache HTTP Server httpd-2.4.43-200421**
+# **Release Notes for Pivotal Build of Apache HTTP Server httpd-2.4.43-200429**
 
-Updated: April 21, 2020
+Updated: April 29, 2020
 
 ## **What’s in the Release Notes**
 
@@ -20,7 +20,7 @@ These release notes cover the following topics:
 
 This package is a courtesy build of Pivotal's [https://github.com/appsuite/oss-httpd-build](https://github.com/appsuite/oss-httpd-build) framework, to provide a reference for customers of Pivotal's support for the open source Apache HTTP Server project. This includes Apache HTTP Server (httpd), along with a number of frequently updated library components (dependencies). These are distributed to the general public from the [https://network.pivotal.io/products/p-apache-http-server](https://network.pivotal.io/products/p-apache-http-server) download location.
 
-This package is structured to allow parallel installation of multiple releases of Apache HTTP Server and related components. It contains one directory tree, labeled as httpd-2.4.43-200421 which represents the version of httpd and the effective date of all components bundled in the package, in this case, all of the components current as of 2020 April 21.
+This package is structured to allow parallel installation of multiple releases of Apache HTTP Server and related components. It contains one directory tree, labeled as httpd-2.4.43-200429 which represents the version of httpd and the effective date of all components bundled in the package, in this case, all of the components current as of 2020 April 21.
 
 Unlike many httpd distributions, the end user instance configuration, server content and logs and are not modified in this directory tree. See the section on Instance Creation for details of creating a server instance with these user maintained files.
 
@@ -30,7 +30,7 @@ Note that Pivotal convenience packages prior to 2.4.37 included OpenSSL 1.1.0, w
 
 ## **Included Components**
 
-The following components are included in this 2.4.43-200421 build; those marked (\*) are not compiled on RHEL 7 and Ubuntu 16.04, but the OS Vendor's distribution packages are used, instead. Links to the user change notes and vulnerability indexes are illustrated below.
+The following components are included in this 2.4.43-200429 build; those marked (\*) are not compiled on RHEL 7 and Ubuntu 16.04, but the OS Vendor's distribution packages are used, instead. Links to the user change notes and vulnerability indexes are illustrated below.
 
 In cases where the project does not maintain a reference to specific CVE's in an easily web accessible format the [https://www.cvedetails.com/vulnerability-list/](https://www.cvedetails.com/vulnerability-list/) database link is provided; this list is not endorsed as complete or comprehensive and is offered for convenience only.
 
@@ -45,7 +45,7 @@ In cases where the project does not maintain a reference to specific CVE's in an
 [http://www.apache.org/dist/apr/CHANGES-APR-UTIL-1.6]
 * brotli compression library 1.0.7  
 [https://github.com/google/brotli/releases]
-* Curl 7.69.1  
+* Curl 7.70.0  
 [https://curl.haxx.se/changes.html]  
 [https://curl.haxx.se/docs/security.html]
 * Jansson 2.12  (\*)  
@@ -132,18 +132,18 @@ Unix users (running as root);
 ```
 $ mkdir -p /opt/pivotal/webserver  
 $ cd /opt/pivotal/webserver  
-$ tar -xjvf {path-to}/httpd-2.4.43-200421-{arch}.tar.bz2  
-$ httpd-2.4.43-200421/bin/fixrootpath.pl httpd-2.4.43-200421  
-$ ln -s httpd-2.4.43-200421 httpd-2.4  
+$ tar -xjvf {path-to}/httpd-2.4.43-200429-{arch}.tar.bz2  
+$ httpd-2.4.43-200429/bin/fixrootpath.pl httpd-2.4.43-200429  
+$ ln -s httpd-2.4.43-200429 httpd-2.4  
 ```
 
 Windows users (in a Command window 'Run as Administrator');
 ```
 C:\> mkdir \Pivotal\WebServer  
 C:\> cd \Pivotal\WebServer  
-C:\Pivotal\WebServer> unzip {path-to}\httpd-2.4.43-200421-windows-x64.zip  
-C:\Pivotal\WebServer> powershell httpd-2.4.43-200421\bin\fixrootpath.ps1 httpd-2.4.43-200421  
-C:\Pivotal\WebServer> mklink /d httpd-2.4 httpd-2.4.43-200421  
+C:\Pivotal\WebServer> unzip {path-to}\httpd-2.4.43-200429-windows-x64.zip  
+C:\Pivotal\WebServer> powershell httpd-2.4.43-200429\bin\fixrootpath.ps1 httpd-2.4.43-200429  
+C:\Pivotal\WebServer> mklink /d httpd-2.4 httpd-2.4.43-200429  
 ```
 
 **Instance Creation**
