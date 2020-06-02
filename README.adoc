@@ -245,7 +245,7 @@ which is the `../dst/httpd` component directory name with the TAG variable
 suffixed. SRCDIR references the source tree (typically `../src`) and would
 typically not need to be overridden.
 
-The TARGET directory, `/opt/apachapacherver/$(httpd_srcdir)$(TAG)` would
+The TARGET directory, `/opt/apache/webserver/$(httpd_srcdir)$(TAG)` would
 typically not be overridden, and refers to the anticipated installation
 path of the resulting package. Use this to ensure the generated suexec
 binaries are recognized as valid.

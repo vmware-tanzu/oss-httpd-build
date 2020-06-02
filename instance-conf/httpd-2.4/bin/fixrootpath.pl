@@ -24,10 +24,10 @@
 #   --srcdir=path or string to be replaced 
 #   --dstdir=/path/to/destination/installation
 #
-# This package of Apache HTTP Server include two patterns to replace:
+# This package of Apache HTTP Server includes two patterns to replace:
 #
 #   @@ PRODUCT_ROOT @@    --  the product root path
-#   @@ SERVER_ROOT @@	  --  one /path-to-root/servers/{instance}
+#   @@ SERVER_ROOT @@     --  one /path-to-root/servers/{instance}
 #                             to be used for individual server instances
 #
 # Invoking this script from the product root path will default the

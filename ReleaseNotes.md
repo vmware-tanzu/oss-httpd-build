@@ -15,13 +15,13 @@ These release notes cover the following topics:
 
 ## **Package Description**
 
-This package consists of Apache HTTP Server (httpd), along with a number of frequently updated library components (dependencies) required by httpd or one of its optional modules. The package was assembled with VMware's [https://github.com/appsuite/oss-httpd-build](https://github.com/appsuite/oss-httpd-build) OSS Build and Server Instance Schema for Apache HTTP Server.
+This package consists of Apache HTTP Server (httpd), along with a number of frequently updated library components (dependencies) required by httpd or one of its optional modules. This package is assembled with VMware's [https://github.com/appsuite/oss-httpd-build](https://github.com/appsuite/oss-httpd-build) OSS Build and Server Instance Schema for Apache HTTP Server.
 
 This package is structured to allow parallel installation of multiple releases of Apache HTTP Server and related components. It contains one directory tree, labeled as httpd-{version}-{date tag} which represents the version of httpd and the effective date of all components bundled in the package.
 
-Unlike many httpd distributions, the end user instance configuration, server content and logs and are not modified in this program distribution tree. See the section on Instance Creation for details of creating a server instance with these user maintained files.
+Unlike many httpd distributions, the end user instance configuration, server content, and logs and are not modified in this program distribution tree. See the section on Instance Creation for details of creating a server instance with these user maintained files.
 
-In order to build httpd from scratch, see additional details at VMware's [https://github.com/appsuite/oss-httpd-build](github oss-httpd-build) project. A tarball of unix sources and zipfile of windows sources is provided alongside the binary release downloads, for ready reference.
+In order to build httpd from scratch, see additional details at VMware's [https://github.com/appsuite/oss-httpd-build](github oss-httpd-build) project. A tarball of unix sources and zipfile of windows sources is provided alongside the binary release downloads for ready reference.
 
 ## **Included Components**
 
@@ -111,7 +111,7 @@ In the command-line examples given below, unzip is provided by info-zip, while m
 
 ## **Installation**
 
-Create the desired install path, such as `/opt/apache/webserver` or `c:\apache\webserver`, and unpack the tar.bz2 or .zip file into that directory. From this root directory, then invoke the fixrootpath script to correct the embedded paths to the current path, and finally create a symlink when ready to adopt this installation as the "accepted" httpd-2.4 installation path.
+Create the desired install path, such as `/opt/apache/webserver` or `c:\apache\webserver`, and unpack the tar.bz2 or .zip file into that directory. From this root directory, invoke the fixrootpath script to correct the embedded paths to the current path, and finally create a symlink when ready to adopt this installation as the "accepted" httpd-2.4 installation path.
 
 During an upgrade, restart each server instance individually and verify the correct operation of that instance's hosts. If there is a problem resulting from an upgrade, simply restore the symlink to the previously installed httpd path, and restart the servers with the old version to avoid unnecessary interruption. When correct operation is verified the older httpd version can be expunged.
 
