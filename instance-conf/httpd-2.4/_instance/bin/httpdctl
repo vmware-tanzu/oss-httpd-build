@@ -1,8 +1,8 @@
 #!/bin/sh
 #
-# Pivotal Instance Management Schema for Apache HTTP Server
+# VMware Instance Management Schema for Apache HTTP Server
 #
-# Copyright (C) 2017-Present Pivotal Software, Inc. All rights reserved.
+# Copyright (C) 2017-2020 VMware, Inc.
 #
 # This program and the accompanying materials are made available under
 # the terms of the under the Apache License, Version 2.0 (the "License”);
@@ -18,12 +18,12 @@
 # limitations under the License.
 
 # httpdctl  This shell script takes care of starting and stopping
-#           Pivotal Web Server on Unix platforms.
+#           Apache HTTP Server on Unix platforms.
 #
 # RedHat/Fedora init.d service configuration
 #
 # chkconfig: 2345 85 15
-# description: Pivotal Web Server httpd @HostName@
+# description: Apache HTTP Server httpd @HostName@
 # processname: httpd
 # pidfile: @ServerRoot@/logs/httpd.pid
 # config: @ServerRoot@/conf/httpd.conf
@@ -31,50 +31,21 @@
 # Ubuntu/Debian init.d service configuration
 #
 ### BEGIN INIT INFO
-# Provides:          pivotal-httpd-@HostName@
+# Provides:          apache-httpd-@HostName@
 # Required-Start:    $local_fs $remote_fs $network $syslog $named
 # Required-Stop:     $local_fs $remote_fs $network $syslog $named
 # Default-Start:     2 3 4 5
 # Default-Stop:      0 1 6
 # X-Interactive:     true
-# Short-Description: Pivotal Web Server httpd @HostName@
+# Short-Description: Apache HTTP Server httpd @HostName@
 ### END INIT INFO
-
-# Modified in 6.0.0
-#
-#   Switched to the loadable MPM model, removed MPM references from this script
-#
-# Modified in 5.4.0
-#
-#   Renamed services as pivotal httpd {instance}
-#   changed the long description text to Pivotal Web Server httpd 2.4
-#
-# Modified in 5.3.2
-#
-#   Support update-rc.d with LSB init header for Debian-style management
-#   Introduce Debian-style LSB init.d reload/force-reload/try-restart verbs
-#   Enhance 'restart' behavior to start a stopped server using last start flags
-#   Preserve quoted start and configtest arguments (e.g. -D "FOO BAR")
-#
-# Modified in 5.3.0
-#
-#   Added install/uninstall support of Solaris svcadm
-#
-# Modified in 5.2.1
-#
-#   Improved handling of ./httpdctl with no command line arguments
-#
-# Modified in 5.2.0
-#
-#   Outputs the service name Pivotal httpd {server} rather than simply httpd
-#   Added install/uninstall to manage /etc/init.d/servicename and /bin/chkconfig
 
 server_root="@ServerRoot@"
 apache_root="@exp_httpddir@"
 apache_bin="$apache_root/bin/httpd"
 apache_pid="$server_root/logs/httpd.pid"
 apache_last="$server_root/logs/httpd.last"
-service_name="pivotal httpd @ServerInstance@"
+service_name="apache httpd @ServerInstance@"
 action=$1
 if test "x$action" != "x"; then shift; fi
 start_flags=""
@@ -292,7 +263,7 @@ install_server () {
 }
 
 smf_name() {
-    echo pivotal/httpd/`echo $1 | tr . _ | sed 's/pivotal-httpd-//'`
+    echo apache/httpd/`echo $1 | tr . _ | sed 's/apache-httpd-//'`
 }
 
 install_smf_service() {
@@ -307,7 +278,7 @@ install_smf_service() {
 <!--
     Copyright (c) ....
 -->
-<service_bundle type='manifest' name='pivotal:httpd'>
+<service_bundle type='manifest' name='apache:httpd'>
   <service name='$service'
            type='service'
            version='1'>
@@ -345,7 +316,7 @@ install_smf_service() {
       <template>
         <common_name>
           <loctext xml:lang='C'>
-            Pivotal Web Server httpd 2.4
+            Apache HTTP Server httpd 2.4
           </loctext>
         </common_name>
         <documentation>
@@ -402,8 +373,8 @@ uninstall_smf_service() {
     rm $SMF_SITE_MANIFESTS/$service.xml 2> /dev/null
     svcadm restart manifest-import
     RETVAL=$?
-    rmdir $SMF_SITE_MANIFESTS/pivotal/httpd 2> /dev/null
-    rmdir $SMF_SITE_MANIFESTS/pivotal 2> /dev/null
+    rmdir $SMF_SITE_MANIFESTS/apache/httpd 2> /dev/null
+    rmdir $SMF_SITE_MANIFESTS/apache 2> /dev/null
     if [ $RETVAL = 0 ] ; then
         echo
         echo service $service uninstalled

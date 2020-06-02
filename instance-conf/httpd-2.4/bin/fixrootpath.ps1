@@ -1,7 +1,7 @@
 ﻿#
-# Pivotal Instance Management Schema for Apache HTTP Server
+# VMware Instance Management Schema for Apache HTTP Server
 #
-# Copyright (C) 2017-Present Pivotal Software, Inc. All rights reserved.
+# Copyright (C) 2017-2020 VMware, Inc.
 #
 # This program and the accompanying materials are made available under
 # the terms of the under the Apache License, Version 2.0 (the "License”);
@@ -18,18 +18,28 @@
 
 # fixrootpath.ps1
 #
+# This script searches and replaces the installation paths specified by:
+#
+#   --srcdir=path or string to be replaced 
+#   --dstdir=/path/to/destination/installation
+#
+# This package of Apache HTTP Server includes two patterns to replace:
+#
+#   @@ PRODUCT_ROOT @@    --  the product root path
+#   @@ SERVER_ROOT @@     --  one /path-to-root/servers/{instance}
+#                             to be used for individual server instances
+#
 # Invoking this script from the product root path will default the
 # @@ PRODUCT_ROOT @@ to the current working directory
 #
-# NOTE: backtick ` character escapes within the @@ ... @@ pattern 
-# serves to prevent this script from modifying it's own documentation.
-# do not include that backtick when specifying such patterns.
+# NOTE: the whitespace within the @@ ... @@ patterns above is to prevent
+# this script from modifying it's own documentation - do not include the
+# spaces when specifying these patterns.
 
 $name = "fixrootpath"
 $OutputEncoding = [System.Text.Encoding]::UTF8
  
 Write-Host "fixrootpath.ps1 script - adjusts paths or strings in text files"
-Write-Host "Copyright © 2017 Pivotal Software, Inc. All rights reserved."
 Write-Host ""
 
 function syntax {
@@ -37,7 +47,7 @@ function syntax {
     Write-Host "    --srcdir={pattern}  expression to replace, defaults to @@PRODUCT`_ROOT@@"
     Write-Host "    --dstdir={string}   replacement path, defaults to current working"
     Write-Host "                        directory using forward-slash notation,"
-    Write-Host "                        e.g. C:/Pivotal/WebServer"
+    Write-Host "                        e.g. C:/Apache/WebServer"
     Write-Host ""
     Write-Host "The path list may contain one or more explicit file names or path names"
     Write-Host "to recursively search for non-binary files.  The default path to recurse"

@@ -14,7 +14,7 @@ export LD_LIBRARY_PATH
 OPENSSL_CONF=@@PRODUCT_ROOT@@/httpd-2.4/ssl/openssl.cnf
 export OPENSSL_CONF
 
-MANPATH=@@PRODUCT_ROOT@@/httpd-2.4/man:$MANPATH
+MANPATH=@@PRODUCT_ROOT@@/httpd-2.4/man${MANPATH:+:}$MANPATH
 export MANPATH
 
 # If the user exec's this script, offer them a helpful hint;

@@ -1,7 +1,7 @@
 #!/usr/bin/bash
 #
-# Pivotal OSS httpd webserver build schema
-# Copyright (c) 2017 Pivotal Software, Inc.
+# VMware OSS Build Schema for Apache HTTP Server
+# Copyright (c) 2017-2020 VMware, Inc.
 # Licensed under the Apache Software License 2.0
 # 
 # validate-depends.sh : Review required -dev[el] dependencies

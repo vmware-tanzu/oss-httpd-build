@@ -1,12 +1,13 @@
-= Pivotal OSS Build Schema and Instance Management for Apache HTTP Server
+= VMware OSS Build and Instance Management Schema for Apache HTTP Server
 
-Copyright (C) 2017-Present Pivotal Software, Inc. All rights reserved.
+Copyright (C) 2017-2020 VMware, Inc.
 
 This program and the accompanying materials are made available under
 the terms of the under the Apache License, Version 2.0 (the "License”);
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
-http://www.apache.org/licenses/LICENSE-2.0
+
+    http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -23,7 +24,7 @@ components updated in modern linux distributions, which
 are reasonably stable. On Windows, every dependency must
 be built from source.
 
-The build target is `/opt/pivotal/webserver/httpd-2.4/`
+The build target is `/opt/apache/webserver/httpd-2.4/`
 on Linux and Windows, this is simply a symlink. Each has
 a longer pathname, e.g. `httpd-2.4.33{-bldno}/` which is
 symlinked from this httpd-2.4 path. Non-release builds
@@ -267,7 +268,7 @@ which is the `../dst/httpd` component directory name with the TAG variable
 suffixed. SRCDIR references the source tree (typically `../src`) and would
 typically not need to be overridden.
 
-The TARGET directory, `/opt/pivotal/webserver/$(httpd_srcdir)$(TAG)` would
+The TARGET directory, `/opt/apache/webserver/$(httpd_srcdir)$(TAG)` would
 typically not be overridden, and refers to the anticipated installation
 path of the resulting package. Use this to ensure the generated suexec
 binaries are recognized as valid.
@@ -307,8 +308,8 @@ Installing these binaries to a target machine consists of untarring the package,
 relocating references to the desired installation path and creating a symlink
 to use as the 'generic' reference to the now-current httpd.
 
- $ mkdir -p /opt/pivotal/webserver
- $ cd /opt/pivotal/webserver
+ $ mkdir -p /opt/apache/webserver
+ $ cd /opt/apache/webserver
  $ tar -xjvf {pkgname}
  $ ./httpd-2.4.29{tag}/bin/fixrootpath.pl
  $ ln -sf httpd-2.4.29{tag} httpd-2.4
@@ -319,10 +320,10 @@ server instances.
 
 == Instance Creation ==
 
-To create an instance /opt/pivotal/webserver/\{hostname}, use the following
+To create an instance /opt/apache/webserver/\{hostname}, use the following
 commands;
 
- $ cd /opt/pivotal/webserver
+ $ cd /opt/apache/webserver
  $ ./httpd-2.4/bin/newserver.pl --server {hostname}
 
 The resulting directory includes `bin`, `conf`, `htdocs`, `cgi-bin`, `ssl`

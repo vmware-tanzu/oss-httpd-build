@@ -1,6 +1,6 @@
-# Pivotal OSS Build Schema for Apache HTTP Server
-#
-# Copyright (C) 2017-Present Pivotal Software, Inc. All rights reserved.
+# VMware OSS Build Schema for Apache HTTP Server
+# 
+# Copyright (c) 2017-2020 VMware, Inc.
 #
 # This program and the accompanying materials are made available under
 # the terms of the under the Apache License, Version 2.0 (the "License”);
@@ -102,6 +102,8 @@ else
 endif
 
 
+# external/perl/Text-Template packages under the Artistic license 
+# do not conform to an Apache-licensed source package license (per the ASF)
 $(openssl_srcdir):
 ifdef openssl_pkg
 	  if test ! -d pkgs; then mkdir pkgs; fi
@@ -109,10 +111,12 @@ ifdef openssl_pkg
 	  wget -nv $(openssl_srcpath)/$(openssl_pkg) && \
 	  wget -nv $(openssl_srcpath)/$(openssl_pkg).asc && \
 	  cd .. && \
-	  tar -xzf pkgs/$(openssl_pkg)
+	  tar -xzf pkgs/$(openssl_pkg) && \
+	  rm -rf $(openssl_srcdir)/external/perl
 else
 	  git clone -q $(openssl_srcpath).git -n -b $(openssl_ver) $(openssl_srcdir) && \
-	  cd $(openssl_srcdir) && git checkout -q $(openssl_rev) && cd ..
+	  cd $(openssl_srcdir) && git checkout -q $(openssl_rev) && cd .. && \
+	  rm -rf $(openssl_srcdir)/external/perl
 endif
 
 

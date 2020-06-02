@@ -1,8 +1,8 @@
 #!/usr/bin/perl
 #
-# Pivotal Instance Management Schema for Apache HTTP Server
+# VMware Instance Management Schema for Apache HTTP Server
 #
-# Copyright (C) 2017-Present Pivotal Software, Inc. All rights reserved.
+# Copyright (C) 2017-2020 VMware, Inc.
 #
 # This program and the accompanying materials are made available under
 # the terms of the under the Apache License, Version 2.0 (the "License”);
@@ -19,42 +19,7 @@
 
 # newserver.pl
 #
-#   This script creates a new /opt/pivotal/webserver/{server}/ 
-#   instance from an _instance/ template
-#
-# Modified in 6.1.0
-#
-#   Fail when unable to create instance target directory
-#
-# Modified in 6.0.1
-#
-#   Fail for unrecognized --options given on the command line
-#
-# Modified in 5.4.0
-#
-#   Product name transition to Pivotal Web Server
-#   Default 'nobody' user and group renamed to pwshttpd
-#
-# Modified in 5.3.2
-#
-#   Introduce --update operation to update only the {server}/bin/ scripts
-#   Fail when attempting to --overlay or --update a non-existant {server}
-#
-# Modified in 5.2.1
-#
-#   Corrected user/group creation command line syntax when not using Linux.
-#
-# Modified in 5.2.0
-#
-#   Dropped default userfile creation (not used by any conf example)
-#
-# Modified in 5.1.0 
-#
-#   Default to 'worker' mpm, eliminated prompt for selection
-#   Default to user/group vfhttpd/vfhttpd, create if they do not exist
-#   Grant ownership of logs/safe/ and var/ to the vfhttpd user/group
-#   Default to world no-access to logs/, set ownership to vfhttpd group
-#   Default to 640 perms for .csr, .pem (encrypted) files
+# This script creates a server instance director tree from an _instance/ template
 #
 
 use POSIX;
@@ -82,8 +47,8 @@ my @patterns;
 my @plist;
 my %smap = (
     MPM => "worker",
-    User => "pwshttpd",
-    Group => "pwshttpd",
+    User => "httpd",
+    Group => "httpd",
     rel_sysconfdir => "conf",
     rel_logfiledir => "logs",
     exp_runtimedir => "logs",
@@ -100,8 +65,7 @@ else {
     $smap{"FTPPort"} = 8021;
 }
 
-print "newserver.pl script - deploy a new httpd server instance\n"
-    . "Copyright (c) 2017 Pivotal Software, Inc.  All rights reserved.\n\n";
+print "newserver.pl script - deploy a new httpd server instance\n\n";
  
 my $parseresult = GetOptions(
 	'rootdir=s'       => \$rootdir,
@@ -319,11 +283,11 @@ if (!@vfpwnam) {
             chown 0, 0, '/var/empty';
         }
         $cmd = "/usr/bin/mkuser pgrp=$smap{'Group'} groups=$smap{'Group'},staff"
-             . " gecos='Pivotal Web Server unprivileged user' home=/var/empty"
+             . " gecos='Apache HTTP Server unprivileged user' home=/var/empty"
              . " account_locked=true login=false rlogin=false";
     } else {
         $cmd = "/usr/sbin/useradd -g $smap{'Group'}"
-             . " -c 'Pivotal Web Server unprivileged user'";
+             . " -c 'Apache HTTP Server unprivileged user'";
         if ($^O eq 'linux') {
             # linux alone supports -r 'system' accounts and a 'nologin' shell
             $cmd .= ' -r -s /sbin/nologin';
@@ -440,13 +404,12 @@ if (!$quiet) {
               "Modify ".$serverdir."/conf/httpd.conf\n".
               "and ".$serverdir."/bin/httpdctl\n".
               "to make additional adjustments.\n\n";
-              "Thank you for choosing Pivotal Web Server.\n";
     }
 }
 
 sub syntax {
     print "Syntax: $0 [--options] [servername]\n\n".
-     "\t--rootdir=/opt/pivotal/webserver   default is current dir\n".
+     "\t--rootdir=/path-to-httpdserver  default is current dir\n".
      "\t--server=servername             host and default path name to create\n".
      "\t--serverdir=/path/to/instance   default is rootdir/{servername}/ target\n".
      "\t--update                        update only {serverdir}/bin scripts\n".
