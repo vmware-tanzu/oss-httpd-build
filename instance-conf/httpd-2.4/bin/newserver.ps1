@@ -1,11 +1,12 @@
 ﻿#
-# Pivotal OSS Instance Creation Schema for Apache HTTP Server
+# VMware Instance Management Schema for Apache HTTP Server
 #
-# Copyright (c) 2017 Pivotal Software, Inc.
+# Copyright (C) 2017-2020 VMware, Inc.
 #
-# Pivotal licenses this file to You under the Apache License, Version 2.0
-# (the "License"); you may not use this file except in compliance with
-# the License.  You may obtain a copy of the License at
+# This program and the accompanying materials are made available under
+# the terms of the under the Apache License, Version 2.0 (the "License”);
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
 #     http://www.apache.org/licenses/LICENSE-2.0
 #
@@ -15,26 +16,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# newserver.ps1 - Create a new server instance from an _instance/ template
+# newserver.ps1
 #
-# Modified in 6.2.0
-#
-#   Introduce --update operation to update only the {server}/bin/ scripts
-#   to mirror unix newserver.pl and introduce httpdenv.ps1 in old instances
-#   Fail when attempting to --overlay or --update a non-existant {server}
-#
-# Modified in 6.1.0
-#
-#   Fail when unable to create instance target directory
-#
-# Modified in 6.0.1
-#
-#   Corrected pathname handling for --serverdir and other options
-#
-# Modified in 6.0.0 
-#
-#   Transitioned from wsh/vbs to PowerShell for i18n support
-#   Dropped default userfile creation (not used by any conf example)
+# This script creates a new server instance directory tree from an _instance/ template
 #
 
 $name = "newserver"
@@ -54,12 +38,11 @@ $enablessl = $false
 $help = $false
 
 Write-Host "newserver.ps1 script - deploy a new httpd server instance"
-Write-Host "Copyright © 2017 Pivotal Software, Inc. All rights reserved."
 Write-Host ""
 
 function syntax {
     Write-Host "Syntax:" $MyInvocation.ScriptName "[--options] [servername]"
-    Write-Host "    --rootdir=/opt/pivotal/webserver   default is current dir"
+    Write-Host "    --rootdir=/path-to-httpdserver  default is current dir"
     Write-Host "    --server=servername             host and default path name to create"
     Write-Host "    --serverdir=/path/to/instance   default is rootdir/{servername}/ target"
     Write-Host "    --overlay                       overlay existing {serverdir} files"
@@ -77,8 +60,8 @@ function syntax {
 
 $patterns = @()
 $smap = @{
-    "User" =  "pwshttpd";
-    "Group" = "pwshttpd";
+    "User" =  "httpd";
+    "Group" = "httpd";
     "rel_sysconfdir" = "conf";
     "rel_logfiledir" = "logs";
     "exp_runtimedir" = "logs";
@@ -472,6 +455,4 @@ if ($update) {
     Write-Host ""
     Write-Host "Install the service by invoking "
     Write-Host "    `"$serverdir/bin/httpdctl.ps1`" install"
-    Write-Host ""
-    Write-Host "Thank you for choosing Pivotal Web Server."
 }

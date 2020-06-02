@@ -1,6 +1,6 @@
-# Pivotal OSS Build Schema for Apache HTTP Server
-#
-# Copyright (C) 2017-Present Pivotal Software, Inc. All rights reserved.
+# VMware OSS Build Schema for Apache HTTP Server
+# 
+# Copyright (c) 2017-2020 VMware, Inc.
 #
 # This program and the accompanying materials are made available under
 # the terms of the under the Apache License, Version 2.0 (the "License”);
@@ -37,7 +37,7 @@ SRCDIR=$(shell cd ..; pwd)/src
 include $(SRCDIR)/$(BLD)-manifest-vars
 
 DESTDIR=$(shell cd ..; pwd)/dst/$(httpd_srcdir)$(TAG)
-TARGET=/opt/pivotal/webserver/$(httpd_srcdir)$(TAG)
+TARGET=/opt/apache/webserver/$(httpd_srcdir)$(TAG)
 
 CMAKE_DEFAULTS=-G "Unix Makefiles" -D CMAKE_COLOR_MAKEFILE=OFF
 PREFER_CMAKE=0

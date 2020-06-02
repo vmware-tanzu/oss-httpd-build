@@ -1,7 +1,7 @@
 ﻿#
-# Pivotal Instance Management Schema for Apache HTTP Server
+# VMware Instance Management Schema for Apache HTTP Server
 #
-# Copyright (C) 2017-Present Pivotal Software, Inc. All rights reserved.
+# Copyright (C) 2017-2020 VMware, Inc.
 #
 # This program and the accompanying materials are made available under
 # the terms of the under the Apache License, Version 2.0 (the "License”);
@@ -17,7 +17,7 @@
 # limitations under the License.
 
 # httpdctl.ps1  This script takes care of installing, starting and stopping
-#               Pivotal Web Server services on the Windows platform, following
+#               Apache HTTP Server services on the Windows platform, following
 #               the same syntax as the unix httpdctl script.
 #
 # Be absolutely certain to save this file in Encoding 'UTF-8'.
@@ -29,12 +29,11 @@ $server_root="@ServerRoot@"
 $apache_root="@exp_httpddir@"
 $apache_bin="$apache_root/bin/httpd.exe"
 $apache_pid="$server_root/logs/httpd.pid" 
-$service_name="Pivotal httpd @ServerInstance@"
+$service_name="Apache httpd @ServerInstance@"
 $action="help"
 $start_flags=""
 
 Write-Host "httpdctl.ps1 - manage the $service_name server instance"
-Write-Host "Copyright © 2017 Pivotal Software, Inc. All rights reserved."
 Write-Host ""
 
 if ($args.Count -gt 0) { 

@@ -1,10 +1,11 @@
-# Pivotal OSS Build Schema for Apache HTTP Server
+# VMware OSS Build Schema for Apache HTTP Server
+# 
+# Copyright (c) 2017-2020 VMware, Inc.
 #
-# Copyright (c) 2017 Pivotal Software, Inc.
-#
-# Pivotal licenses this file to You under the Apache License, Version 2.0
-# (the "License"); you may not use this file except in compliance with
-# the License.  You may obtain a copy of the License at
+# This program and the accompanying materials are made available under
+# the terms of the under the Apache License, Version 2.0 (the "License”);
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
 #     http://www.apache.org/licenses/LICENSE-2.0
 #
@@ -52,7 +53,7 @@ collect-httpd: pre-package
 		--srcdir=$(DESTDIR) \
 		--dstdir=@@PRODUCT_ROOT@@/$(httpd_srcdir)$(TAG) $(PKGDIR)
 	perl ../instance-conf/httpd-2.4/bin/fixrootpath.pl \
-		--srcdir=/opt/pivotal/webserver/httpd-2.4 \
+		--srcdir=/opt/apache/webserver/httpd-2.4 \
 		--dstdir=@@PRODUCT_ROOT@@/$(httpd_srcdir)$(TAG) $(PKGDIR)
 
 prepare-instance: collect-httpd

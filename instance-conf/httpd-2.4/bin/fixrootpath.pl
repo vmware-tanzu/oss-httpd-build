@@ -1,8 +1,8 @@
 #!/usr/bin/perl
 #
-# Pivotal Instance Management Schema for Apache HTTP Server
+# VMware Instance Management Schema for Apache HTTP Server
 #
-# Copyright (C) 2017-Present Pivotal Software, Inc. All rights reserved.
+# Copyright (C) 2017-2020 VMware, Inc.
 #
 # This program and the accompanying materials are made available under
 # the terms of the under the Apache License, Version 2.0 (the "License”);
@@ -24,7 +24,7 @@
 #   --srcdir=path or string to be replaced 
 #   --dstdir=/path/to/destination/installation
 #
-# Pivotal Web Server patch distributions include two patterns to replace:
+# This package of Apache HTTP Server include two patterns to replace:
 #
 #   @@ PRODUCT_ROOT @@    --  the product root path
 #   @@ SERVER_ROOT @@	  --  one /path-to-root/servers/{instance}
