@@ -65,7 +65,7 @@ collect-httpd: pre-package
 !IFDEF VCRUNTIME
 	copy $(VCToolsRedistDir)\vcruntime*.dll $(PKGDIR)\bin\ 
 !ENDIF
-	del $(PKGDIR)\bin\pcre*.*
+	del $(PKGDIR)\bin\pcre*test.*
 	del $(PKGDIR)\bin\runtest.*
 	del $(PKGDIR)\bin\runsuite.*
 	del $(PKGDIR)\bin\test*.*
