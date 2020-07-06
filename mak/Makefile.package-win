@@ -52,7 +52,7 @@ OBJCOPY=objcopy
 all: package-httpd
 
 pre-package:
-	-rd /s/q $(PKGDIR) 2>/dev/null
+	-rd /s/q $(PKGDIR) 2>NUL
 
 collect-httpd: pre-package
 	xcopy /s/v/e/i $(DESTDIR) $(PKGDIR)

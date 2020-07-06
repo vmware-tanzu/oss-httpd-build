@@ -129,7 +129,7 @@ enable_ldap=--enable-ldap --enable-authnz-ldap
 
 $(openldap_srcdir)/Makefile: build-openssl \
 			     $(SRCDIR)/$(openldap_srcdir)/configure
-	-mkdir $(openldap_srcdir) 2>/dev/null
+	-mkdir $(openldap_srcdir) 2>NUL
 	cd $(openldap_srcdir) && \
 	  CPPFLAGS="-I$(DESTDIR)/include $(CPPFLAGS)" \
 	  LDFLAGS="-L$(DESTDIR)/lib $(LDFLAGS)" \
@@ -801,7 +801,7 @@ $(httpd_srcdir)/Makefile: build-openssl build-openldap \
 			  build-apr build-aprutil \
 			  build-nghttp2 build-curl \
 			  $(SRCDIR)/$(httpd_srcdir)/configure
-	-mkdir $(httpd_srcdir) 2>/dev/null
+	-mkdir $(httpd_srcdir) 2>NUL
 	cd $(httpd_srcdir) && \
 	  $(SRCDIR)/$(httpd_srcdir)/configure \
 		 --prefix=$(DESTDIR) \

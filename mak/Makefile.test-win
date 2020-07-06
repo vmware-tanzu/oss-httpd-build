@@ -81,7 +81,7 @@ test-nghttp2: pre-test
 
 # Omiting -apxs $(DESTDIR)/bin/apxs.bat for the time being
 $(httpdtest_srcdir)/t/TEST: pre-test
-	-mkdir $(httpdtest_srcdir) 2>/dev/null
+	-mkdir $(httpdtest_srcdir) 2>NUL
 	xcopy /s/v/e $(SRCDIR)\$(httpdtest_srcdir) $(httpdtest_srcdir) && \
 	cd $(httpdtest_srcdir) && \
 	  perl Makefile.PL && \
