@@ -460,7 +460,7 @@ gather-libxml2-rc: pre-manifest
 
 gather-libxml2-master: pre-manifest
 	libxml2_srcpath=https://github.com/gnome/libxml2 && \
-	libxml2_ver=mainline && \
+	libxml2_ver=master && \
 	if test -d libxml2-git; then ( cd libxml2-git; git fetch --all ); else ( git clone $$libxml2_srcpath --bare libxml2-git ); fi && \
 	libxml2_rev=`cd libxml2-git; git show -b $$libxml2_ver --format="format:%h" --name-only | awk "//{print $$1; exit;}"` && \
 	libxml2_srcdir=libxml2-2.x-$$libxml2_rev && \
