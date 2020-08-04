@@ -231,17 +231,6 @@ gather-openssl-candidate: pre-manifest
 	echo openssl_srcpath=$$openssl_srcpath >>$(BLD)-manifest-vars && \
 	echo openssl_ver=$$openssl_ver >>$(BLD)-manifest-vars
 
-gather-openssl-111branch: # pre-manifest
-	openssl_srcpath=https://github.com/openssl/openssl && \
-	openssl_ver=OpenSSL_1_1_1-stable && \
-	if test -d openssl-git; then ( cd openssl-git; git fetch --all ); else ( git clone $$openssl_srcpath --bare openssl-git ); fi && \
-	openssl_rev=`cd openssl-git; git show -b $$openssl_ver --format="format:%h" --name-only | awk "//{print $$1; exit;}"` && \
-	openssl_srcdir=openssl-1.1.1-$$openssl_rev && \
-	echo openssl_rev=$$openssl_rev >>$(BLD)-manifest-vars && \
-	echo openssl_srcdir=$$openssl_srcdir >>$(BLD)-manifest-vars && \
-	echo openssl_srcpath=$$openssl_srcpath >>$(BLD)-manifest-vars && \
-	echo openssl_ver=$$openssl_ver >>$(BLD)-manifest-vars
-
 gather-openssl-master: pre-manifest
 	openssl_srcpath=https://github.com/openssl/openssl && \
 	openssl_ver=master && \
@@ -545,7 +534,7 @@ gather-complete-candidate: gather-core-candidate \
 gather-core-snapshot: gather-apr-1xbranch gather-aprutil-1xbranch \
 		      gather-expat-master gather-pcre-trunk \
 		      gather-apriconv-1xbranch gather-libxml2-master \
-		      gather-httpd-2xbranch gather-openssl-111branch \
+		      gather-httpd-2xbranch gather-openssl-master \
 		      gather-nghttp2-master gather-brotli-master \
 		      gather-curl-master gather-httpdtest-trunk \
 		      gather-zlib-master gather-jansson-master
