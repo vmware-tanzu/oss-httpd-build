@@ -183,11 +183,11 @@ build-apr: $(apr_srcdir)/Makefile
 	cd $(apr_srcdir) && \
 	  $(MAKE) && \
 	  $(MAKE) install && \
-	  copy "$(SRCDIR)\$(apr_srcdir)\include\arch\*.h" "$(DESTDIR)\include\arch" && \
+	  copy "$(SRCDIR)\$(apr_srcdir)\include\arch\*.h" "$(DESTDIR)\include\arch" & \
 	  copy "$(SRCDIR)\$(apr_srcdir)\include\arch\win32\*.h" "$(DESTDIR)\include\arch\win32" && \
-	  copy /y CMakeFiles\apr-1.dir\apr-1.pdb "$(DESTDIR)\lib" && \
-	  copy /y CMakeFiles\aprapp-1.dir\aprapp-1.pdb "$(DESTDIR)\lib" && \
-	  copy /y CMakeFiles\libaprapp-1.dir\libaprapp-1.pdb "$(DESTDIR)\lib" && \
+	  copy /y CMakeFiles\apr-$(apr_major).dir\apr-$(apr_major).pdb "$(DESTDIR)\lib" && \
+	  copy /y CMakeFiles\aprapp-$(apr_major).dir\aprapp-$(apr_major).pdb "$(DESTDIR)\lib" && \
+	  copy /y CMakeFiles\libaprapp-$(apr_major).dir\libaprapp-$(apr_major).pdb "$(DESTDIR)\lib" && \
 	cd ..
 
 
@@ -202,10 +202,10 @@ with_apriconv=--with-apr-iconv=$(DESTDIR)
 $(apriconv_srcdir)/Makefile.win: $(SRCDIR)\$(apriconv_srcdir)\build\modules.mk.win
 	-mkdir $(apriconv_srcdir) 2>NUL
 	xcopy /s/e/d/y "$(SRCDIR)\$(apriconv_srcdir)\*" "$(apriconv_srcdir)\"
-	sed -e "s# \([^= ]*\)\\\\\([lib]*apr-1\.lib\) # /libpath:\1 \2 #;" \
+	sed -e "s# \([^= ]*\)\\\\\([lib]*apr-$(apr_major)\.lib\) # /libpath:\1 \2 #;" \
 		< $(SRCDIR)\$(apriconv_srcdir)\build\modules.mk.win \
 		> $(apriconv_srcdir)\build\modules.mk.win
-	sed -e "s#"".*\\\\libapr-1.lib""# #;s#\(LINK32_FLAGS=\)\(.*\) /out#\1 libapr-1.lib \2 /libpath:..\\\\$(apr_srcdir)\\\\$$(OUTDIR) /out#;" \
+	sed -e "s#"".*\\\\libapr-.lib""# #;s#\(LINK32_FLAGS=\)\(.*\) /out#\1 libapr-$(apr_major).lib \2 /libpath:..\\\\$(apr_srcdir)\\\\$$(OUTDIR) /out#;" \
 		< $(SRCDIR)\$(apriconv_srcdir)\libapriconv.mak \
 		> $(apriconv_srcdir)\libapriconv.mak
 	copy << $(apriconv_srcdir)\Makefile.win
@@ -311,7 +311,7 @@ build-aprutil: $(aprutil_srcdir)/Makefile
 	cd $(aprutil_srcdir) && \
 	  $(MAKE) && \
 	  $(MAKE) install && \
-	  copy /y CMakeFiles\aprutil-1.dir\aprutil-1.pdb "$(DESTDIR)\lib" && \
+	  copy /y CMakeFiles\aprutil-$(apr_major).dir\aprutil-$(apr_major).pdb "$(DESTDIR)\lib" && \
 	cd ..
 !ENDIF
 
