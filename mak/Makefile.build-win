@@ -157,6 +157,7 @@ $(apr_srcdir)/Makefile: build-openssl build-expat \
 	-mkdir $(apr_srcdir) 2>NUL
 	cd $(apr_srcdir) && \
 	  cmake $(CMAKE_DEFAULTS) \
+		-D APR_INSTALL_PRIVATE_H=ON  \
 		-D CMAKE_INSTALL_PREFIX=$(DESTDIR) \
 		$(SRCDIR)/$(apr_srcdir) && \
 	cd ..
@@ -177,14 +178,9 @@ $(apr_srcdir)/Makefile: build-openssl build-expat \
 !ENDIF
 
 build-apr: $(apr_srcdir)/Makefile
-	-cd $(apr_srcdir) && \
-	  mkdir "$(DESTDIR)\include\arch" && \
-	  mkdir "$(DESTDIR)\include\arch\win32"
 	cd $(apr_srcdir) && \
 	  $(MAKE) && \
 	  $(MAKE) install && \
-	  copy "$(SRCDIR)\$(apr_srcdir)\include\arch\*.h" "$(DESTDIR)\include\arch" & \
-	  copy "$(SRCDIR)\$(apr_srcdir)\include\arch\win32\*.h" "$(DESTDIR)\include\arch\win32" && \
 	  copy /y CMakeFiles\apr-$(apr_major).dir\apr-$(apr_major).pdb "$(DESTDIR)\lib" && \
 	  copy /y CMakeFiles\aprapp-$(apr_major).dir\aprapp-$(apr_major).pdb "$(DESTDIR)\lib" && \
 	  copy /y CMakeFiles\libaprapp-$(apr_major).dir\libaprapp-$(apr_major).pdb "$(DESTDIR)\lib" && \

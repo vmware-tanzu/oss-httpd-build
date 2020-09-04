@@ -117,6 +117,7 @@ gather-apr-release: pre-manifest
 	apr_ver=`echo $$apr_pkg | sed 's#apr-\(.*\)\.tar\.bz2#\1#;'` && \
 	apr_srcdir=apr-$$apr_ver && \
 	apr_major=`echo $$apr_ver | sed 's#\([0-9]*\)\..*#\1#;'` && \
+	echo apr_major=$$apr_major >>$(BLD)-manifest-vars && \
 	echo apr_pkg=$$apr_pkg >>$(BLD)-manifest-vars && \
 	echo apr_srcdir=$$apr_srcdir >>$(BLD)-manifest-vars && \
 	echo apr_srcpath=$$apr_srcpath >>$(BLD)-manifest-vars && \
@@ -127,6 +128,8 @@ gather-apr-rc: pre-manifest
 	apr_pkg=`wget -q -O - $$apr_srcpath/ | sed -n '/<a href="\(apr-1\.[0-9]\.[0-9]*\.tar\.bz2\)"/{s#.*href="\([^"]*\).*#\1#;h};$$!b;g;p'` && \
 	apr_ver=`echo $$apr_pkg | sed 's#apr-\(.*\)\.tar\.bz2#\1#;'` && \
 	apr_srcdir=apr-$$apr_ver && \
+	apr_major=`echo $$apr_ver | sed 's#\([0-9]*\)\..*#\1#;'` && \
+	echo apr_major=$$apr_major >>$(BLD)-manifest-vars && \
 	echo apr_pkg=$$apr_pkg >>$(BLD)-manifest-vars && \
 	echo apr_srcdir=$$apr_srcdir >>$(BLD)-manifest-vars && \
 	echo apr_srcpath=$$apr_srcpath >>$(BLD)-manifest-vars && \
@@ -137,6 +140,8 @@ gather-apr-1xbranch: pre-manifest
 	apr_rev=`svn info $$apr_srcpath | sed -n '/Last Changed Rev: \([0-9]\+\)/{s#.*: ##;p}'` && \
 	apr_ver=1.7.x-$$apr_rev && \
 	apr_srcdir=apr-$$apr_ver && \
+	apr_major=`echo $$apr_ver | sed 's#\([0-9]*\)\..*#\1#;'` && \
+	echo apr_major=$$apr_major >>$(BLD)-manifest-vars && \
 	echo apr_rev=$$apr_rev >>$(BLD)-manifest-vars && \
 	echo apr_srcdir=$$apr_srcdir >>$(BLD)-manifest-vars && \
 	echo apr_srcpath=$$apr_srcpath >>$(BLD)-manifest-vars && \
@@ -147,6 +152,8 @@ gather-apr-trunk: pre-manifest
 	apr_rev=`svn info $$apr_srcpath | sed -n '/Last Changed Rev: \([0-9]\+\)/{s#.*: ##;p}'` && \
 	apr_ver=2.0.x-$$apr_rev && \
 	apr_srcdir=apr-$$apr_ver && \
+	apr_major=`echo $$apr_ver | sed 's#\([0-9]*\)\..*#\1#;'` && \
+	echo apr_major=$$apr_major >>$(BLD)-manifest-vars && \
 	echo apr_rev=$$apr_rev >>$(BLD)-manifest-vars && \
 	echo apr_srcdir=$$apr_srcdir >>$(BLD)-manifest-vars && \
 	echo apr_srcpath=$$apr_srcpath >>$(BLD)-manifest-vars && \
