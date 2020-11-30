@@ -300,7 +300,7 @@ gather-brotli-master: pre-manifest
 
 gather-curl-release: pre-manifest
 	curl_srcpath=https://curl.haxx.se/download && \
-	curl_pkg=`wget -q -O - $$curl_srcpath/ | sed -n '/<a href="\(curl-7\.[0-9.]*\.tar\.bz2\)"/{s#.*href="\([^"]*\).*#\1#;h};$$!b;g;p'` && \
+	curl_pkg=`wget -q -O - $$curl_srcpath.html | sed -n '/<a href="\/download\/\(curl-7\.[0-9.]*\.tar\.bz2\)"/{s#.*href="\/download\/\([^"]*\).*#\1#;h};$$!b;g;p'` && \
 	curl_ver=`echo $$curl_pkg | sed 's#curl-\(.*\)\.tar\.bz2#\1#;'` && \
 	curl_srcdir=curl-$$curl_ver && \
 	echo curl_pkg=$$curl_pkg >>$(BLD)-manifest-vars && \
