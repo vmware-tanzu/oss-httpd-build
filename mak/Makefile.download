@@ -43,7 +43,7 @@ ifdef httpd_pkg
 	  wget -nv $(httpd_srcpath)/$(httpd_pkg) && \
 	  wget -nv $(httpd_srcpath)/$(httpd_pkg).asc && \
 	  cd .. && \
-          tar -xjf pkgs/$(httpd_pkg)
+	  tar -xjf pkgs/$(httpd_pkg)
 else
 	  svn co -q -r $(httpd_rev) $(httpd_srcpath) $(httpd_srcdir)
 endif
@@ -154,7 +154,7 @@ ifdef curl_pkg
 	  wget -nv $(curl_srcpath)/$(curl_pkg) && \
 	  wget -nv $(curl_srcpath)/$(curl_pkg).asc && \
 	  cd .. && \
-          tar -xjf pkgs/$(curl_pkg)
+	  tar -xjf pkgs/$(curl_pkg)
 else
 	  git clone -q $(curl_srcpath).git -n -b $(curl_ver) $(curl_srcdir) && \
 	  cd $(curl_srcdir) && git checkout -q $(curl_rev) && cd ..
@@ -169,7 +169,7 @@ ifdef openldap_pkg
 	  openldap_sig=`echo $(openldap_pkg) | sed 's#\.tgz#.sha1#'` && \
 	  wget -nv $(openldap_srcpath)/$$openldap_sig && \
 	  cd .. && \
-          tar -xzf pkgs/$(openldap_pkg)
+	  tar -xzf pkgs/$(openldap_pkg)
 else
 	  # git clone -q -b OPENLDAP_REL_ENG_$(openldap_ver)
 	  git clone -q $(openldap_srcpath) -n -b $(openldap_ver) $(openldap_srcdir) && \

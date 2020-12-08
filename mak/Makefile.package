@@ -87,7 +87,7 @@ ifdef OBJCOPY
 	cd $(PKGDIR) && \
 	for x in `find . -type f`; do \
 	  if expr \( \( `expr "$$x" : ".*\.debug\$$"` = 0 \) \
-	          \& \( "`file $$x`" : ".*not stripped" \) \) >/dev/null; then \
+		  \& \( "`file $$x`" : ".*not stripped" \) \) >/dev/null; then \
 	    if test \! -f $$x.debug -a \! -h $$x; then ( \
 	      chmod u+w $$x && \
 	      cp -pf $$x $$x.orig && \
@@ -103,8 +103,8 @@ ifdef OBJCOPY
 	      echo \ Split $$x.debug; \
 	      if test $$? -gt 0; then ( \
 		rm -f $$x $$x.debug; \
-	        mv $$x.orig $$x; \
-	        echo \ Skipped $$x.debug; \
+		mv $$x.orig $$x; \
+		echo \ Skipped $$x.debug; \
 	      ); fi; \
 	    ); fi; \
 	  fi; \

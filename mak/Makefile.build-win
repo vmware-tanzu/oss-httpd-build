@@ -683,7 +683,7 @@ build-lua: $(lua_srcdir)/src/Makefile.win
 	copy *lua?.pdb "$(DESTDIR)\bin\"
 	copy *.lib "$(DESTDIR)\lib\"
 	copy lua_src.pdb "$(DESTDIR)\lib\"
-        for %a in (lua.h luaconf.h lualib.h lauxlib.h lua.hpp) do \
+	for %a in (lua.h luaconf.h lualib.h lauxlib.h lua.hpp) do \
 	  copy %a "$(DESTDIR)\include\"
 	cd "..\doc"
 	-mkdir "$(DESTDIR)\man"
@@ -715,8 +715,8 @@ $(curl_srcdir)/Makefile:  $(SRCDIR)/$(curl_srcdir)/CMakeLists.txt
 		-D BUILD_CURL_EXE=OFF \
 		-D BUILD_TESTING=OFF \
 		-D CURL_HIDDEN_SYMBOLS=OFF \
-	        -D CMAKE_USE_LIBSSH=OFF \
-        	-D BUILD_STATIC_LIBS=OFF \
+		-D CMAKE_USE_LIBSSH=OFF \
+		-D BUILD_STATIC_LIBS=OFF \
 		-D BUILD_SHARED_LIBS=ON \
 		-D USE_NGHTTP2=ON \
 		-D NGHTTP2_STATICLIB=ON \
@@ -755,7 +755,7 @@ $(curl_srcdir)/Makefile: build-openssl build-zlib build-jansson build-nghttp2 \
 		 --without-libidn2 \
 		 --without-librtmp \
 		 --without-zsh-functions-dir \
-                 $(with_openldap) \
+		 $(with_openldap) \
 		 --prefix=$(DESTDIR) && \
 	cd ..
 
@@ -782,7 +782,7 @@ $(httpd_srcdir)/Makefile: build-openssl build-openldap \
 		< $(SRCDIR)\$(httpd_srcdir)\CMakeLists.txt \
 		> $(SRCDIR)\$(httpd_srcdir)\CMakeLists.txt.mdpatch && \
 	  copy /y $(SRCDIR)\$(httpd_srcdir)\CMakeLists.txt.mdpatch \
-	          $(SRCDIR)\$(httpd_srcdir)\CMakeLists.txt
+		  $(SRCDIR)\$(httpd_srcdir)\CMakeLists.txt
 !ENDIF
 	cd $(httpd_srcdir) && \
 	  cmake $(CMAKE_DEFAULTS) \
