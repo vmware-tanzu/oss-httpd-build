@@ -67,7 +67,7 @@ test-openssl: pre-test
 test-brotli: pre-test
 !IFDEF brotli_srcdir
 	-cd $(brotli_srcdir) && \
-	  $(MAKE) test
+	  $(MAKE) test && \
 	cd ..
 !ENDIF
 
