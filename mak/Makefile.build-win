@@ -376,6 +376,9 @@ build-brotli: $(brotli_srcdir)/Makefile
 	  $(MAKE) && \
 	  $(MAKE) install && \
 	  copy /y brotli.pdb "$(DESTDIR)\bin" && \
+	  copy /y brotlicommon.pdb "$(DESTDIR)\bin" && \
+	  copy /y brotlidec.pdb "$(DESTDIR)\bin" && \
+	  copy /y brotlienc.pdb "$(DESTDIR)\bin" && \
 	  copy /y CMakeFiles\brotlicommon-static.dir\brotlicommon-static.pdb "$(DESTDIR)\lib" && \
 	  copy /y CMakeFiles\brotlidec-static.dir\brotlidec-static.pdb "$(DESTDIR)\lib" && \
 	  copy /y CMakeFiles\brotlienc-static.dir\brotlienc-static.pdb "$(DESTDIR)\lib" && \
