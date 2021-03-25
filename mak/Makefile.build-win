@@ -90,7 +90,6 @@ $(openssl_srcdir)/Makefile: $(SRCDIR)/$(openssl_srcdir)/Configure
 	  perl $(SRCDIR)/$(openssl_srcdir)/Configure shared \
 		 --libdir=lib --prefix=$(DESTDIR) --openssldir=$(DESTDIR)/ssl $(OPENSSL_ARCH) && \
 	cd ..
-!ENDIF
 
 build-openssl: $(openssl_srcdir)/Makefile
 	cd $(openssl_srcdir) && \
