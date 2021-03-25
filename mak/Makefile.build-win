@@ -81,24 +81,8 @@ OPENSSL_ARCH=VC-WIN64A-masm
 OPENSSL_ARCH=VC-WIN32
 !ENDIF
 
-##!IF "$(patsubst 1.0.%,,$(openssl_ver))" == ""
-##openssl_legacy=1
-##!ENDIF
-
 !IFNDEF openssl_srcdir
 build-openssl:
-!ELSE
-# Ancient openssl 1.0.2 did not support vpath builds or concurrent builds
-!IFDEF openssl_legacy
-$(openssl_srcdir)/Makefile: $(SRCDIR)/$(openssl_srcdir)
-#			    $(firstword $(MAKEFILE_LIST))
-			    
-	-mkdir $(openssl_srcdir) 2>NUL
-	xcopy /s/e/d/y "$(SRCDIR)\$(openssl_srcdir)\*" "$(openssl_srcdir)\"
-	cd $(openssl_srcdir) && \
-	  perl ./Configure --prefix=$(DESTDIR) shared \
-		   -I$(DESTDIR)/include -L$(DESTDIR)/lib $(OPENSSL_ARCH) && \
-	cd ..
 !ELSE
 $(openssl_srcdir)/Makefile: $(SRCDIR)/$(openssl_srcdir)/Configure
 	-mkdir $(openssl_srcdir) 2>NUL
@@ -162,19 +146,7 @@ $(apr_srcdir)/Makefile: build-openssl build-expat \
 		$(SRCDIR)/$(apr_srcdir) && \
 	cd ..
 !ELSE
-$(apr_srcdir)/Makefile: build-openssl build-expat \
-			$(SRCDIR)/$(apr_srcdir)/configure
-	-mkdir $(apr_srcdir) 2>NUL
-	cd $(apr_srcdir) && \
-	  $(SRCDIR)/$(apr_srcdir)/configure \
-		 --with-openssl=$(DESTDIR) \
-		 --with-crypto \
-		 --without-ldap \ 
-		 --without-lber \
-		 --with-installbuilddir=\$${prefix}/build \
-		 --includedir=\$${prefix}/include \
-		 --prefix=$(DESTDIR) && \
-	cd ..
+# TODO: Non-CMake Command line build alternatives?
 !ENDIF
 
 build-apr: $(apr_srcdir)/Makefile
@@ -248,6 +220,7 @@ build-apriconv: $(apriconv_srcdir)/Makefile.win build-apr
 	  $(MAKE) -f Makefile.win PREFIX=$(DESTDIR) install && \
 	cd ..
 !ELSE
+# TODO: Review Non-CMake Command line build alternative
 $(apriconv_srcdir)/Makefile: build-apr \
 			    $(SRCDIR)/$(apriconv_srcdir)/configure
 	-mkdir $(apriconv_srcdir) 2>NUL
@@ -284,23 +257,7 @@ $(aprutil_srcdir)/Makefile: build-openssl build-expat build-apr build-apriconv \
 		$(SRCDIR)/$(aprutil_srcdir) && \
 	cd ..
 !ELSE
-$(aprutil_srcdir)/Makefile: build-openssl build-expat build-apr build-apriconv \
-			    $(SRCDIR)/$(aprutil_srcdir)/configure
-	-mkdir $(aprutil_srcdir) 2>NUL
-	cd $(aprutil_srcdir) && \
-	  $(SRCDIR)/$(aprutil_srcdir)/configure \
-		 $(with_apr) \
-		 $(with_apriconv) \
-		 $(with_openssl) \
-		 $(with_openldap) \
-		 $(with_libxml2) \
-		 $(with_aprexpat) \
-		 --without-nss \
-		 --with-crypto \
-		 --with-installbuilddir=\$${prefix}/build \
-		 --includedir=\$${prefix}/include \
-		 --prefix=$(DESTDIR) && \
-	cd ..
+# TODO: Non-CMake Command line build alternative?
 !ENDIF
 
 build-aprutil: $(aprutil_srcdir)/Makefile
@@ -376,6 +333,9 @@ build-brotli: $(brotli_srcdir)/Makefile
 	  $(MAKE) && \
 	  $(MAKE) install && \
 	  copy /y brotli.pdb "$(DESTDIR)\bin" && \
+	  copy /y brotlicommon.pdb "$(DESTDIR)\bin" && \
+	  copy /y brotlidec.pdb "$(DESTDIR)\bin" && \
+	  copy /y brotlienc.pdb "$(DESTDIR)\bin" && \
 	  copy /y CMakeFiles\brotlicommon-static.dir\brotlicommon-static.pdb "$(DESTDIR)\lib" && \
 	  copy /y CMakeFiles\brotlidec-static.dir\brotlidec-static.pdb "$(DESTDIR)\lib" && \
 	  copy /y CMakeFiles\brotlienc-static.dir\brotlienc-static.pdb "$(DESTDIR)\lib" && \
@@ -410,7 +370,24 @@ build-jansson: $(jansson_srcdir)/Makefile
 build-libxml2:
 
 !ELSE
-!IF $(PREFER_CMAKE)
+!IF $(PREFER_CMAKE) && (("$(BLD)" == "bleed") || ("$(BLD)" == "snapshot"))
+$(libxml2_srcdir)/Makefile: $(SRCDIR)/$(libxml2_srcdir)/CMakeLists.txt
+	-mkdir $(libxml2_srcdir) 2>NUL
+	cd $(libxml2_srcdir) && \
+	  cmake $(CMAKE_DEFAULTS) \
+		-D CMAKE_INSTALL_PREFIX=$(DESTDIR) \
+		-D LIBXML2_WITH_PROGRAMS=OFF \
+		$(SRCDIR)/$(libxml2_srcdir) && \
+	cd ..
+
+build-libxml2: $(libxml2_srcdir)/Makefile
+	cd $(libxml2_srcdir) && \
+	  $(MAKE) && \
+	  $(MAKE) install && \
+	  copy /y libxml2.pdb "$(DESTDIR)\bin" && \
+	cd ..
+!ELSE
+# TODO: Drop upon 2.9.11 release
 $(libxml2_srcdir)/win32/Makefile: $(SRCDIR)/$(libxml2_srcdir)/win32/configure.js
 	-mkdir $(libxml2_srcdir) 2>NUL
 	xcopy /s/e/d/y "$(SRCDIR)\$(libxml2_srcdir)\*" "$(libxml2_srcdir)\"
@@ -516,18 +493,6 @@ build-libxml2: $(libxml2_srcdir)/win32/Makefile
 	  $(MAKE) && \
 	  $(MAKE) install-libs && \
 	cd ..\..
-!ELSE
-$(libxml2_srcdir)/Makefile: $(SRCDIR)/$(libxml2_srcdir)
-	-mkdir $(libxml2_srcdir) 2>NUL
-	cd $(libxml2_srcdir) && \
-	  $(SRCDIR)/$(libxml2_srcdir)/configure prefix=$(DESTDIR) && \
-	cd ..
-
-build-libxml2: $(libxml2_srcdir)/Makefile
-	cd $(libxml2_srcdir) && \
-	  $(MAKE) && \
-	  $(MAKE) install && \
-	cd ..
 !ENDIF
 !ENDIF
 
@@ -535,7 +500,6 @@ build-libxml2: $(libxml2_srcdir)/Makefile
 !IFNDEF nghttp2_srcdir
 build-nghttp2:
 !ELSE
-!IF $(PREFER_CMAKE)
 $(nghttp2_srcdir)/Makefile: $(SRCDIR)/$(nghttp2_srcdir)/CMakeLists.txt
 	-mkdir $(nghttp2_srcdir) 2>NUL
 	cd $(nghttp2_srcdir) && \
@@ -546,15 +510,6 @@ $(nghttp2_srcdir)/Makefile: $(SRCDIR)/$(nghttp2_srcdir)/CMakeLists.txt
 		-D ENABLE_STATIC_LIB=0 \
 		$(SRCDIR)/$(nghttp2_srcdir) && \
 	cd ..
-!ELSE
-$(nghttp2_srcdir)/Makefile: $(SRCDIR)/$(nghttp2_srcdir)/configure
-	-mkdir $(nghttp2_srcdir) 2>NUL
-	cd $(nghttp2_srcdir) && \
-	  $(SRCDIR)/$(nghttp2_srcdir)/configure \
-		 --enable-lib-only \
-		 --prefix=$(DESTDIR) && \
-	cd ..
-!ENDIF
 
 build-nghttp2: $(nghttp2_srcdir)/Makefile
 	cd $(nghttp2_srcdir) && \
@@ -568,7 +523,6 @@ build-nghttp2: $(nghttp2_srcdir)/Makefile
 !IFNDEF lua_srcdir
 build-lua:
 !ELSE
-!IF $(PREFER_CMAKE)
 $(lua_srcdir)/src/Makefile.win: $(SRCDIR)/$(lua_srcdir)/src/Makefile
 	xcopy /s/e/d/y "$(SRCDIR)\$(lua_srcdir)" "$(lua_srcdir)\"
 	awk > $(lua_srcdir)/src/liblua.rc < $(lua_srcdir)/src/lua.h -f <<
@@ -695,10 +649,6 @@ build-lua: $(lua_srcdir)/src/Makefile.win
 	copy * "$(DESTDIR)\share\doc\lua\"
 	del "$(DESTDIR)\share\doc\lua\*.1"
 	cd "..\.."
-!ELSE
-
-build-lua:
-!ENDIF
 !ENDIF
 
 
@@ -706,9 +656,9 @@ build-lua:
 with_curl=
 build-curl:
 !ELSE
-!IF $(PREFER_CMAKE)
 with_curl=--with-curl=$(DESTDIR)
-$(curl_srcdir)/Makefile:  $(SRCDIR)/$(curl_srcdir)/CMakeLists.txt
+$(curl_srcdir)/Makefile: build-openssl build-zlib build-jansson build-nghttp2 \
+			 $(SRCDIR)/$(curl_srcdir)/CMakeLists.txt
 	-mkdir $(curl_srcdir) 2>NUL
 	cd $(curl_srcdir) && \
 	  cmake $(CMAKE_DEFAULTS) \
@@ -730,45 +680,9 @@ build-curl: $(curl_srcdir)/Makefile
 	  $(MAKE) install && \
 	  copy /y lib\libcurl.pdb "$(DESTDIR)\bin" && \
 	cd ..
-!ELSE
-with_curl=--with-curl=$(DESTDIR)
-$(curl_srcdir)/Makefile: build-openssl build-zlib build-jansson build-nghttp2 \
-			 $(SRCDIR)/$(curl_srcdir)/configure
-	-mkdir $(curl_srcdir) 2>NUL
-	cd $(curl_srcdir) && \
-	  LD_LIBRARY_PATH=$(DESTDIR)/lib:$(LD_LIBRARY_PATH) \
-	    $(SRCDIR)/$(curl_srcdir)/configure \
-		 $(with_ssl) \
-		 $(with_zlib) \
-		 $(with_brotli) \
-		 $(with_nghttp2) \
-		 --without-gnutls \
-		 --without-polarssl \
-		 --without-mbedtls \
-		 --without-cyassl \
-		 --without-nss \
-		 --without-axtls \
-		 --without-libpsl \
-		 --without-libmetalink \
-		 --without-libssh2 \
-		 --without-gssapi \
-		 --without-libidn2 \
-		 --without-librtmp \
-		 --without-zsh-functions-dir \
-		 $(with_openldap) \
-		 --prefix=$(DESTDIR) && \
-	cd ..
-
-build-curl: $(curl_srcdir)/Makefile
-	cd $(curl_srcdir) && \
-	  $(MAKE) && \
-	  $(MAKE) install && \
-	cd ..
-!ENDIF
 !ENDIF
 
 
-!IF $(PREFER_CMAKE)
 $(httpd_srcdir)/Makefile: build-openssl build-openldap \
 			  build-brotli build-jansson build-libxml2 \
 			  build-lua build-pcre build-zlib \
@@ -776,63 +690,12 @@ $(httpd_srcdir)/Makefile: build-openssl build-openldap \
 			  build-nghttp2 build-curl \
 			  $(SRCDIR)/$(httpd_srcdir)/CMakeLists.txt
 	-mkdir $(httpd_srcdir) 2>NUL
-!IF "$(httpd_ver)" == "2.4.41"
-	sed -e "s#\(.*/server\)$$#\1 \1/mpm/winnt#" \
-	    -e "s#\(SET(mod_md_requires *[^ ]*\) .*)#\1)#" \
-		< $(SRCDIR)\$(httpd_srcdir)\CMakeLists.txt \
-		> $(SRCDIR)\$(httpd_srcdir)\CMakeLists.txt.mdpatch && \
-	  copy /y $(SRCDIR)\$(httpd_srcdir)\CMakeLists.txt.mdpatch \
-		  $(SRCDIR)\$(httpd_srcdir)\CMakeLists.txt
-!ENDIF
 	cd $(httpd_srcdir) && \
 	  cmake $(CMAKE_DEFAULTS) \
 		-D CMAKE_INSTALL_PREFIX=$(DESTDIR) \
 		-D CURL_LIBRARIES=$(DESTDIR)/lib/libcurl_imp.lib \
 		$(SRCDIR)/$(httpd_srcdir) && \
 	cd ..
-!ELSE
-$(httpd_srcdir)/Makefile: build-openssl build-openldap \
-			  build-brotli build-jansson build-libxml2 \
-			  build-lua build-pcre build-zlib \
-			  build-apr build-aprutil \
-			  build-nghttp2 build-curl \
-			  $(SRCDIR)/$(httpd_srcdir)/configure
-	-mkdir $(httpd_srcdir) 2>NUL
-	cd $(httpd_srcdir) && \
-	  $(SRCDIR)/$(httpd_srcdir)/configure \
-		 --prefix=$(DESTDIR) \
-		 $(with_ssl) \
-		 $(with_apr) \
-		 $(with_aprutil) \
-		 $(with_brotli) \
-		 $(with_jansson) \
-		 $(with_libxml2) \
-		 $(with_lua) \
-		 $(with_pcre) \
-		 $(with_zlib) \
-		 $(with_nghttp2) \
-		 $(with_openldap) \
-		 $(with_curl) \
-		 --enable-mods-shared=all \
-		 --enable-mpms-shared=all \
-		 --enable-load-all-modules \
-		 --enable-unixd=static \
-		 --enable-version=static \
-		 $(enable_ldap) \
-		 --disable-dialup \
-		 --disable-echo \
-		 --disable-reflector \
-		 --enable-cgi=shared \
-		 --enable-authnz-fcgi=shared \
-		 --enable-proxy-http2=shared \
-		 --enable-suexec=shared \
-		 --with-suexec-caller=httpd \
-		 --with-suexec-bin=$(TARGET)/bin/suexec		\
-		 --with-suexec-docroot=$(TARGET)/suexec-cgi-bin	\
-		 --with-suexec-logfile=$(TARGET)/logs/suexec.log \
-		 --with-mpm=event && \
-	cd ..
-!ENDIF
 
 build-httpd: $(httpd_srcdir)/Makefile
 	cd $(httpd_srcdir) && \
