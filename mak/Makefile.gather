@@ -278,7 +278,7 @@ gather-nghttp2-master: pre-manifest
 gather-brotli-release: pre-manifest
 	brotli_srcpath=https://github.com/google/brotli/releases && \
 	brotli_ver=`wget --max-redirect=0 $$brotli_srcpath/latest/ 2>&1 | sed 's#Location: .*/tag/v\([^/]*\) \[following\]#\1#p;d;'` && \
-	brotli_srcpath=https://github.com/google/brotli/archive/v$$brotli_ver.tar.gz && \
+	brotli_srcpath=https://github.com/google/brotli/archive/refs/tags/v$$brotli_ver.tar.gz && \
 	brotli_srcdir=brotli-$$brotli_ver && \
 	brotli_pkg=$$brotli_srcdir.tar.gz && \
 	echo brotli_pkg=$$brotli_pkg >>$(BLD)-manifest-vars && \
@@ -344,8 +344,8 @@ gather-openldap-master: pre-manifest
 
 gather-expat-release: pre-manifest
 	expat_srcpath=https://github.com/libexpat/libexpat/releases && \
-	expat_ver=`wget -q -O - $$expat_srcpath | sed -n 's#^.*<a.* href=".*\/archive\/R_\(.*\)\.tar\.gz".*$$#\1#;t once;$$!b;:once;p;q;'` && \
-	expat_srcpath=https://github.com/libexpat/libexpat/archive/R_$$expat_ver.tar.gz && \
+	expat_ver=`wget -q -O - $$expat_srcpath | sed -n 's#^.*<a.* href=".*\/archive\/refs\/tags\/R_\(.*\)\.tar\.gz".*$$#\1#;t once;$$!b;:once;p;q;'` && \
+	expat_srcpath=https://github.com/libexpat/libexpat/archive/refs/tags/R_$$expat_ver.tar.gz && \
 	expat_srcdir=libexpat-R_$$expat_ver && \
 	expat_pkg=$$expat_srcdir.tar.gz && \
 	expat_ver=`echo $$expat_ver | sed "s#_#.#g"` && \
@@ -409,8 +409,8 @@ gather-pcre2-trunk: pre-manifest
 
 gather-jansson-release: pre-manifest
 	jansson_srcpath=https://github.com/akheron/jansson/releases && \
-	jansson_ver=`wget -q -O - $$jansson_srcpath | sed -n 's#^.*<a.* href=".*\/archive\/v\(.*\)\.tar\.gz".*$$#\1#;t once;$$!b;:once;p;q;'` && \
-	jansson_srcpath=https://github.com/akheron/jansson/archive/v$$jansson_ver.tar.gz && \
+	jansson_ver=`wget -q -O - $$jansson_srcpath | sed -n 's#^.*<a.* href=".*\/archive\/refs\/tags\/v\(.*\)\.tar\.gz".*$$#\1#;t once;$$!b;:once;p;q;'` && \
+	jansson_srcpath=https://github.com/akheron/jansson/archive/refs/tags/v$$jansson_ver.tar.gz && \
 	jansson_srcdir=jansson-$$jansson_ver && \
 	jansson_pkg=$$jansson_srcdir.tar.gz && \
 	jansson_ver=`echo $$jansson_ver | sed "s#_#.#g"` && \
@@ -433,8 +433,8 @@ gather-jansson-master: pre-manifest
 
 gather-libxml2-release: pre-manifest
 	libxml2_srcpath=https://github.com/GNOME/libxml2/releases && \
-	libxml2_ver=`wget -q -O - $$libxml2_srcpath | sed -n 's#^.*<a.* href=".*\/archive\/v\([^"-]*\)\.tar\.gz".*$$#\1#;t once;$$!b;:once;p;q;'` && \
-	libxml2_srcpath=https://github.com/GNOME/libxml2/archive/v$$libxml2_ver.tar.gz && \
+	libxml2_ver=`wget -q -O - $$libxml2_srcpath | sed -n 's#^.*<a.* href=".*\/archive\/refs\/tags\/v\([^"-]*\)\.tar\.gz".*$$#\1#;t once;$$!b;:once;p;q;'` && \
+	libxml2_srcpath=https://github.com/GNOME/libxml2/archive/refs/tags/v$$libxml2_ver.tar.gz && \
 	libxml2_srcdir=libxml2-$$libxml2_ver && \
 	libxml2_pkg=$$libxml2_srcdir.tar.gz && \
 	libxml2_ver=`echo $$libxml2_ver | sed "s#_#.#g"` && \
@@ -445,8 +445,8 @@ gather-libxml2-release: pre-manifest
 
 gather-libxml2-rc: pre-manifest
 	libxml2_srcpath=https://github.com/GNOME/libxml2/releases && \
-	libxml2_ver=`wget -q -O - $$libxml2_srcpath | sed -n 's#^.*<a.* href=".*\/archive\/v\([^"]*-rc[0-9]*\)\.tar\.gz".*$$#\1#;t once;$$!b;:once;p;q;'` && \
-	libxml2_srcpath=https://github.com/GNOME/libxml2/archive/v$$libxml2_ver.tar.gz && \
+	libxml2_ver=`wget -q -O - $$libxml2_srcpath | sed -n 's#^.*<a.* href=".*\/archive\/refs\/tags\/v\([^"]*-rc[0-9]*\)\.tar\.gz".*$$#\1#;t once;$$!b;:once;p;q;'` && \
+	libxml2_srcpath=https://github.com/GNOME/libxml2/archive/refs/tags/v$$libxml2_ver.tar.gz && \
 	libxml2_srcdir=libxml2-$$libxml2_ver && \
 	libxml2_pkg=$$libxml2_srcdir.tar.gz && \
 	libxml2_ver=`echo $$libxml2_ver | sed "s#_#.#g"` && \
