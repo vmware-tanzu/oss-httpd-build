@@ -467,10 +467,8 @@ gather-libxml2-master: pre-manifest
 	echo libxml2_ver=$$libxml2_ver >>$(BLD)-manifest-vars
 
 gather-lua-release: pre-manifest
-# LUA 5.4.x broken on 2.4.46 - restore this pattern when fix is backported and released
-# 	lua_pkg=`wget -q -O - $$lua_srcpath/ | sed -n '/<A HREF="lua-[0-9]/{s#.*HREF="\(lua-[0-9.]*tar.gz\)".*#\1#;p;q}'`
 	lua_srcpath=https://www.lua.org/ftp && \
-	lua_pkg=`wget -q -O - $$lua_srcpath/ | sed -n '/<A HREF="lua-5\.3/{s#.*HREF="\(lua-[0-9.]*tar.gz\)".*#\1#;p;q}'` && \
+ 	lua_pkg=`wget -q -O - $$lua_srcpath/ | sed -n '/<A HREF="lua-[0-9]/{s#.*HREF="\(lua-[0-9.]*tar.gz\)".*#\1#;p;q}'` && \
 	lua_srcdir=`echo $$lua_pkg | sed 's#\(.*\)\.tar\.gz#\1#;'` && \
 	lua_ver=`echo $$lua_srcdir | sed 's#lua-\(.*\)#\1#;'` && \
 	echo lua_pkg=$$lua_pkg >>$(BLD)-manifest-vars && \
