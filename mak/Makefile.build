@@ -461,7 +461,7 @@ $(curl_srcdir)/Makefile: build-openssl build-zlib build-brotli build-nghttp2 \
 		 --without-nss \
 		 --without-axtls \
 		 --without-libpsl \
-		 --without-libmetalink \
+		 --without-libgsasl \
 		 --without-libssh2 \
 		 --without-gssapi \
 		 --without-libidn2 \
