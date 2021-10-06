@@ -2,7 +2,7 @@
 #
 # VMware Instance Management Schema for Apache HTTP Server
 #
-# Copyright (C) 2017-2020 VMware, Inc.
+# Copyright (C) 2017-2021 VMware, Inc.
 #
 # This program and the accompanying materials are made available under
 # the terms of the under the Apache License, Version 2.0 (the "License”);
