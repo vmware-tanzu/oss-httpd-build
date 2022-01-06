@@ -222,7 +222,7 @@ ifdef libxml2_pkg
 	  cd pkgs && \
 	  wget -nv $(libxml2_srcpath) -O $(libxml2_pkg) && \
 	  cd .. && \
-	  tar -xzf pkgs/$(libxml2_pkg)
+	  tar -xjf pkgs/$(libxml2_pkg)
 else
 	  git clone -q $(libxml2_srcpath).git -n -b $(libxml2_ver) $(libxml2_srcdir) && \
 	  cd $(libxml2_srcdir) && git checkout -q $(libxml2_rev) && cd ..

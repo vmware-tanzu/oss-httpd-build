@@ -233,8 +233,8 @@ changeed, owing to newly downloaded directories to be preconfigured.
  $ make -f ../mak/Makefile.preconfig [BLD={type}]
 
 Prepare configuration scripts of packages, particularly from source control
-where autoconf etc have not been invoked yet. Release and candidate source
-packages are already distributed with this step completed.
+where autoconf etc have not been invoked yet, or where release and candidate
+source packages are not distributed with an autotools step completed.
 
 This makefile is run after `Makefile.gather`+`Makefile.download` from the
 source directory root, and must be performed following updates to the
