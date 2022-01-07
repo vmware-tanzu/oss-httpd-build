@@ -194,12 +194,15 @@ $(pcre_srcdir):
 ifdef pcre_pkg
 	  if test ! -d pkgs; then mkdir pkgs; fi
 	  cd pkgs && \
-	  wget -nv $(pcre_srcpath)/$(pcre_pkg) && \
-	  wget -nv $(pcre_srcpath)/$(pcre_pkg).sig && \
+	  wget -nv $(pcre_srcpath) && \
+	  wget -nv $(pcre_srcpath).sig && \
 	  cd .. && \
 	  tar -xjf pkgs/$(pcre_pkg)
 else
-	  svn co -q -r $(pcre_rev) $(pcre_srcpath) $(pcre_srcdir)
+	  #former logic of exim svn repository, not in sync with gitlab dev
+	  #svn co -q -r $(pcre_rev) $(pcre_srcpath) $(pcre_srcdir)
+	  git clone -q $(pcre_srcpath).git -n -b $(pcre_ver) $(pcre_srcdir) && \
+	  cd $(pcre_srcdir) && git checkout -q $(pcre_rev) && cd ..
 endif
 
 

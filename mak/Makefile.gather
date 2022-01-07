@@ -376,16 +376,6 @@ gather-pcre-release: pre-manifest
 	echo pcre_srcpath=$$pcre_srcpath >>$(BLD)-manifest-vars && \
 	echo pcre_ver=$$pcre_ver >>$(BLD)-manifest-vars
 
-gather-pcre-candidate: pre-manifest
-	pcre_srcpath=https://ftp.pcre.org/pub/pcre/Testing/ && \
-	pcre_pkg=`wget -q -O - $$pcre_srcpath/ | sed -n '/<a href="\(pcre-8\.[0-9]*-RC[0-9]*\.tar\.bz2\)"/{s#.*href="\([^"]*\).*#\1#;h};$$!b;g;p'` && \
-	pcre_srcdir=`echo $$pcre_pkg | sed 's#\(pcre-.*\)\.tar\.bz2#\1#;'` && \
-	pcre_ver=`echo $$pcre_srcdir | sed 's#pcre-\(.*\)#\1#;'` && \
-	echo pcre_pkg=$$pcre_pkg >>$(BLD)-manifest-vars && \
-	echo pcre_srcdir=$$pcre_srcdir >>$(BLD)-manifest-vars && \
-	echo pcre_srcpath=$$pcre_srcpath >>$(BLD)-manifest-vars && \
-	echo pcre_ver=$$pcre_ver >>$(BLD)-manifest-vars
-
 gather-pcre-trunk: pre-manifest
 	pcre_srcpath=svn://vcs.exim.org/pcre/code/trunk && \
 	pcre_rev=`svn info $$pcre_srcpath | sed -n '/Last Changed Rev: \([0-9]\+\)/{s#.*: ##;p}'` && \
@@ -396,11 +386,23 @@ gather-pcre-trunk: pre-manifest
 	echo pcre_srcpath=$$pcre_srcpath >>$(BLD)-manifest-vars && \
 	echo pcre_ver=$$pcre_ver >>$(BLD)-manifest-vars
 
-gather-pcre2-trunk: pre-manifest
-	pcre_srcpath=svn://vcs.exim.org/pcre2/code/trunk && \
-	pcre_rev=`svn info $$pcre_srcpath | sed -n '/Last Changed Rev: \([0-9]\+\)/{s#.*: ##;p}'` && \
-	pcre_ver=10.x-$$pcre_rev && \
-	pcre_srcdir=pcre2-$$pcre_ver && \
+gather-pcre2-release: pre-manifest
+	pcre_srcpath=https://github.com/PhilipHazel/pcre2/releases && \
+	pcre_srcpath=$$pcre_srcpath/`wget -q -O - $$pcre_srcpath | sed -n 's#^.*<a.* href=".*/PhilipHazel/pcre2/releases/\(download/pcre2-[^"/]*/pcre2[^"]*\.tar\.bz2\)".*$$#\1#;t once;$$!b;:once;p;q;'` && \
+	pcre_pkg=`echo $$pcre_srcpath | sed "s#.*/\([^/]*\)#\1#;"` && \
+	pcre_ver=`echo $$pcre_pkg | sed "s#pcre2-\(.*\)\.tar\.bz2#\1#;"` && \
+	pcre_srcdir=`echo $$pcre_pkg | sed "s#\(.*\)\.tar\.bz2#\1#;"` && \
+	echo pcre_pkg=$$pcre_pkg >>$(BLD)-manifest-vars && \
+	echo pcre_srcdir=$$pcre_srcdir >>$(BLD)-manifest-vars && \
+	echo pcre_srcpath=$$pcre_srcpath >>$(BLD)-manifest-vars && \
+	echo pcre_ver=$$pcre_ver >>$(BLD)-manifest-vars
+
+gather-pcre2-master: pre-manifest
+	pcre_srcpath=https://github.com/PhilipHazel/pcre2 && \
+	pcre_ver=master && \
+	if test -d pcre2-git; then ( cd pcre2-git; git fetch --all ); else ( git clone $$pcre_srcpath --bare pcre2-git ); fi && \
+	pcre_rev=`cd pcre2-git; git show -b $$pcre_ver --format="format:%h" --name-only | awk "//{print $$1; exit;}"` && \
+	pcre_srcdir=pcre2-10.x-$$pcre_rev && \
 	echo pcre_rev=$$pcre_rev >>$(BLD)-manifest-vars && \
 	echo pcre_srcdir=$$pcre_srcdir >>$(BLD)-manifest-vars && \
 	echo pcre_srcpath=$$pcre_srcpath >>$(BLD)-manifest-vars && \
@@ -492,7 +494,7 @@ gather-core-release:  gather-apr-release gather-aprutil-release \
 		      gather-curl-release gather-httpdtest-trunk
 
 gather-complete-release: gather-core-release \
-		      gather-expat-release gather-pcre-release \
+		      gather-expat-release gather-pcre2-release \
 		      gather-apriconv-release gather-libxml2-release \
 		      gather-lua-release gather-zlib-release \
 		      gather-jansson-release
@@ -517,7 +519,7 @@ gather-linux-candidate: gather-core-candidate
 	rm $(BLD)-manifest-vars.sav
 
 gather-complete-candidate: gather-core-candidate \
-		      gather-expat-release gather-pcre-candidate \
+		      gather-expat-release gather-pcre2-release \
 		      gather-apriconv-rc gather-libxml2-release \
 		      gather-lua-release gather-zlib-release \
 		      gather-jansson-release
@@ -527,7 +529,7 @@ gather-complete-candidate: gather-core-candidate \
 
 
 gather-core-snapshot: gather-apr-1xbranch gather-aprutil-1xbranch \
-		      gather-expat-master gather-pcre-trunk \
+		      gather-expat-master gather-pcre2-master \
 		      gather-apriconv-1xbranch gather-libxml2-master \
 		      gather-httpd-2xbranch gather-openssl-master \
 		      gather-nghttp2-master gather-brotli-master \
@@ -546,7 +548,7 @@ gather-linux-snapshot: gather-core-snapshot
 	rm $(BLD)-manifest-vars.sav
 
 
-gather-core-bleed:    gather-apr-trunk gather-pcre2-trunk \
+gather-core-bleed:    gather-apr-trunk gather-pcre2-master \
 		      gather-httpd-trunk gather-openssl-master \
 		      gather-nghttp2-master gather-brotli-master \
 		      gather-expat-master gather-libxml2-master \
