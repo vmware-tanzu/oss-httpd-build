@@ -367,21 +367,12 @@ gather-expat-master: pre-manifest
 
 
 gather-pcre-release: pre-manifest
-	pcre_srcpath=https://ftp.pcre.org/pub/pcre/ && \
-	pcre_pkg=`wget -q -O - $$pcre_srcpath/ | sed -n '/<a href="\(pcre-8\.[0-9]*\.tar\.bz2\)"/{s#.*href="\([^"]*\).*#\1#;h};$$!b;g;p'` && \
+	pcre_srcpath=https://ftp.exim.org/pub/pcre && \
+	pcre_srcpath=$$pcre_srcpath/`wget -q -O - $$pcre_srcpath/ | sed -n '/<a href="\(pcre-8\.[0-9]*\.tar\.bz2\)"/{s#.*href="\([^"]*\).*#\1#;h};$$!b;g;p'` && \
+	pcre_pkg=`echo $$pcre_srcpath | sed "s#.*/\([^/]*\)#\1#;"` && \
 	pcre_srcdir=`echo $$pcre_pkg | sed 's#\(pcre-.*\)\.tar\.bz2#\1#;'` && \
 	pcre_ver=`echo $$pcre_srcdir | sed 's#pcre-\(.*\)#\1#;'` && \
 	echo pcre_pkg=$$pcre_pkg >>$(BLD)-manifest-vars && \
-	echo pcre_srcdir=$$pcre_srcdir >>$(BLD)-manifest-vars && \
-	echo pcre_srcpath=$$pcre_srcpath >>$(BLD)-manifest-vars && \
-	echo pcre_ver=$$pcre_ver >>$(BLD)-manifest-vars
-
-gather-pcre-trunk: pre-manifest
-	pcre_srcpath=svn://vcs.exim.org/pcre/code/trunk && \
-	pcre_rev=`svn info $$pcre_srcpath | sed -n '/Last Changed Rev: \([0-9]\+\)/{s#.*: ##;p}'` && \
-	pcre_ver=8.x-$$pcre_rev && \
-	pcre_srcdir=pcre-$$pcre_ver && \
-	echo pcre_rev=$$pcre_rev >>$(BLD)-manifest-vars && \
 	echo pcre_srcdir=$$pcre_srcdir >>$(BLD)-manifest-vars && \
 	echo pcre_srcpath=$$pcre_srcpath >>$(BLD)-manifest-vars && \
 	echo pcre_ver=$$pcre_ver >>$(BLD)-manifest-vars
@@ -494,7 +485,7 @@ gather-core-release:  gather-apr-release gather-aprutil-release \
 		      gather-curl-release gather-httpdtest-trunk
 
 gather-complete-release: gather-core-release \
-		      gather-expat-release gather-pcre2-release \
+		      gather-expat-release gather-pcre-release \
 		      gather-apriconv-release gather-libxml2-release \
 		      gather-lua-release gather-zlib-release \
 		      gather-jansson-release
@@ -519,7 +510,7 @@ gather-linux-candidate: gather-core-candidate
 	rm $(BLD)-manifest-vars.sav
 
 gather-complete-candidate: gather-core-candidate \
-		      gather-expat-release gather-pcre2-release \
+		      gather-expat-release gather-pcre-release \
 		      gather-apriconv-rc gather-libxml2-release \
 		      gather-lua-release gather-zlib-release \
 		      gather-jansson-release
