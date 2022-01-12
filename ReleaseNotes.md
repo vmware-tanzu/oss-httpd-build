@@ -189,7 +189,7 @@ $ {instance}/bin/httpdctl uninstall
 ```
 2. Update the httpdctl script with new features plus any revised service names:
 ```
-$ httpd-2.4/bin/newserver.pl –server={instance} –update
+$ httpd-2.4/bin/newserver.pl --server={instance} --update
 ```
 3. Install and start the service with the new name:
 ```
@@ -208,7 +208,7 @@ PS C:\Apache\WebServer> {instance}\bin\httpdctl.ps1 uninstall
 ```
 2. Update the httpdctl script with new features plus any revised service names:
 ```
-PS C:\...> httpd-2.4\bin\newserver.ps1 –server={instance} –update
+PS C:\...> httpd-2.4\bin\newserver.ps1 --server={instance} --update
 ```
 3. Install and start the service with the new name:
 ```
