@@ -446,14 +446,18 @@ else
 with_curl=--with-curl=$(DESTDIR)
 $(curl_srcdir)/Makefile: build-openssl build-zlib build-brotli build-nghttp2 \
 			 $(SRCDIR)/$(curl_srcdir)/configure
+# Until libcurl includes both brotlidec + brotlicommon, or libbrotli changes 
+# its pkgconfig libs to list -lbrotlicommon for brotlienc+brotlidec, 
+# this option breaks the libcurl build at openssl detection due to unresolved brotli symbols
+#		 $(with_brotli) 
 	-mkdir $(curl_srcdir) 2>/dev/null
 	cd $(curl_srcdir) && \
 	  LD_LIBRARY_PATH=$(DESTDIR)/lib:$(LD_LIBRARY_PATH) \
 	    $(SRCDIR)/$(curl_srcdir)/configure \
 		 $(with_ssl) \
 		 $(with_zlib) \
-		 $(with_brotli) \
 		 $(with_nghttp2) \
+		 --without-brotli \
 		 --without-gnutls \
 		 --without-polarssl \
 		 --without-mbedtls \
