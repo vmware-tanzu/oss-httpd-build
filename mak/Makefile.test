@@ -47,7 +47,7 @@ endif
 test-aprutil: pre-test
 ifdef aprutil_srcdir
 	cd $(aprutil_srcdir) && \
-	  make test && \
+	  LD_LIBRARY_PATH=$(DESTDIR)/lib make test && \
 	cd ..
 endif
 

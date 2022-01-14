@@ -114,7 +114,7 @@ To deploy many of these using RHEL 7 packages, use
 And use CPAN for the packages not distributed with the OS as listed above
 (note the RHEL 7 package perl-Text-Template is too old for use by OpenSSL); 
 
- $ cpan install Text::Template Protocol::HTTP2::Client
+ $ cpan install Apache::Test5005compat Text::Template Protocol::HTTP2::Client
 
 In RHEL 8 and Fedora 30 and later, the libxcrypt package is required
 (although it may often be installed by default), while the Text::Template
@@ -132,6 +132,8 @@ and Protocol::HTTP2 perl packages become available;
            perl-Crypt-SSLeay perl-Net-SSLGlue perl-DateTime \
            perl-Module-Build-Tiny perl-Test-LeakTrace perl-Test-TCP \
            perl-Text-Template Protocol-HTTP2
+
+ $ cpan install Apache::Test5005compat
 
 === RedHat or Fedora Linux deployment package dependencies:
 

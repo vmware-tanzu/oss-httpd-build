@@ -37,10 +37,11 @@ pre-manifest:
 
 
 gather-httpdtest-trunk: pre-manifest
-	httpdtest_srcpath=https://svn.apache.org/repos/asf/httpd/test/framework/trunk && \
-	httpdtest_rev=`svn info $$httpdtest_srcpath | sed -n '/Last Changed Rev: \([0-9]\+\)/{s#.*: ##;p}'` && \
-	httpdtest_ver=$$httpdtest_rev && \
-	httpdtest_srcdir=httpdtest-$$httpdtest_ver && \
+	httpdtest_srcpath=https://github.com/apache/httpd-tests && \
+	httpdtest_ver=trunk && \
+	if test -d httpdtest-git; then ( cd httpdtest-git; git fetch --all ); else ( git clone $$httpdtest_srcpath --bare httpdtest-git ); fi && \
+	httpdtest_rev=`cd httpdtest-git; git show -b $$httpdtest_ver --format="format:%h" --name-only | awk "//{print $$1; exit;}"` && \
+	httpdtest_srcdir=httpdtest-$$httpdtest_rev && \
 	echo httpdtest_rev=$$httpdtest_rev >>$(BLD)-manifest-vars && \
 	echo httpdtest_srcdir=$$httpdtest_srcdir >>$(BLD)-manifest-vars && \
 	echo httpdtest_srcpath=$$httpdtest_srcpath >>$(BLD)-manifest-vars && \

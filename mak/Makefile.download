@@ -33,7 +33,8 @@ all: download-all
 
 
 $(httpdtest_srcdir):
-	svn co -q -r $(httpdtest_rev) $(httpdtest_srcpath) $(httpdtest_srcdir)
+	git clone -q $(httpdtest_srcpath).git -n -b $(httpdtest_ver) $(httpdtest_srcdir) && \
+	cd $(httpdtest_srcdir) && git checkout -q $(httpdtest_rev) && cd ..
 
 
 $(httpd_srcdir):
