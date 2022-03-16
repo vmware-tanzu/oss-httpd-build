@@ -231,9 +231,18 @@ gather-openssl-release: pre-manifest
 	echo openssl_srcpath=$$openssl_srcpath >>$(BLD)-manifest-vars && \
 	echo openssl_ver=$$openssl_ver >>$(BLD)-manifest-vars
 
+gather-openssl3-release: pre-manifest
+	openssl_srcpath=https://www.openssl.org/source && \
+	openssl_pkg=`wget -q -O - $$openssl_srcpath/ | sed 's#.*<a href="\(openssl-3\.[a-z0-9\.]*\.tar\.gz\)".*#\1#p;d;'` && \
+	openssl_ver=`echo $$openssl_pkg | sed 's#openssl-\(.*\)\.tar\.gz#\1#;'` && \
+	echo openssl_pkg=$$openssl_pkg >>$(BLD)-manifest-vars && \
+	echo openssl_srcdir=openssl-$$openssl_ver >>$(BLD)-manifest-vars && \
+	echo openssl_srcpath=$$openssl_srcpath >>$(BLD)-manifest-vars && \
+	echo openssl_ver=$$openssl_ver >>$(BLD)-manifest-vars
+
 gather-openssl-candidate: pre-manifest
 	openssl_srcpath=https://www.openssl.org/source && \
-	openssl_pkg=`wget -q -O - $$openssl_srcpath/ | sed 's#.*<a href="\(openssl-1\.1\.1[a-z0-9-]*\.tar\.gz\)".*#\1#p;d;'` && \
+	openssl_pkg=`wget -q -O - $$openssl_srcpath/ | sed 's#.*<a href="\(openssl-3\.[a-z0-9\.]*\.tar\.gz\)".*#\1#p;d;'` && \
 	openssl_ver=`echo $$openssl_pkg | sed 's#openssl-\(.*\)\.tar\.gz#\1#;'` && \
 	echo openssl_pkg=$$openssl_pkg >>$(BLD)-manifest-vars && \
 	echo openssl_srcdir=openssl-$$openssl_ver >>$(BLD)-manifest-vars && \
@@ -480,13 +489,16 @@ gather-zlib-master: pre-manifest
 	echo zlib_ver=$$zlib_ver >>$(BLD)-manifest-vars
 
 
+# by defining a target using gather-pcre-release or gather-openssl-release, the
+# user can back up to the previous openssl-1.1.1 or pcre-8.x legacy components.
+
 gather-core-release:  gather-apr-release gather-aprutil-release \
-		      gather-httpd-release gather-openssl-release \
+		      gather-httpd-release gather-openssl3-release \
 		      gather-nghttp2-release gather-brotli-release \
 		      gather-curl-release gather-httpdtest-trunk
 
 gather-complete-release: gather-core-release \
-		      gather-expat-release gather-pcre-release \
+		      gather-expat-release gather-pcre2-release \
 		      gather-apriconv-release gather-libxml2-release \
 		      gather-lua-release gather-zlib-release \
 		      gather-jansson-release
@@ -511,7 +523,7 @@ gather-linux-candidate: gather-core-candidate
 	rm $(BLD)-manifest-vars.sav
 
 gather-complete-candidate: gather-core-candidate \
-		      gather-expat-release gather-pcre-release \
+		      gather-expat-release gather-pcre2-release \
 		      gather-apriconv-rc gather-libxml2-release \
 		      gather-lua-release gather-zlib-release \
 		      gather-jansson-release
