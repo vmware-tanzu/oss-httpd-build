@@ -26,7 +26,7 @@ be built from source.
 
 The build target is `/opt/apache/webserver/httpd-2.4/`
 on Linux and Windows, this is simply a symlink. Each has
-a longer pathname, e.g. `httpd-2.4.33{-bldno}/` which is
+a longer pathname, e.g. `httpd-2.4.53{-bldno}/` which is
 symlinked from this httpd-2.4 path. Non-release builds
 have additional pathname components such as `-snapshot`,
 `-bleed`, etc, and may have a TAG to distinguish two
@@ -100,7 +100,7 @@ For the actual `Makefile.build` phase, a number of system component -devel
 packages are needed.
 
  $ yum install libuuid-devel expat-devel jansson-devel libxml2-devel \
-           lua-devel pcre-devel zlib-devel docbook2X
+           lua-devel pcre2-devel zlib-devel docbook2X
 
 Perl is used by the openssl documentation schema (Text::Template)
 and many Perl packages are used by the httpdtest perl framework.
@@ -125,7 +125,7 @@ and Protocol::HTTP2 perl packages become available;
  $ dnf install cmake imake
 
  $ dnf install libuuid-devel expat-devel jansson-devel libxml2-devel \
-           libxcrypt-devel lua-devel pcre-devel zlib-devel docbook2X
+           libxcrypt-devel lua-devel pcre2-devel zlib-devel docbook2X
 
  $ dnf install perl-core perl-Module-Load-Conditional \
            perl-HTTP-DAV perl-LWP-Protocol-https perl-AnyEvent-HTTP \
@@ -153,7 +153,7 @@ In RHEL 8 and Fedora 30 and later, the libxcrypt package is required
 
 === Ubuntu or Debian development package dependencies:
 
-Tested with Ubuntu 16.04 and 18.04, install the following
+Tested with Ubuntu 18.04 and 20.04, install the following
 required tools which may not be included by default;
 
  $ apt-get install build-essential autoconf cmake docbook2x git \
@@ -162,7 +162,7 @@ required tools which may not be included by default;
 For the actual `Makefile.build` phase, a number of system component -devel
 packages are needed.
 
- $ apt-get install libexpat1-dev libjansson-dev libpcre3-dev \
+ $ apt-get install libexpat1-dev libjansson-dev libpcre2-dev \
                uuid-dev libxml2-dev liblua5.3-dev zlib1g-dev
 
 Perl is used by the openssl documentation schema (Text::Template)
@@ -188,7 +188,7 @@ with the -devel packages above; most are already present by default);
 
 === Microsoft Windows dependencies
 
- . Microsoft Visual Studio 2017 or 2015
+ . Microsoft Visual Studio 2017 or 2022
  . NASM Assembler
  . ActiveState or Strawberry Perl
  . unxutils or gnuwin32 Windows-native unix command line tools (Note mingw and cygwin are not supported)
@@ -333,4 +333,5 @@ and `logs` subdirectories. The `bin` directory includes an environment script
 for consuming the instance's and then binaries distributed in `httpd-2.4/bin`,
 as well as an httpd control script `httpdctl`.
 
-
+See the README.md file for more specific details about package installation 
+and instance management.

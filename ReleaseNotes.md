@@ -8,7 +8,7 @@ These release notes cover the following topics:
 * Included Components
 * RHEL 7 Users
 * RHEL 8 Users
-* Ubuntu 16.04 and 18.04 Users
+* Ubuntu 18.04 / 20.04 Users
 * Microsoft Windows Users
 * Installation
 * Instance Creation
@@ -23,6 +23,8 @@ This package is structured to allow parallel installation of multiple releases o
 Unlike many httpd distributions, the end user instance configuration, server content, and logs and are not modified in this program distribution tree. See the section on Instance Creation for details of creating a server instance with these user maintained files.
 
 In order to build httpd from scratch, see additional details at VMware's [https://github.com/appsuite/oss-httpd-build](github oss-httpd-build) project. A tarball of unix sources and zipfile of windows sources is provided alongside the binary release downloads for ready reference.
+
+Versions prior to 2.4.53 used the OpenSSL and PCRE-8.x legacy versions. As of httpd 2.4.53, OpenSSL release 3.0 and PCRE2 release 10.x are used instead. If modules were also compiled to consume OpenSSL or PCRE2 themselves, they must be rebuilt.
 
 ## **Included Components**
 
@@ -59,8 +61,8 @@ In cases where the project does not maintain a reference to specific CVE's in an
 [https://www.openssl.org/news/vulnerabilities.html]  
 [https://www.openssl.org/news/changelog.html]
 * PCRE library (\*)  
-[https://www.cvedetails.com/vulnerability-list/vendor_id-3265/opdos-1/Pcre.html]  
-[https://www.pcre.org/original/changelog.txt]
+[https://www.cvedetails.com/vulnerability-list/vendor_id-3265/product_id-33513/Pcre-Pcre2.html]  
+[https://www.pcre.org/changelog.txt]
 * Zlib compression library (\*)  
 [https://www.cvedetails.com/vulnerability-list/vendor_id-72/product_id-1820/GNU-Zlib.html]  
 [https://zlib.net/ChangeLog.txt]
@@ -69,7 +71,7 @@ In cases where the project does not maintain a reference to specific CVE's in an
 
 The RHEL 7 package requires several commonly installed packages to be available, these may be provisioned with the following command;
 ```
-$ yum install libuuid expat jansson libxml2 lua pcre zlib
+$ yum install libuuid expat jansson libxml2 lua pcre2 zlib
 ```
 In order to use the provided apxs utility, additional packages are required as indicated at the [https://github.com/appsuite/oss-httpd-build](https://github.com/appsuite/oss-httpd-build) README page.
 
@@ -77,23 +79,23 @@ In order to use the provided apxs utility, additional packages are required as i
 
 The RHEL 7 package is compatible with RHEL 8 and Fedora 30+, and requires some less commonly installed packages to be available. These may all be provisioned with the following command;
 
-$ dnf install libuuid expat jansson libxcrypt-compat libxml2 lua pcre zlib
+$ dnf install libuuid expat jansson libxcrypt-compat libxml2 lua pcre2 zlib
 
-## **Ubuntu 16.04 and 18.04 Users**
+## **Ubuntu 18.04 and 20.04 Users**
 
-The Ubuntu 16.04 package (compatible with 18.04) requires several commonly installed packages to be available, these may be provisioned with the following command;
+The Ubuntu 18.04 package (compatible with 20.04) requires several commonly installed packages to be available, these may be provisioned with the following command;
 ```
-$ apt-get install libexpat1 libjansson4 libpcre3 libxml2 libuuid1 liblua5.3-0 zlib1g
+$ apt-get install libexpat1 libjansson4 libpcre2-8-0 libxml2 libuuid1 liblua5.3-0 zlib1g
 ```
 In order to use the provided apxs utility, additional packages are required as indicated at the [https://github.com/appsuite/oss-httpd-build](https://github.com/appsuite/oss-httpd-build) README page.
 
 ## **Microsoft Windows Users**
 
-This package is built using Visual C++ 19 and C Runtime version 14, components of Microsoft Visual Studio 2019. Windows Server 2019 and Windows Server 2016 are all suitable for deployment. Windows 10 is suitable for developer evaluation but is not suitable for server deployment, as Microsoft restricts the Windows 10 desktop license, limiting aspects of the operating system behavior including the Windows Sockets API, and tunes the process scheduler to deliver a better desktop experience.
+This package is built using Visual C++ 19 and C Runtime version 14, components of Microsoft Visual Studio 2022. Windows Server 2022 and Windows Server 2019 are both suitable for deployment. Windows 11 and Windows 10 Desktop are suitable for developer evaluation but are not suitable for server deployment, as Microsoft restricts the Windows Desktop license, limiting aspects of the operating system behavior including the Windows Sockets API, and tunes the process scheduler to deliver a better desktop experience.
 
-Users must obtain and install the "Microsoft Visual C++ Redistributable for Visual Studio 2019", x64 edition; from [https://visualstudio.microsoft.com/downloads/](https://visualstudio.microsoft.com/downloads/) (currently this is listed under Other Tools and Frameworks, and provides support for Visual Studio 2015 and 2017 as well.) Install the x64 flavor, and observe the prerequisites noted for that package. Installing this package from Microsoft ensures that this runtime is updated by the Windows Update service for security vulnerabilities within the Universal C Runtime itself.
+Users must obtain and install the "Microsoft Visual C++ Redistributable for Visual Studio 2022", x64 edition; from [https://visualstudio.microsoft.com/downloads/](https://visualstudio.microsoft.com/downloads/) (currently this is listed under Other Tools and Frameworks, and provides support for Visual Studio 2015, 2017 and 2019 as well.) Install the x64 flavor, and observe the prerequisites noted for that package. Installing this package from Microsoft ensures that this runtime is updated by the Windows Update service for security vulnerabilities within the Universal C Runtime itself.
 
-Note that Pivotal convenience packages prior to httpd 2.4.41 were built with Visual Studio 2017. This may cause issues for users who have compiled third-party modules. Users are advised to rebuild any such modules before combining them with these newer packages.
+Note that Pivotal convenience packages prior to httpd 2.4.53 were built with Visual Studio 2017 or 2019. This may cause issues for users who have compiled third-party modules. Users are advised to rebuild any such modules before combining them with these newer packages.
 
 This package relies upon Windows PowerShell to execute the httpd control scripts on Windows computers. All supported Windows versions have PowerShell installed by default, but specific installations of Windows may not. To check whether your version of Windows has PowerShell installed, go to Start > All Programs > Accessories and check for **Windows PowerShell** in the list.
 
