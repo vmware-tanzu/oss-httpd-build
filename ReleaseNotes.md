@@ -71,7 +71,7 @@ In cases where the project does not maintain a reference to specific CVE's in an
 
 The RHEL 7 package requires several commonly installed packages to be available, these may be provisioned with the following command;
 ```
-$ yum install libuuid expat jansson libxml2 lua pcre2 zlib
+$ yum install expat jansson libuuid libxml2 lua pcre2 zlib
 ```
 In order to use the provided apxs utility, additional packages are required as indicated at the [https://github.com/appsuite/oss-httpd-build](https://github.com/appsuite/oss-httpd-build) README page.
 
@@ -79,13 +79,15 @@ In order to use the provided apxs utility, additional packages are required as i
 
 The RHEL 7 package is compatible with RHEL 8 and Fedora 30+, and requires some less commonly installed packages to be available. These may all be provisioned with the following command;
 
-$ dnf install libuuid expat jansson libxcrypt-compat libxml2 lua pcre2 zlib
+$ dnf install expat jansson libuuid libxcrypt libxml2 lua pcre2 zlib
+
+On some later flavors of linux, libxcrypt may go by the package designation libxcrypt-compat instead.
 
 ## **Ubuntu 18.04 and 20.04 Users**
 
 The Ubuntu 18.04 package (compatible with 20.04) requires several commonly installed packages to be available, these may be provisioned with the following command;
 ```
-$ apt-get install libexpat1 libjansson4 libpcre2-8-0 libxml2 libuuid1 liblua5.3-0 zlib1g
+$ apt-get install libexpat1 libjansson4 liblua5.3-0 libpcre2-8-0 libuuid1 libxml2 zlib1g
 ```
 In order to use the provided apxs utility, additional packages are required as indicated at the [https://github.com/appsuite/oss-httpd-build](https://github.com/appsuite/oss-httpd-build) README page.
 
