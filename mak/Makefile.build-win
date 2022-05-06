@@ -70,7 +70,8 @@ build-expat: $(expat_srcdir)/Makefile
 	  $(MAKE) && \
 	  $(MAKE) install && \
 	cd ..
-	-copy /y "$(expat_srcdir)\CMakeFiles\expat.dir\expat.pdb" "$(DESTDIR)\lib"
+	-copy /y "$(expat_srcdir)\xmlwf\xmlwf.pdb" "$(DESTDIR)\bin"
+	-copy /y "$(expat_srcdir)\libexpat.pdb" "$(DESTDIR)\bin"
 !ENDIF
 
 
@@ -278,9 +279,9 @@ $(pcre_srcdir)/Makefile:  $(SRCDIR)/$(pcre_srcdir)/CMakeLists.txt
 	cd $(pcre_srcdir) && \
 	  cmake $(CMAKE_DEFAULTS) \
 		-D BUILD_SHARED_LIBS=ON -D CMAKE_INSTALL_PREFIX=$(DESTDIR) \
+		-D INSTALL_MSVC_PDB=ON \
 		$(SRCDIR)/$(pcre_srcdir) && \
 	cd ..
-#-D BUILD_tests=OFF
 
 build-pcre: $(pcre_srcdir)/Makefile
 	cd $(pcre_srcdir) && \
@@ -376,6 +377,10 @@ $(libxml2_srcdir)/Makefile: $(SRCDIR)/$(libxml2_srcdir)/CMakeLists.txt
 	  cmake $(CMAKE_DEFAULTS) \
 		-D CMAKE_INSTALL_PREFIX=$(DESTDIR) \
 		-D LIBXML2_WITH_PROGRAMS=OFF \
+		-D LIBXML2_WITH_ICONV=OFF \
+		-D LIBXML2_WITH_LZMA=OFF \
+		-D LIBXML2_WITH_ZLIB=OFF \
+		-D LIBXML2_WITH_PYTHON=OFF \
 		$(SRCDIR)/$(libxml2_srcdir) && \
 	cd ..
 
