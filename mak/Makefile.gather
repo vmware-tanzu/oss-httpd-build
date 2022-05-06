@@ -388,8 +388,8 @@ gather-pcre-release: pre-manifest
 	echo pcre_ver=$$pcre_ver >>$(BLD)-manifest-vars
 
 gather-pcre2-release: pre-manifest
-	pcre_srcpath=https://github.com/PhilipHazel/pcre2/releases && \
-	pcre_srcpath=$$pcre_srcpath/`wget -q -O - $$pcre_srcpath | sed -n 's#^.*<a.* href=".*/PhilipHazel/pcre2/releases/\(download/pcre2-[^"/]*/pcre2[^"]*\.tar\.bz2\)".*$$#\1#;t once;$$!b;:once;p;q;'` && \
+	pcre_srcpath=https://github.com/PCRE2Project/pcre2/releases && \
+	pcre_srcpath=$$pcre_srcpath/`wget -q -O - $$pcre_srcpath | sed -n 's#^.*<a.* href=".*/PCRE2Project/pcre2/releases/\(download/pcre2-[^"/]*/pcre2[^"]*\.tar\.bz2\)".*$$#\1#;t once;$$!b;:once;p;q;'` && \
 	pcre_pkg=`echo $$pcre_srcpath | sed "s#.*/\([^/]*\)#\1#;"` && \
 	pcre_ver=`echo $$pcre_pkg | sed "s#pcre2-\(.*\)\.tar\.bz2#\1#;"` && \
 	pcre_srcdir=`echo $$pcre_pkg | sed "s#\(.*\)\.tar\.bz2#\1#;"` && \
@@ -399,7 +399,7 @@ gather-pcre2-release: pre-manifest
 	echo pcre_ver=$$pcre_ver >>$(BLD)-manifest-vars
 
 gather-pcre2-master: pre-manifest
-	pcre_srcpath=https://github.com/PhilipHazel/pcre2 && \
+	pcre_srcpath=https://github.com/PCRE2Project/pcre2 && \
 	pcre_ver=master && \
 	if test -d pcre2-git; then ( cd pcre2-git; git fetch --all ); else ( git clone $$pcre_srcpath --bare pcre2-git ); fi && \
 	pcre_rev=`cd pcre2-git; git show -b $$pcre_ver --format="format:%h" --name-only | awk "//{print $$1; exit;}"` && \
