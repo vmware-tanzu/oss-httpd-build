@@ -1,5 +1,5 @@
 
-# Tanzu os-httpd-build Governance
+# Tanzu oss-httpd-build Governance
 
 This document defines the project governance for Tanzu oss-httpd-build, an open source schema to build and manage instances of Apache HTTP Server by VMware.
 
