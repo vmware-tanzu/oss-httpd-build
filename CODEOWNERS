@@ -1,0 +1,12 @@
+# This file details the various owners of the oss-httpd-build repository for
+# VMware OSS Build and Instance Management Schema for Apache HTTP Server and
+# the corresponding directories
+
+# Repository Ownership
+
+## Ownership of the entire oss-httpd-build repository
+*                          @vmware-tanzu/oss-httpd-build-maintainers
+
+## Ownership of release engineering efforts (an example)
+#/test/                       @vmware-tanzu/oss-httpd-build-releng
+
