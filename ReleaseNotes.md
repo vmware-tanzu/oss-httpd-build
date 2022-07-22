@@ -16,13 +16,13 @@ These release notes cover the following topics:
 
 ## **Package Description**
 
-This package consists of Apache HTTP Server (httpd), along with a number of frequently updated library components (dependencies) required by httpd or one of its optional modules. This package is assembled with VMware's [https://github.com/appsuite/oss-httpd-build](https://github.com/appsuite/oss-httpd-build) OSS Build and Server Instance Schema for Apache HTTP Server.
+This package consists of Apache HTTP Server (httpd), along with a number of frequently updated library components (dependencies) required by httpd or one of its optional modules. This package is assembled with VMware's [https://github.com/vmware-tanzu/oss-httpd-build](https://github.com/vmware-tanzu/oss-httpd-build) OSS Build and Server Instance Schema for Apache HTTP Server.
 
 This package is structured to allow parallel installation of multiple releases of Apache HTTP Server and related components. It contains one directory tree, labeled as httpd-{version}-{date tag} which represents the version of httpd and the effective date of all components bundled in the package.
 
 Unlike many httpd distributions, the end user instance configuration, server content, and logs and are not modified in this program distribution tree. See the section on Instance Creation for details of creating a server instance with these user maintained files.
 
-In order to build httpd from scratch, see additional details at VMware's [https://github.com/appsuite/oss-httpd-build](github oss-httpd-build) project. A tarball of unix sources and zipfile of windows sources is provided alongside the binary release downloads for ready reference.
+In order to build httpd from scratch, see additional details at VMware's [https://github.com/vmware-tanzu/oss-httpd-build](github oss-httpd-build) project. A tarball of unix sources and zipfile of windows sources is provided alongside the binary release downloads for ready reference.
 
 Versions prior to 2.4.53 used the OpenSSL and PCRE-8.x legacy versions. As of httpd 2.4.53, OpenSSL release 3.0 and PCRE2 release 10.x are used instead. If modules were also compiled to consume OpenSSL or PCRE2 themselves, they must be rebuilt.
 
@@ -73,7 +73,7 @@ The RHEL 7 package requires several commonly installed packages to be available,
 ```
 $ yum install expat jansson libuuid libxml2 lua pcre2 zlib
 ```
-In order to use the provided apxs utility, additional packages are required as indicated at the [https://github.com/appsuite/oss-httpd-build](https://github.com/appsuite/oss-httpd-build) README page.
+In order to use the provided apxs utility, additional packages are required as indicated at the [https://github.com/vmware-tanzu/oss-httpd-build](https://github.com/vmware-tanzu/oss-httpd-build) README page.
 
 ## **RHEL 8 Users**
 
@@ -89,7 +89,7 @@ The Ubuntu 18.04 package (compatible with 20.04) requires several commonly insta
 ```
 $ apt-get install libexpat1 libjansson4 liblua5.3-0 libpcre2-8-0 libuuid1 libxml2 zlib1g
 ```
-In order to use the provided apxs utility, additional packages are required as indicated at the [https://github.com/appsuite/oss-httpd-build](https://github.com/appsuite/oss-httpd-build) README page.
+In order to use the provided apxs utility, additional packages are required as indicated at the [https://github.com/vmware-tanzu/oss-httpd-build](https://github.com/vmware-tanzu/oss-httpd-build) README page.
 
 ## **Microsoft Windows Users**
 
