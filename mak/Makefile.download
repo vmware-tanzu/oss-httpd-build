@@ -126,7 +126,7 @@ $(nghttp2_srcdir):
 ifdef nghttp2_pkg
 	  if test ! -d pkgs; then mkdir pkgs; fi
 	  cd pkgs && \
-	  wget -nv $(nghttp2_srcpath)/$(nghttp2_pkg) && \
+	  wget -nv $(nghttp2_srcpath) && \
 	  cd .. && \
 	  tar -xjf pkgs/$(nghttp2_pkg)
 else
@@ -183,8 +183,9 @@ ifdef expat_pkg
 	  if test ! -d pkgs; then mkdir pkgs; fi
 	  cd pkgs && \
 	  wget -nv $(expat_srcpath) -O $(expat_pkg) && \
+	  wget -nv $(expat_srcpath).asc -O $(expat_pkg).asc && \
 	  cd .. && \
-	  tar -xzf pkgs/$(expat_pkg)
+	  tar -xjf pkgs/$(expat_pkg)
 else
 	  git clone -q $(expat_srcpath).git -n -b $(expat_ver) $(expat_srcdir) && \
 	  cd $(expat_srcdir) && git checkout -q $(expat_rev) && cd ..
@@ -210,8 +211,9 @@ ifdef jansson_pkg
 	  if test ! -d pkgs; then mkdir pkgs; fi
 	  cd pkgs && \
 	  wget -nv $(jansson_srcpath) -O $(jansson_pkg) && \
+	  wget -nv $(jansson_srcpath).asc -O $(jansson_pkg).asc && \
 	  cd .. && \
-	  tar -xzf pkgs/$(jansson_pkg)
+	  tar -xjf pkgs/$(jansson_pkg)
 else
 	  git clone -q $(jansson_srcpath).git -n -b $(jansson_ver) $(jansson_srcdir) && \
 	  cd $(jansson_srcdir) && git checkout -q $(jansson_rev) && cd ..
@@ -226,7 +228,7 @@ ifdef libxml2_pkg
 	  cd .. && \
 	  tar -xjf pkgs/$(libxml2_pkg)
 else
-	  git clone -q $(libxml2_srcpath).git -n -b $(libxml2_ver) $(libxml2_srcdir) && \
+	  git clone -q $(libxml2_srcpath) -n -b $(libxml2_ver) $(libxml2_srcdir) && \
 	  cd $(libxml2_srcdir) && git checkout -q $(libxml2_rev) && cd ..
 endif
 
