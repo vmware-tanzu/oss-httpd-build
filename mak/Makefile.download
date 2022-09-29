@@ -187,8 +187,10 @@ ifdef expat_pkg
 	  cd .. && \
 	  tar -xjf pkgs/$(expat_pkg)
 else
-	  git clone -q $(expat_srcpath).git -n -b $(expat_ver) $(expat_srcdir) && \
-	  cd $(expat_srcdir) && git checkout -q $(expat_rev) && cd ..
+	  git clone -q $(expat_srcpath).git -n -b $(expat_ver) $(expat_srcdir)-tmp && \
+	  cd $(expat_srcdir)-tmp && git checkout -q $(expat_rev) -- expat && cd .. && \
+	  mv $(expat_srcdir)-tmp/expat $(expat_srcdir) && \
+	  rm -rf $(expat_srcdir)-tmp
 endif
 
 

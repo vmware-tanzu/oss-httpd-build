@@ -57,12 +57,12 @@ with_expat=
 build-expat:
 !ELSE
 with_expat=--with-expat=$(DESTDIR)
-$(expat_srcdir)/Makefile:  $(SRCDIR)/$(expat_srcdir)/expat/CMakeLists.txt
+$(expat_srcdir)/Makefile:  $(SRCDIR)/$(expat_srcdir)/CMakeLists.txt
 	-mkdir $(expat_srcdir) 2>NUL
 	cd $(expat_srcdir) && \
 	  cmake $(CMAKE_DEFAULTS) -D BUILD_tests=OFF -D BUILD_tools=OFF \
 		-D BUILD_shared=OFF -D CMAKE_INSTALL_PREFIX=$(DESTDIR) \
-		$(SRCDIR)/$(expat_srcdir)/expat && \
+		$(SRCDIR)/$(expat_srcdir) && \
 	cd ..
 
 build-expat: $(expat_srcdir)/Makefile

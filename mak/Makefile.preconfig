@@ -166,14 +166,14 @@ endif
 ifndef expat_srcdir
 preconfig-expat: pre-preconfig
 else
-$(expat_srcdir)/expat/configure: $(expat_srcdir)/expat/configure.ac \
-				 $(expat_srcdir)/expat/Makefile.am
-	-mkdir $(expat_srcdir)/expat/m4 2>/dev/null
-	cd $(expat_srcdir)/expat && \
+$(expat_srcdir)/configure: $(expat_srcdir)/configure.ac \
+				 $(expat_srcdir)/Makefile.am
+	-mkdir $(expat_srcdir)/m4 2>/dev/null
+	cd $(expat_srcdir) && \
 	  ./buildconf.sh && \
-	cd ../..
+	cd ..
 
-preconfig-expat: pre-preconfig $(expat_srcdir)/expat/configure
+preconfig-expat: pre-preconfig $(expat_srcdir)/configure
 endif
 
 
