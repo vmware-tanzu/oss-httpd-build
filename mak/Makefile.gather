@@ -137,9 +137,9 @@ gather-apr-rc: pre-manifest
 	echo apr_ver=$$apr_ver >>$(BLD)-manifest-vars
 
 gather-apr-1xbranch: pre-manifest
-	apr_srcpath=https://svn.apache.org/repos/asf/apr/apr/branches/1.7.x && \
+	apr_srcpath=https://svn.apache.org/repos/asf/apr/apr/branches/1.8.x && \
 	apr_rev=`svn info $$apr_srcpath | sed -n '/Last Changed Rev: \([0-9]\+\)/{s#.*: ##;p}'` && \
-	apr_ver=1.7.x-$$apr_rev && \
+	apr_ver=1.8.x-$$apr_rev && \
 	apr_srcdir=apr-$$apr_ver && \
 	apr_major=`echo $$apr_ver | sed 's#\([0-9]*\)\..*#\1#;'` && \
 	echo apr_major=$$apr_major >>$(BLD)-manifest-vars && \
@@ -448,7 +448,6 @@ gather-libxml2-release: pre-manifest
 	echo libxml2_ver=$$libxml2_ver >>$(BLD)-manifest-vars
 
 gather-libxml2-master: pre-manifest
-	
 	libxml2_srcpath=https://gitlab.gnome.org/GNOME/libxml2.git && \
 	libxml2_ver=master && \
 	if test -d libxml2-git; then ( cd libxml2-git; git fetch --all ); else ( git clone $$libxml2_srcpath --bare libxml2-git ); fi && \
