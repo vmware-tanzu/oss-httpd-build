@@ -437,11 +437,12 @@ gather-jansson-master: pre-manifest
 
 
 gather-libxml2-release: pre-manifest
-	libxml2_srcpath=https://gitlab.gnome.org/GNOME/libxml2/- && \
-	libxml2_srcpath=$$libxml2_srcpath/`wget -q -O - $$libxml2_srcpath/tags | sed -n 's#.*<a .* href=".*/GNOME/libxml2/-/\(archive/v[^"/]*/libxml2-v[^"/>]*\.tar\.bz2\)">.*#\1#;t once;$$!b;:once;p;q;'` && \
-	libxml2_pkg=`echo $$libxml2_srcpath | sed "s#.*/\([^/]*\)#\1#;"` && \
-	libxml2_ver=`echo $$libxml2_pkg | sed "s#libxml2-v\(.*\)\.tar\.bz2#\1#;"` && \
-	libxml2_srcdir=`echo $$libxml2_pkg | sed "s#\(.*\)\.tar\.bz2#\1#;"` && \
+	libxml2_srcpath=https://download.gnome.org/sources/libxml2 && \
+	libxml2_srcpath=$$libxml2_srcpath/`wget -q -O - "$$libxml2_srcpath/?C=M&O=D" | sed -n '/<a href="2\.[0-9]/{s#.*<a href="\(2\.[0-9]*\)/.*#\1#p;q}'` && \
+	libxml2_pkg=`wget -q -O - "$$libxml2_srcpath/?C=M&O=D"  | sed -n '/<a href="libxml2-2\.[0-9]*\.[0-9]*\.tar\.xz"/{s#.*<a href="\([^"]*\)".*#\1#p;q}'` && \
+	libxml2_srcdir=`echo $$libxml2_pkg | sed 's#\(libxml2-.*\)\.tar\.xz#\1#;'` && \
+	libxml2_ver=`echo $$libxml2_srcdir | sed 's#libxml2-\(.*\)#\1#;'` && \
+	libxml2_srcpath=$$libxml2_srcpath/$$libxml2_pkg && \
 	echo libxml2_pkg=$$libxml2_pkg >>$(BLD)-manifest-vars && \
 	echo libxml2_srcdir=$$libxml2_srcdir >>$(BLD)-manifest-vars && \
 	echo libxml2_srcpath=$$libxml2_srcpath >>$(BLD)-manifest-vars && \
