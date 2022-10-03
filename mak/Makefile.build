@@ -457,7 +457,7 @@ $(curl_srcdir)/Makefile: build-openssl build-zlib build-brotli build-nghttp2 \
 		 $(with_ssl) \
 		 $(with_zlib) \
 		 $(with_nghttp2) \
-		 --without-brotli \
+		 $(with_brotli) \
 		 --without-gnutls \
 		 --without-polarssl \
 		 --without-mbedtls \
