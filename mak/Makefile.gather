@@ -510,11 +510,13 @@ gather-complete-release: gather-core-release \
 	mv $(BLD)-manifest-vars $(BLD)-manifest-vars.sav
 	LC_COLLATE=C sort < $(BLD)-manifest-vars.sav > $(BLD)-manifest-vars
 	rm $(BLD)-manifest-vars.sav
+	! grep -E "=$$" $(BLD)-manifest-vars
 
 gather-linux-release: gather-core-release
 	mv $(BLD)-manifest-vars $(BLD)-manifest-vars.sav
 	LC_COLLATE=C sort < $(BLD)-manifest-vars.sav > $(BLD)-manifest-vars
 	rm $(BLD)-manifest-vars.sav
+	! grep -E "=$$" $(BLD)-manifest-vars
 
 
 gather-core-candidate: gather-apr-rc gather-aprutil-rc \
@@ -526,6 +528,7 @@ gather-linux-candidate: gather-core-candidate
 	mv $(BLD)-manifest-vars $(BLD)-manifest-vars.sav
 	LC_COLLATE=C sort < $(BLD)-manifest-vars.sav > $(BLD)-manifest-vars
 	rm $(BLD)-manifest-vars.sav
+	! grep -E "=$$" $(BLD)-manifest-vars
 
 gather-complete-candidate: gather-core-candidate \
 		      gather-expat-release gather-pcre2-release \
@@ -535,6 +538,7 @@ gather-complete-candidate: gather-core-candidate \
 	mv $(BLD)-manifest-vars $(BLD)-manifest-vars.sav
 	LC_COLLATE=C sort < $(BLD)-manifest-vars.sav > $(BLD)-manifest-vars
 	rm $(BLD)-manifest-vars.sav
+	! grep -E "=$$" $(BLD)-manifest-vars
 
 
 gather-core-snapshot: gather-apr-1xbranch gather-aprutil-1xbranch \
@@ -550,11 +554,13 @@ gather-complete-snapshot: gather-core-snapshot \
 	mv $(BLD)-manifest-vars $(BLD)-manifest-vars.sav
 	LC_COLLATE=C sort < $(BLD)-manifest-vars.sav > $(BLD)-manifest-vars
 	rm $(BLD)-manifest-vars.sav
+	! grep -E "=$$" $(BLD)-manifest-vars
 
 gather-linux-snapshot: gather-core-snapshot
 	mv $(BLD)-manifest-vars $(BLD)-manifest-vars.sav
 	LC_COLLATE=C sort < $(BLD)-manifest-vars.sav > $(BLD)-manifest-vars
 	rm $(BLD)-manifest-vars.sav
+	! grep -E "=$$" $(BLD)-manifest-vars
 
 
 gather-core-bleed:    gather-apr-trunk gather-pcre2-master \
@@ -569,11 +575,13 @@ gather-complete-bleed: gather-core-bleed \
 	mv $(BLD)-manifest-vars $(BLD)-manifest-vars.sav
 	LC_COLLATE=C sort < $(BLD)-manifest-vars.sav > $(BLD)-manifest-vars
 	rm $(BLD)-manifest-vars.sav
+	! grep -E "=$$" $(BLD)-manifest-vars
 
 gather-linux-bleed:   gather-core-bleed
 	mv $(BLD)-manifest-vars $(BLD)-manifest-vars.sav
 	LC_COLLATE=C sort < $(BLD)-manifest-vars.sav > $(BLD)-manifest-vars
 	rm $(BLD)-manifest-vars.sav
+	! grep -E "=$$" $(BLD)-manifest-vars
 
 ifeq "$(BLD)" "release"
 tcnative: gather-tcnative-release
