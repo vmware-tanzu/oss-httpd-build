@@ -49,7 +49,7 @@ gather-httpdtest-trunk: pre-manifest
 
 
 gather-httpd-release: pre-manifest
-	httpd_srcpath=https://www.apache.org/dist/httpd && \
+	httpd_srcpath=https://downloads.apache.org/httpd && \
 	httpd_pkg=`wget -q -O - $$httpd_srcpath/ | sed -n '/<a href="\(httpd-2\.4\.[0-9]*\.tar\.bz2\)"/{s#.*href="\([^"]*\).*#\1#;h};$$!b;g;p'` && \
 	httpd_ver=`echo $$httpd_pkg | sed 's#httpd-\(.*\)\.tar\.bz2#\1#;'` && \
 	httpd_srcdir=httpd-$$httpd_ver && \
@@ -90,7 +90,7 @@ gather-httpd-trunk: pre-manifest
 
 
 gather-tcnative-release: pre-manifest
-	tcnative_srcpath=https://www.apache.org/dist/tomcat/tomcat-connectors/native && \
+	tcnative_srcpath=https://downloads.apache.org/tomcat/tomcat-connectors/native && \
 	tcnative_ver=`wget -q -O - $$tcnative_srcpath/ | sed -n '/<a href="\(1\.2\.[0-9]*\/\)"/{s#.*href="\([^"/]*\)\/.*#\1#;h};$$!b;g;p'` && \
 	tcnative_srcpath=$$tcnative_srcpath/$$tcnative_ver/source && \
 	tcnative_srcdir=tomcat-native-$$tcnative_ver-src && \
@@ -113,7 +113,7 @@ gather-tcnative-trunk: pre-manifest
 
 
 gather-apr-release: pre-manifest
-	apr_srcpath=https://www.apache.org/dist/apr && \
+	apr_srcpath=https://downloads.apache.org/apr && \
 	apr_pkg=`wget -q -O - $$apr_srcpath/ | sed -n '/<a href="\(apr-1\.[0-9]\.[0-9]*\.tar\.bz2\)"/{s#.*href="\([^"]*\).*#\1#;h};$$!b;g;p'` && \
 	apr_ver=`echo $$apr_pkg | sed 's#apr-\(.*\)\.tar\.bz2#\1#;'` && \
 	apr_srcdir=apr-$$apr_ver && \
@@ -162,7 +162,7 @@ gather-apr-trunk: pre-manifest
 
 
 gather-apriconv-release: pre-manifest
-	apriconv_srcpath=https://www.apache.org/dist/apr && \
+	apriconv_srcpath=https://downloads.apache.org/apr && \
 	apriconv_pkg=`wget -q -O - $$apriconv_srcpath/ | sed -n '/<a href="\(apr-iconv-1\.[0-9]\.[0-9]*\.tar\.bz2\)"/{s#.*href="\([^"]*\).*#\1#;h};$$!b;g;p'` && \
 	apriconv_ver=`echo $$apriconv_pkg | sed 's#apr-iconv-\(.*\)\.tar\.bz2#\1#;'` && \
 	echo apriconv_pkg=$$apriconv_pkg >>$(BLD)-manifest-vars && \
@@ -191,7 +191,7 @@ gather-apriconv-1xbranch: pre-manifest
 
 
 gather-aprutil-release: pre-manifest
-	aprutil_srcpath=https://www.apache.org/dist/apr && \
+	aprutil_srcpath=https://downloads.apache.org/apr && \
 	aprutil_pkg=`wget -q -O - $$aprutil_srcpath/ | sed -n '/<a href="\(apr-util-1\.[0-9]\.[0-9]*\.tar\.bz2\)"/{s#.*href="\([^"]*\).*#\1#;h};$$!b;g;p'` && \
 	aprutil_ver=`echo $$aprutil_pkg | sed 's#apr-util-\(.*\)\.tar\.bz2#\1#;'` && \
 	echo aprutil_pkg=$$aprutil_pkg >>$(BLD)-manifest-vars && \
