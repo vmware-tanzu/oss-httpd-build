@@ -332,11 +332,13 @@ with_lua=
 build-lua:
 
 
+# with-pcre= changes may be temporary until path-only detection is reliable
+# but uses the srcdir since the pkg name applies only to releases
 ifndef pcre_srcdir
 with_pcre=
 build-pcre:
 else ifeq "$(PREFER_CMAKE)" "1"
-with_pcre=--with-pcre=$(DESTDIR)
+with_pcre=--with-pcre=$(DESTDIR)/bin/$(firstword $(subst -, ,$(pcre_srcdir)))-config
 $(pcre_srcdir)/Makefile:  $(SRCDIR)/$(pcre_srcdir)/CMakeLists.txt
 	-mkdir $(pcre_srcdir) 2>/dev/null
 	cd $(pcre_srcdir) && \
@@ -351,7 +353,7 @@ build-pcre: $(pcre_srcdir)/Makefile
 	  $(MAKE) install && \
 	cd ..
 else
-with_pcre=--with-pcre=$(DESTDIR)
+with_pcre=--with-pcre=$(DESTDIR)/bin/$(firstword $(subst -, ,$(pcre_srcdir)))-config
 $(pcre_srcdir)/Makefile: $(SRCDIR)/$(pcre_srcdir)/configure
 	-mkdir $(pcre_srcdir) 2>/dev/null
 	cd $(pcre_srcdir) && \
